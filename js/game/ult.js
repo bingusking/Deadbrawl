@@ -7,7 +7,7 @@ const ULTS={rift:{name:'PHANTOM RUSH'}}; // fighters without an entry show ULT a
 /* ---- Rift: PHANTOM RUSH ----
    Lunge grab (unblockable, dodgeable). On a hit: punch them up, blink to the other side, punch again,
    rising in a zig-zag (N hits), then blink above them and slam them into the floor. */
-const RU={N:5,L:13,DMG:28,SLAM:70,RISE:0.72,SWAY:0.8};
+const RU={N:5,L:13,DMG:28,SLAM:70,RISE:0.72,SWAY:1.6} // SWAY: how far each punch knocks them sideways (zig-zag width);
 MOVES.rult={base:'stance',startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[0,0.75],y:[0,2.0],grab:1,shake:0.15,
   react:(a,d)=>riftUltStart(a,d)};
 
@@ -18,7 +18,7 @@ function tryUlt(f){
   cutin(f);G.freeze=40;sfx.super();return true;}
 
 function riftUltStart(a,d){
-  a.state='rult';a.move=null;a.ut=0;a.ux0=clamp(d.x,-STAGE+1.3,STAGE-1.3);a.uy0=Math.max(d.y,0.35);a.udir=a.facing;
+  a.state='rult';a.move=null;a.ut=0;a.ux0=clamp(d.x,-STAGE+RU.SWAY+0.9,STAGE-RU.SWAY-0.9);a.uy0=Math.max(d.y,0.35);a.udir=a.facing;
   d.state='ultd';d.vx=d.vy=0;d.x=a.ux0;d.y=a.uy0;a.pass=d.pass=true;}
 
 // where the victim is before hit i (i=0 is where they were grabbed); odd hits push one way, even the other
