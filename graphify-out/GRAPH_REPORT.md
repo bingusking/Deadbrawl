@@ -1,7 +1,7 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 24 files · ~7,643 words
+- 24 files · ~7,687 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `7eac4c77`
+- Built from commit: `4f3a1824`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,14 +38,14 @@
 ## God Nodes (most connected - your core abstractions)
 1. `runMove()` - 11 edges
 2. `act()` - 11 edges
-3. `stepFighter()` - 9 edges
-4. `buildRig()` - 9 edges
+3. `buildRig()` - 9 edges
+4. `stepFighter()` - 9 edges
 5. `services` - 8 edges
 6. `goOnline()` - 7 edges
 7. `cvShow()` - 6 edges
 8. `netLost()` - 6 edges
-9. `startMove()` - 5 edges
-10. `tryAbility()` - 5 edges
+9. `riftUltTick()` - 5 edges
+10. `phaseLogic()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
@@ -134,11 +134,11 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
-- **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
+- **Why does `afterimage()` connect `fighters.js` to `online.js`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `game.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
-- **Why does `shotgunFx()` connect `fighters.js` to `online.js`?**
+- **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._

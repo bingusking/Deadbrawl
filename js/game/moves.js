@@ -117,11 +117,13 @@ function riftFrame(f){
     case 'jump':return jf();
     case 'land':return G.time-(f.throwBackT||-99)<18?['rift_throwb',0]:G.time-(f.throwFwdT||-99)<18?['rift_throwf',0]:G.time-(f.slamT||-99)<18?['rift_slamd',0]:G.time-(f.upT||-99)<18?['rift_throwu',0]:[J,7];
     case 'wakeup':return [J,1];
-    case 'dodge':return [R,3];
+    case 'dodge':return f.dodgeDir===f.facing?[R,3]:['rift_dodgeb',Math.min(3,Math.floor(f.mt/6))];
+    case 'victory':return ['rift_win',Math.min(4,Math.floor(st/12))];
     case 'charge':return [H,f.charge<TAP?0:0];
     case 'ghold':return ['rift_grab',2];
     case 'hold':return ['rift_grab',2];
-    case 'parry':case 'guard':case 'block':return [H,0];
+    case 'parry':return [H,0];
+    case 'guard':case 'block':return ['rift_block',f.state==='block'?1:0];
     case 'rult':return riftUltFrame(f);
     case 'hitstun':case 'stun':case 'ultd':return ['rift_hit',0];
     case 'airhit':return ['rift_hit',0,'tumble'];

@@ -22,7 +22,7 @@ function makeSpriteMesh(order){
 function spriteFrame(f){
   const t=G.time,st=f.st||0;
   switch(f.state){
-    case 'intro':case 'idle':return ['idle',Math.floor(t/5+f.idx*3)%SPR.idle.length];
+    case 'intro':case 'idle':return ['idle',Math.floor(t/7+f.idx*3)%SPR.idle.length];
     case 'victory':return ['vish_win',Math.min(4,Math.floor(st/12))]; // plays once, holds the last pose
     case 'walkf':return ['run',Math.floor(st/5)%SPR.run.length];
     case 'walkb':return ['runb',Math.floor(st/10)%SPR.runb.length];
@@ -53,8 +53,8 @@ function spriteFrame(f){
         case 'knife':return ['knife',k<4?1:k<=s?2:k<=s+4?3:k<=s+9?4:5];
         case 'dash':return ['dash',k<=2?0:k<=s?1:k<=s+a?2+Math.min(2,Math.floor((k-s-1)/5)):5];
         case 'shotgun':return ['shotgun',k<4?0:k<s?1:k<=s+a+5?2:3];
-        case 'slam':return k<=s?['heavy',3]:f.airMove&&k<=s+a?['kick',2]:['heavy',5];
-        case 'kick':return ['kick',k<4?0:k<=s?1:k<=s+a?(f.airMove?2:3):4];
+        case 'slam':return k<=s?['heavy',3]:f.airMove&&k<=s+a?['kick',3]:['heavy',5];
+        case 'kick':return ['kick',k<4?1:k<=s?2:k<=s+a?3:4]; // rise, chamber, axe kick, recover
       }}
   }
   return ['idle',0];
