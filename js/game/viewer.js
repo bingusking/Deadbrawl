@@ -24,7 +24,7 @@ function viewerTick(){
 // play style, summary and stat bars (1-5) per fighter
 const CVMETA={
   vish:{splash:'assets/splash_vish.webp',bg:'assets/bg_vish.webp',tag:'ALL-ROUNDER · ZONER',bio:'Keeps you at range with knives and a shotgun, then dashes through to start a combo. Strong at every distance.',st:{POWER:3,SPEED:4,RANGE:5,DIFFICULTY:2}},
-  rift:{tag:'MIX-UPS · GRAPPLER',bio:'Teleports behind you and grabs through your guard. Hard to read, punishing up close, weak if you keep him guessing wrong.',st:{POWER:4,SPEED:3,RANGE:3,DIFFICULTY:4}},
+  rift:{splash:'assets/splash_rift.webp',bg:'assets/bg_rift.webp',splashPos:'55% bottom',tag:'MIX-UPS · GRAPPLER',bio:'Teleports behind you and grabs straight through your guard. Hard to read and deadly up close, but every blink leaves an opening.',st:{POWER:4,SPEED:3,RANGE:3,DIFFICULTY:4}},
   jacob:{splash:'assets/splash_jacob.webp',bg:'assets/bg_jacob.webp',splashPos:'60% bottom',tag:'POWERHOUSE · HOOK',bio:'Drags you in with the grapple hook and flattens you with slams. Slow on foot, huge damage once he connects.',st:{POWER:5,SPEED:2,RANGE:3,DIFFICULTY:3}},
 };
 const CVDATA={};
