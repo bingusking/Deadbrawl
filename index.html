@@ -24,9 +24,11 @@ button{font-family:inherit}
 .cvname{position:absolute;left:3vw;top:20vh;font-family:'Permanent Marker',cursive;font-size:clamp(90px,13vw,230px);line-height:.85;color:#d8232f;opacity:.16;transform:rotate(-6deg);white-space:nowrap;pointer-events:none}
 .cvfloor{position:absolute;left:8vw;width:30vw;bottom:9vh;height:4vh;border-radius:50%;background:radial-gradient(#000d,#0000 70%)}
 /* splash art (when a fighter has one) replaces the in-game sprite */
-#cvsplash{position:absolute;left:1vw;bottom:14vh;width:44vw;max-height:70vh;object-fit:contain;object-position:left bottom;display:none;filter:drop-shadow(0 1.5vh 1.2vh #000);animation:cvFloat 4s ease-in-out infinite}
+/* splash stands on the backdrop's floor: sized/placed in JS (cvPlace), lit with the scene colour, with a contact shadow under the feet */
+#cvsplash{position:absolute;display:none;transform-origin:50% 100%;filter:drop-shadow(0 0 .22vw var(--rim,#ff3b2f)) brightness(.96);animation:cvBreath 3.6s ease-in-out infinite}
+#viewer.hasSplash .cvfloor{height:5.5vh;background:radial-gradient(closest-side,#000e,#000a 45%,#0000)}
 #viewer.hasSplash #cvsplash{display:block}#viewer.hasSplash #cvimg{display:none}
-@keyframes cvFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-.8vh)}}
+@keyframes cvBreath{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.008)}}
 #cvimg{position:absolute;bottom:10vh;transform-origin:50% 100%;filter:drop-shadow(0 0 .3vw #ff3b2f) drop-shadow(0 1.5vh 1vh #000)}
 .cvpanel{position:absolute;right:3.5vw;top:50%;transform:translateY(-50%);width:min(820px,50vw);z-index:2}
 .cvtitle span{display:block;font-family:'Permanent Marker',cursive;font-size:clamp(48px,5.6vw,96px);line-height:.9;transform:rotate(-3deg);transform-origin:left;text-shadow:5px 5px 0 #000}
@@ -45,9 +47,11 @@ button{font-family:inherit}
 .cvkit{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
 .cvkit div{background:rgba(14,9,13,.8);padding:5px 8px 3px;font-size:clamp(13px,.95vw,16px);color:#c9bfc3;letter-spacing:.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .cvkit b{color:#ffcc33;margin-right:6px}
+#viewer .back{left:auto;right:3.5vw;bottom:3.5vh}
+#viewer .back .mbtn{font-size:clamp(24px,2.4vw,38px)}
 .cvhint{position:absolute;left:50%;transform:translateX(-50%);bottom:4.5vh;color:#7b6f76;font-size:16px;letter-spacing:2px;white-space:nowrap}
 #viewer.swap #cvimg,#viewer.swap .cvname{animation:cvIn .35s ease-out}
-#viewer.swap #cvsplash{animation:cvIn .35s ease-out,cvFloat 4s ease-in-out .35s infinite}
+#viewer.swap #cvsplash{animation:cvIn .35s ease-out,cvBreath 3.6s ease-in-out .35s infinite}
 #viewer.swap .cvpanel>*{animation:cvUp .3s ease-out both}
 @keyframes cvIn{0%{opacity:0;translate:-4vw 0}100%{opacity:1;translate:0 0}}
 @keyframes cvUp{0%{opacity:0;translate:0 12px}100%{opacity:1;translate:0 0}}
