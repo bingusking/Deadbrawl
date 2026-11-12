@@ -122,7 +122,8 @@ function riftFrame(f){
     case 'ghold':return ['rift_grab',2];
     case 'hold':return ['rift_grab',2];
     case 'parry':case 'guard':case 'block':return [H,0];
-    case 'hitstun':case 'stun':return ['rift_hit',0];
+    case 'rult':return riftUltFrame(f);
+    case 'hitstun':case 'stun':case 'ultd':return ['rift_hit',0];
     case 'airhit':return ['rift_hit',0,'tumble'];
     case 'kd':case 'ko':return ['rift_hit',0,'down'];
     case 'attack':{const m=f.move,s=m?m.startup:0,a=m?m.active:0,k=f.mt;
@@ -133,7 +134,7 @@ function riftFrame(f){
       if(f.mname==='air')return k<=s?['rift_air',1]:k<=s+4?['rift_air',2]:k<=s+m.active?['rift_air',3]:[J,4];
       if(f.mname==='slam')return ['rift_slam',k<=s?1:2];
       if(f.mname==='tele'&&f.tpPush)return [H,k<=s?0:2];
-      if(f.mname==='lunge')return ['rift_lunge',k<=s?0:1];
+      if(f.mname==='lunge'||f.mname==='rult')return ['rift_lunge',k<=s?0:1];
       if(f.mname==='tele'||f.mname==='dash')return [R,3];
       return f.mt<=s?[H,0]:[H,2];}
   }
@@ -153,7 +154,7 @@ function jacobFrame(f){
     case 'charge':return ['jacob_heavy',f.charge<TAP?0:1];
     case 'parry':return [T,2];
     case 'guard':case 'block':return [T,0];
-    case 'hitstun':case 'stun':return ['jacob_hit',0];
+    case 'hitstun':case 'stun':case 'ultd':return ['jacob_hit',0];
     case 'airhit':return ['jacob_hit',0,'tumble'];
     case 'kd':case 'ko':return ['jacob_hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0;

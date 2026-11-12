@@ -37,7 +37,7 @@ function spriteFrame(f){
     case 'parry':return ['parry',f.mt<3?1:f.mt<5?2:f.mt<7?3:f.mt<=PARRY_WIN?4:5];
     case 'hold':case 'ghold':return ['knife',3];
     case 'guard':case 'block':return ['parry',1];
-    case 'hitstun':case 'stun':return ['hit',0];
+    case 'hitstun':case 'stun':case 'ultd':return ['hit',0];
     case 'airhit':return ['hit',0,'tumble'];
     case 'kd':case 'ko':return ['hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0,a=m?m.active:0;
@@ -63,7 +63,7 @@ function drawSprite(f){
   if(f.state!==f._ls){f._ls=f.state;f.st=0;}else f.st=(f.st||0)+1;
   let [anim,idx,mode]=spriteFrame(f);
   const dummy=G.training&&f.idx===1;
-  if(dummy){anim='dummy';const hit=['hitstun','stun','airhit'].includes(f.state);
+  if(dummy){anim='dummy';const hit=['hitstun','stun','airhit','ultd'].includes(f.state);
     idx=hit?(Math.floor(f.st/3)%8):0;mode=['kd','ko'].includes(f.state)?'down':f.state==='airhit'?'tumble':undefined;}
   const rift=f.char==='rift'&&!dummy;let own=false;
   if(rift){[anim,idx,mode]=riftFrame(f);own=true;}

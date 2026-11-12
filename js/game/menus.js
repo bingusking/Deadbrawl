@@ -117,7 +117,7 @@ addEventListener('keydown',e=>{
     keys[e.code]=true;
     if(e.repeat||G.phase!=='fight')return;
     const dk={KeyW:'kU',ArrowUp:'kU',KeyS:'kD',ArrowDown:'kD',KeyA:'kL',ArrowLeft:'kL',KeyD:'kR',ArrowRight:'kR',KeyT:'taunt'}[e.code];if(dk)pressMe(dk);
-    const m={KeyQ:'melee',KeyF:'parry',Digit1:'a1',Digit2:'a2',Digit3:'a3',Digit4:'a4',ShiftLeft:'dodge',ShiftRight:'dodge',KeyW:'jump',ArrowUp:'jump',Space:'jump',Numpad1:'a1',Numpad2:'a2',Numpad3:'a3',Numpad4:'a4'}[e.code];
+    const m={KeyR:'ult',KeyQ:'melee',KeyF:'parry',Digit1:'a1',Digit2:'a2',Digit3:'a3',Digit4:'a4',ShiftLeft:'dodge',ShiftRight:'dodge',KeyW:'jump',ArrowUp:'jump',Space:'jump',Numpad1:'a1',Numpad2:'a2',Numpad3:'a3',Numpad4:'a4'}[e.code];
     if(m==='melee'&&(keys.KeyS||keys.ArrowDown))pressMe('slam');else if(m)pressMe(m);
   }
 });

@@ -32,6 +32,7 @@ function startDodge(f){
 }
 // abilities, parry and dodge (abilities + dodge also work in the air)
 function tryAbility(f){
+  if(tryUlt(f))return true;
   const V=f.char==='vish';if(f.char==='rift'&&tryRift(f))return true;if(f.char==='jacob'&&tryJacob(f))return true;
   if(V&&f.buf.a1>0&&f.knives>0){f.buf.a1=0;const o=f===p1?p2:p1,d=(o.x-f.x)*f.facing;
     if(d>0&&d<1.7&&Math.abs(o.y-f.y)<1.4&&o.state!=='ko')return startMove(f,'burst'); // point-blank: throw every stored knife
@@ -125,6 +126,8 @@ function stepFighter(f,o){
   if(f.char==='jacob')jacobTick(f,o);else if(f.rope)f.rope.visible=false;
   if(f.knives<3){if(++f.knifeT>=CD.knifeRegen){f.knives++;f.knifeT=0;}}else f.knifeT=0;
   f.t++;
+  if(f.state==='rult'){riftUltTick(f,o);return;} // the ultimate drives both fighters' positions
+  if(f.state==='ultd'){f.vx=f.vy=0;return;}
   const wasAir=f.air();
   const fwd=()=>f.facing>0?f.inp.r:f.inp.l, back=()=>f.facing>0?f.inp.l:f.inp.r;
   if(['idle','walkf','walkb','guard','jump','land'].includes(f.state))f.comboTaken=0;

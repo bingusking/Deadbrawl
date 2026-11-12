@@ -7,7 +7,7 @@ function readPlayer(){p1.inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||
 function callout(f,txt,col){const el=$('#call'+(f.idx+1));el.innerHTML='<b style="color:'+col+'">'+txt+'</b>';el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),900);}
 function splash(html,dur=1.2){const s=$('#splash');s.innerHTML=html;s.classList.remove('show');void s.offsetWidth;s.style.setProperty('--d',dur+'s');s.classList.add('show');}
 function flash(a){const f=$('#flash');f.style.transition='none';f.style.opacity=a;void f.offsetWidth;f.style.transition='opacity .35s';f.style.opacity=0;}
-function cutin(){const c=$('#cutin');c.classList.remove('on');void c.offsetWidth;c.classList.add('on');const bar=c.querySelector('.cbar');bar.style.animation='none';void bar.offsetWidth;bar.style.animation='';flash(0.35);}
+function cutin(f){const c=$('#cutin');if(f&&f.char){c.querySelector('.cface').style.backgroundImage='url('+(HUDIMG['face_'+f.char]||'assets/face.webp')+')';c.querySelector('.cname').innerHTML='<small>ULTIMATE</small>'+((ULTS[f.char]||{}).name||'SUPER');}c.classList.remove('on');void c.offsetWidth;c.classList.add('on');const bar=c.querySelector('.cbar');bar.style.animation='none';void bar.offsetWidth;bar.style.animation='';flash(0.35);}
 // combo counter: grows, shakes and heats up with each hit, shows the running damage total
 function showCombo(a,n,dmg){if(n===undefined)n=a.combo;if(n<2)return;const el=$('#combo'+(a.idx+1));
   el.innerHTML='<b>'+n+'</b>HITS'+(dmg?'<em>'+dmg+' DMG</em>':'');el.style.setProperty('--s',Math.min(1.6,1+(n-2)*0.07));
@@ -31,6 +31,7 @@ function phaseLogic(){
   if(G.phase==='intro'){
     if(G.pt===95){splash('FIGHT!<span class="u"></span>',0.9);sfx.ok();for(const f of[p1,p2])f.state='idle';G.phase='fight';}
   }else if(G.phase==='fight'){
+    if(G.training&&!['rult','attack'].includes(p1.state))p1.tension=100; // training: ULT always ready
     if(G.training){for(const f of[p1,p2])if(G.time-(f.lastHitT||-999)>110&&f.hp<MAXHP&&!['airhit','kd','hitstun','stun'].includes(f.state)){f.hp=MAXHP;f.trailHp=MAXHP;}}
     else if(G.freeze<=0&&G.hitstop<=0)G.timer--;
     if(G.timer<=0){G.timer=0;G.phase='ko';G.pt=0;const w=p1.hp===p2.hp?null:(p1.hp>p2.hp?p1:p2);G.koBy=w;if(w)G.wins[w.idx]++;splash('TIME!<span class="u"></span>',2);}
@@ -51,7 +52,7 @@ function updHud(force){
     const hp=f.hp/MAXHP*100,tr=f.trailHp/MAXHP*100;
     $('#hp'+i).style.width=hp+'%';$('#tr'+i).style.width=tr+'%';
     $('#hp'+i).classList.toggle('low',hp<25);
-    const tn=$('#tn'+i);tn.style.width=f.tension+'%';tn.classList.toggle('full',f.tension>=50);$('#tv'+i).textContent=Math.floor(f.tension);
+    const tn=$('#tn'+i);tn.style.width=f.tension+'%';tn.classList.toggle('full',f.tension>=ULT_COST);$('#tv'+i).textContent=Math.floor(f.tension);
     $$('#rw'+i+' .rd').forEach((d,k)=>d.classList.toggle('w',G.wins[f.idx]>k));
   }
   $('#timer').textContent=G.training?'∞':Math.ceil(G.timer/60);
@@ -65,6 +66,8 @@ function updHud(force){
     k1.querySelector('i').style.height=f.hooks>0?'0%':(100-f.hookT/JHOOK_REGEN*100)+'%';k1.querySelector('b').textContent=f.hooks>0?'':Math.ceil((JHOOK_REGEN-f.hookT)/60);k1.classList.toggle('ready',f.hooks>0);k1.classList.toggle('charging',f.hookOn>0);}
   else $('#ab-1').classList.remove('charging');
   if(f.char==='rift'){set('1',f.cd.r1,150);set('2',f.tpWin>0?0:f.cd.r2,300);set('3',f.cd.r3,240);set('4',f.cd.r4,240);$('#ab-2').classList.toggle('charging',f.tpWin>0);}
+  {const r=$('#ab-r'),has=!!ULTS[f.char];r.classList.toggle('lock',!has);r.querySelector('.soon').style.display=has?'none':'';
+   r.querySelector('i').style.height=has?(100-Math.min(100,f.tension/ULT_COST*100))+'%':'0%';r.classList.toggle('ultready',has&&f.tension>=ULT_COST);}
   const q=$('#ab-q');q.classList.toggle('charging',f.state==='charge'&&f.charge>=TAP);q.classList.add('ready');
   q.querySelector('i').style.height=f.state==='charge'?(100-Math.min(1,f.charge/CHARGE)*100)+'%':'0%';
 }
@@ -76,9 +79,12 @@ function updCam(snap){
   const tx=clamp(mid,-5,5),tz=6.4+d*0.42,ty=1.75+hy*0.35;
   const lo=Math.min(p1.y,p2.y)*0.5;
   const want=new THREE.Vector3(tx,ty+lo,tz),look=new THREE.Vector3(tx,1.15+hy*0.3+lo,0);
+  for(const f of[p1,p2])if(f.uFollow&&!f.air()&&!(f===p1?p2:p1).air())f.uFollow=0;
+  {const U=[p1,p2].find(f=>f.state==='rult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
+   if(U){const top=Math.max(U.y,V.y)+2.3,bot=Math.min(U.y,V.y),cy=(top+bot)/2;want.set(clamp((U.x+V.x)/2,-5,5),cy+0.2,6.6+(top-bot)*1.15);look.set(want.x,cy,0);G.ultCam=30;}else if(G.ultCam>0)G.ultCam--;}
   if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.z-=k*2.2;want.y-=k*0.6;} // intro: start close, pull back, centred between both fighters
   if(G.phase==='ko'&&G.pt<130&&G.koBy){const w=G.koBy===p1?p2:p1;want.set(w.x*0.6+tx*0.4,1.6,6.5);look.set(w.x*0.6+tx*0.4,0.8,0);}
-  if(snap){camPos.copy(want);camLook.copy(look);}else{camPos.lerp(want,0.08);camLook.lerp(look,0.1);}
+  if(snap){camPos.copy(want);camLook.copy(look);}else{const r=G.ultCam?0.16:0.08;camPos.lerp(want,r);camLook.lerp(look,r*1.25);}
   cam.position.copy(camPos);
   if(G.shake>0.002){cam.position.x+=(rnd()-0.5)*G.shake*SET.shake;cam.position.y+=(rnd()-0.5)*G.shake*SET.shake;G.shake*=0.85;}else G.shake=0;
   cam.lookAt(camLook);

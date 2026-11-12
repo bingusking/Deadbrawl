@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 23 files · ~7,365 words
+- 24 files · ~7,643 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 259 nodes · 387 edges · 19 communities (15 shown, 4 thin omitted)
+- 270 nodes · 401 edges · 19 communities (16 shown, 3 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fc371bc6`
+- Built from commit: `7eac4c77`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,7 +24,7 @@
 - menus.js
 - moves.js
 - package.json
-- Fighter
+- ult.js
 - services
 - Deadbrawl
 - animation.js
@@ -38,14 +38,14 @@
 ## God Nodes (most connected - your core abstractions)
 1. `runMove()` - 11 edges
 2. `act()` - 11 edges
-3. `buildRig()` - 9 edges
-4. `stepFighter()` - 9 edges
+3. `stepFighter()` - 9 edges
+4. `buildRig()` - 9 edges
 5. `services` - 8 edges
 6. `goOnline()` - 7 edges
 7. `cvShow()` - 6 edges
 8. `netLost()` - 6 edges
-9. `phaseLogic()` - 5 edges
-10. `splash()` - 5 edges
+9. `startMove()` - 5 edges
+10. `tryAbility()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
@@ -58,7 +58,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 4 thin omitted)
+## Communities (19 total, 3 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -73,8 +73,8 @@ Cohesion: 0.12
 Nodes (28): addFx(), dust(), dustGeo, fx, muzzleFlash(), spark(), sparkGeo, trail() (+20 more)
 
 ### Community 3 - "fighters.js"
-Cohesion: 0.20
-Nodes (18): afterimage(), applyHit(), burstKnife(), canBlock(), overlap(), projectiles, runMove(), shotgunFx() (+10 more)
+Cohesion: 0.16
+Nodes (19): afterimage(), applyHit(), burstKnife(), canBlock(), Fighter, overlap(), projectiles, runMove() (+11 more)
 
 ### Community 4 - "server.js"
 Cohesion: 0.11
@@ -91,6 +91,10 @@ Nodes (15): CD, jacobFrame(), jacobRope(), jacobTick(), KNIFE_HIT, MOVES, riftFr
 ### Community 7 - "package.json"
 Cohesion: 0.18
 Nodes (11): dependencies, ws@^8.18.0, description, engines, node, main, name, scripts (+3 more)
+
+### Community 8 - "ult.js"
+Cohesion: 0.25
+Nodes (7): blinkTo(), riftUltTick(), RU, ruEnd(), ruPoint(), ultHit(), ULTS
 
 ### Community 9 - "services"
 Cohesion: 0.22
@@ -121,20 +125,20 @@ Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
 ## Knowledge Gaps
-- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
-- **Why does `afterimage()` connect `fighters.js` to `online.js`?**
+- **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `game.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
-- **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
+- **Why does `shotgunFx()` connect `fighters.js` to `online.js`?**
   _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
