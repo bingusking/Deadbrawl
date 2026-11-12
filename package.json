@@ -1,0 +1,9 @@
+{
+  "name": "deadbrawl",
+  "version": "1.0.0",
+  "description": "Deadbrawl: 2D browser fighting game with online matchmaking",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "ws": "^8.18.0" }
+}
