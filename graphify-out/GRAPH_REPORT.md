@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 23 files · ~6,839 words
+- 23 files · ~7,146 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 251 nodes · 373 edges · 19 communities (15 shown, 4 thin omitted)
+- 257 nodes · 382 edges · 19 communities (15 shown, 4 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0ff18df0`
+- Built from commit: `42b23c87`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -24,7 +24,7 @@
 - menus.js
 - moves.js
 - package.json
-- fx.js
+- Fighter
 - services
 - Deadbrawl
 - animation.js
@@ -43,9 +43,9 @@
 5. `services` - 8 edges
 6. `goOnline()` - 7 edges
 7. `netLost()` - 6 edges
-8. `splash()` - 5 edges
-9. `startRound()` - 5 edges
-10. `phaseLogic()` - 5 edges
+8. `cChoose()` - 5 edges
+9. `show()` - 5 edges
+10. `toSelect()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
@@ -69,12 +69,12 @@ Cohesion: 0.15
 Nodes (20): callout(), camLook, camPos, CHARS, cutin(), endMatch(), flash(), G (+12 more)
 
 ### Community 2 - "online.js"
-Cohesion: 0.19
-Nodes (20): goOnline(), GPR, guestProj(), guestTick(), NET, netClose(), netDec(), netEnc() (+12 more)
+Cohesion: 0.12
+Nodes (28): addFx(), dust(), dustGeo, fx, muzzleFlash(), spark(), sparkGeo, trail() (+20 more)
 
 ### Community 3 - "fighters.js"
-Cohesion: 0.16
-Nodes (19): afterimage(), applyHit(), burstKnife(), canBlock(), Fighter, overlap(), projectiles, runMove() (+11 more)
+Cohesion: 0.20
+Nodes (18): afterimage(), applyHit(), burstKnife(), canBlock(), overlap(), projectiles, runMove(), shotgunFx() (+10 more)
 
 ### Community 4 - "server.js"
 Cohesion: 0.11
@@ -91,10 +91,6 @@ Nodes (15): CD, jacobFrame(), jacobRope(), jacobTick(), KNIFE_HIT, MOVES, riftFr
 ### Community 7 - "package.json"
 Cohesion: 0.18
 Nodes (11): dependencies, ws@^8.18.0, description, engines, node, main, name, scripts (+3 more)
-
-### Community 8 - "fx.js"
-Cohesion: 0.25
-Nodes (8): addFx(), dust(), dustGeo, fx, muzzleFlash(), spark(), sparkGeo, trail()
 
 ### Community 9 - "services"
 Cohesion: 0.22
@@ -116,6 +112,10 @@ Nodes (4): ac(), noise(), sfx, tone()
 Cohesion: 0.67
 Nodes (3): aiCore(), aiThink(), DIFF
 
+### Community 16 - "viewer.js"
+Cohesion: 0.27
+Nodes (7): CVDATA, cvInit(), CVMETA, cvNav(), cvShow(), cvStep(), VANIMS
+
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
@@ -131,12 +131,12 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `afterimage()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `game.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
 - **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+- **Should `online.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Should `server.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
-- **Should `moves.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.07635467980295567 - nodes in this community are weakly interconnected._

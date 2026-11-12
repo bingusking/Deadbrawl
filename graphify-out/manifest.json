@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "js/game/menus.js": {
-    "mtime": 1794473982.3764768,
-    "seen": 1794474142.2497003,
-    "ast_hash": "b158a00e8fa8e432e610a8a26cb03fcc",
+    "mtime": 1794475370.3311074,
+    "seen": 1794475491.5020156,
+    "ast_hash": "bcba52bc23123b0a788d3efd35d04da9",
     "semantic_hash": ""
   },
   "js/game/moves.js": {
@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "js/game/viewer.js": {
-    "mtime": 1794468361.4333231,
-    "seen": 1794469219.9031684,
-    "ast_hash": "002a49f6bc481a5782711ecaec05e89e",
+    "mtime": 1794475397.4634333,
+    "seen": 1794475491.5020225,
+    "ast_hash": "2f07d29530829bffccce95bcdaae1bce",
     "semantic_hash": ""
   },
   "package.json": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794474043.8150082,
-    "seen": 1794474142.2497284,
-    "ast_hash": "28c3ba33acb81b12c5a727eb1a5bfc08",
+    "mtime": 1794475370.3292682,
+    "seen": 1794475491.5020337,
+    "ast_hash": "d12b8a625586dc8ff0d1ea4fc5b19e62",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {

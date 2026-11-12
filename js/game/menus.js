@@ -64,7 +64,7 @@ function charIntro(){const c=$('#cintro'),A=c.querySelector('.a'),B=c.querySelec
   for(const e of[A,B]){e.classList.remove('go');e.style.animationDelay='';}void c.offsetWidth;
   A.classList.add('go');G.introHold=88;
   if(!G.training){B.style.animationDelay='1.4s';B.classList.add('go');G.introHold=172;}}
-function toViewer(){G.mode='viewer';show('viewer');$('#hud').classList.remove('on');canvas.style.visibility='visible';}
+function toViewer(){G.mode='viewer';show('viewer');$('#hud').classList.remove('on');canvas.style.visibility='hidden';cvShow(CIDS.includes(G.p1char)?G.p1char:'vish');}
 let ovl=null;
 function openOvl(id){ovl=id;$$('.ovl').forEach(o=>o.classList.toggle('on',o.id===id));setSel($$('#'+id+' .mbtn'),0);}
 function closeOvl(){ovl=null;$$('.ovl').forEach(o=>o.classList.remove('on'));}
@@ -111,7 +111,7 @@ addEventListener('keydown',e=>{
   if(G.mode==='onl'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();toMenu();}return;}
   if(G.mode==='select'&&!G.training&&['KeyW','ArrowUp','KeyS','ArrowDown'].includes(e.code)){const d=e.code==='KeyW'||e.code==='ArrowUp'?-1:1;G.diff=DIFFS[(DIFFS.indexOf(G.diff)+d+3)%3];$('#dlabel').textContent=G.diff;sfx.sel();return;}
   if(G.mode==='select'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();if(G.selStage===1)cReset();else toMenu();}else if(['Enter','Space','KeyJ'].includes(e.code)&&!e.repeat)cChoose();else if(['KeyA','ArrowLeft'].includes(e.code))cNav(-1);else if(['KeyD','ArrowRight'].includes(e.code))cNav(1);return;}
-  if(G.mode==='viewer'){if(e.code==='Escape'||e.code==='Backspace')toMenu();return;}
+  if(G.mode==='viewer'){if(e.code==='Escape'||e.code==='Backspace')toMenu();else if(e.code==='KeyA'||e.code==='ArrowLeft')cvNav(-1);else if(e.code==='KeyD'||e.code==='ArrowRight')cvNav(1);return;}
   if(G.mode==='fight'){
     if(e.code==='Escape'){if(G.phase!=='done'){if(!G.online)G.paused=true;openOvl('pause');}return;}
     keys[e.code]=true;
