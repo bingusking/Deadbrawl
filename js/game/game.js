@@ -80,7 +80,7 @@ function updCam(snap){
   if(G.phase==='ko'&&G.pt<130&&G.koBy){const w=G.koBy===p1?p2:p1;want.set(w.x*0.6+tx*0.4,1.6,6.5);look.set(w.x*0.6+tx*0.4,0.8,0);}
   if(snap){camPos.copy(want);camLook.copy(look);}else{camPos.lerp(want,0.08);camLook.lerp(look,0.1);}
   cam.position.copy(camPos);
-  if(G.shake>0.002){cam.position.x+=(rnd()-0.5)*G.shake;cam.position.y+=(rnd()-0.5)*G.shake;G.shake*=0.85;}else G.shake=0;
+  if(G.shake>0.002){cam.position.x+=(rnd()-0.5)*G.shake*SET.shake;cam.position.y+=(rnd()-0.5)*G.shake*SET.shake;G.shake*=0.85;}else G.shake=0;
   cam.lookAt(camLook);
 }
 

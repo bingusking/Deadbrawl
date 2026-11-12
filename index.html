@@ -13,18 +13,40 @@ html,body{width:100%;height:100%;overflow:hidden;background:#0c090e;font-family:
 button{font-family:inherit}
 
 /* ---------- MENU ---------- */
-#menu{background:#000}
+#menu{background:#050304;overflow:hidden}
+/* stand-in arena until the real background art arrives: drop it at assets/menu_bg.webp and set --menubg */
+.mbg{position:absolute;inset:0;background:var(--menubg,none) center/cover no-repeat,radial-gradient(ellipse 60% 70% at 74% 72%,#4a1216 0%,#1a0809 50%,#050304 100%)}
+.mbg::before{content:'';position:absolute;top:-10%;bottom:-10%;left:47%;width:9vw;background:#a3161f;opacity:.28;transform:skewX(-22deg)}
+.mbg::after{content:'';position:absolute;left:0;right:0;bottom:0;height:24vh;background:linear-gradient(#0000,#0a0405 60%);border-top:1px solid #2a1012}
+.mpil{position:absolute;bottom:22vh;width:3.2vw;background:#140a0b;box-shadow:inset -.6vw 0 #1d0f10}
+#membr{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mf{position:absolute;bottom:9vh;transform-origin:50% 100%;pointer-events:none;transition:opacity .5s}
+.mf.back{filter:brightness(.32) saturate(.6) contrast(1.1);bottom:13vh}
+.mf.front{filter:drop-shadow(0 0 .25vw #ff3b2f) drop-shadow(0 1.2vh 1vh #000)}
+.mshad{position:absolute;bottom:7.5vh;height:3vh;border-radius:50%;background:radial-gradient(#000c,#0000 70%)}
+#mflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
+#mflash.go{animation:mflash .35s ease-out}
+@keyframes mflash{0%{opacity:.55}100%{opacity:0}}
 .mwrap{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:0 7vw;gap:0;min-width:40vw}
 .logo{font-family:'Permanent Marker',cursive;font-size:clamp(54px,8.5vw,128px);line-height:.82;transform:rotate(-5deg);margin-bottom:5vh;text-shadow:5px 5px 0 #000}
 .logo .a{color:#fff}
 .logo .b{color:#d8232f;display:block;margin-left:.5em}
 .logo .ul{display:block;height:.07em;width:85%;background:#d8232f;transform:skewX(-35deg);margin-top:.05em}
-.mbtn{font-size:clamp(30px,3.4vw,52px);font-weight:600;letter-spacing:3px;background:none;border:none;color:#9a8f95;text-align:left;cursor:pointer;padding:.05em 0 0 26px;position:relative;transition:color .12s,transform .12s;line-height:1.1}
-.mbtn.sel{color:#fff;transform:translateX(14px)}
-.mbtn.sel::before{content:'';position:absolute;left:0;top:44%;width:13px;height:13px;background:#d8232f;transform:translateY(-50%) rotate(45deg)}
+.mbtn{font-size:clamp(30px,3.4vw,52px);font-weight:600;letter-spacing:3px;background:none;border:none;color:#9a8f95;text-align:left;cursor:pointer;padding:.05em .6em 0 26px;position:relative;isolation:isolate;transition:color .12s,transform .12s;line-height:1.1;align-self:flex-start}
+.mbtn.sel{color:#fff;transform:translateX(10px)}
+/* selected option: a red slash-bar snaps in behind it */
+.mbtn.sel::before{content:'';position:absolute;left:4px;right:-6px;top:6%;bottom:2%;background:#d8232f;transform:skewX(-16deg);z-index:-1;animation:barIn .14s ease-out;box-shadow:6px 6px 0 #000}
+.mbtn.sel small{color:#ffd9d9}
+@keyframes barIn{0%{transform:skewX(-16deg) scaleX(0);transform-origin:left}100%{transform:skewX(-16deg) scaleX(1)}}
+#menu.intro .logo{animation:logoSlam .5s cubic-bezier(.2,1.6,.4,1) both}
+#menu.intro .mwrap .mbtn,#menu.intro .mwrap .hint{animation:slideIn .4s ease-out both}
+#menu.intro .mf,#menu.intro .mshad{animation:fadeUp .7s ease-out both}
+@keyframes logoSlam{0%{opacity:0;transform:rotate(-5deg) scale(2.4)}60%{opacity:1;transform:rotate(-5deg) scale(.94)}100%{transform:rotate(-5deg) scale(1)}}
+@keyframes slideIn{0%{opacity:0;transform:translateX(-40px)}100%{opacity:1}}
+@keyframes fadeUp{0%{opacity:0;translate:0 4vh}100%{opacity:1;translate:0 0}}
 .mbtn small{font-size:.55em;color:#d8232f;margin-left:12px;letter-spacing:2px}
 .hint{margin-top:4vh;color:#7b6f76;font-size:20px;letter-spacing:2px}
-.panel{position:absolute;z-index:3;right:5vw;top:50%;transform:translateY(-50%);background:rgba(12,8,12,.92);border-left:4px solid #d8232f;padding:26px 34px;min-width:360px;display:none;clip-path:polygon(0 0,100% 0,100% 92%,94% 100%,0 100%)}
+.panel{position:fixed;z-index:9;right:5vw;top:50%;transform:translateY(-50%);background:rgba(12,8,12,.92);border-left:4px solid #d8232f;padding:26px 34px;min-width:360px;display:none;clip-path:polygon(0 0,100% 0,100% 92%,94% 100%,0 100%)}
 .panel.on{display:block}
 .panel h3{font-size:40px;font-weight:600;letter-spacing:3px;line-height:1}
 .panel table{border-collapse:collapse;margin-top:10px;font-size:23px}
@@ -94,7 +116,14 @@ button{font-family:inherit}
 .ovl h2.lose{color:#9aa}
 .ovl h2.win{color:#ffcc33}
 .ovl .sub{font-size:26px;color:#aaa;letter-spacing:3px;margin:-2vh 0 3vh}
-.ovl .mbtn{text-align:center;padding-left:0}
+.ovl .mbtn{text-align:center;padding-left:0;align-self:center}
+#settings{background:rgba(5,3,4,.95)}
+#settings .mbtn{min-width:13em;text-align:left;padding-left:.6em}
+#settings .mbtn.sel::before{display:block}
+#settings .mbtn.sel{text-shadow:none}
+#settings .mbtn small{float:right}
+#settings h2{font-size:clamp(46px,6vw,90px)}
+#cdiffrow b{color:#d8232f;cursor:pointer}
 .ovl .mbtn.sel{transform:none}
 .ovl .mbtn.sel::before{display:none}
 .ovl .mbtn.sel{color:#fff;text-shadow:0 0 18px #d8232f}
@@ -169,15 +198,18 @@ button{font-family:inherit}
 <body>
 <canvas id="c"></canvas>
 
-<div id="menu" class="screen on">
+<div id="menu" class="screen on intro">
+  <div class="mbg"><div class="mpil" style="left:52vw;top:8vh"></div><div class="mpil" style="left:93vw;top:5vh"></div><div class="mpil" style="left:64vw;top:16vh;opacity:.6"></div></div>
+  <canvas id="membr"></canvas>
+  <div id="mfs"></div>
+  <div id="mflash"></div>
   <div class="mwrap">
     <div class="logo"><span class="a">DEAD</span><span class="b">BRAWL</span><span class="ul"></span></div>
     <button class="mbtn sel" data-a="play">PLAY <small>VS CPU</small></button>
     <button class="mbtn" data-a="online">ONLINE <small>QUEUE</small></button>
     <button class="mbtn" data-a="train">TRAINING <small>DUMMY</small></button>
-    <button class="mbtn" data-a="diff">DIFFICULTY <small id="dlabel">NORMAL</small></button>
-    <button class="mbtn" data-a="char">CHARACTER</button>
-    <button class="mbtn" data-a="ctrl">CONTROLS</button>
+    <button class="mbtn" data-a="char">CHARACTERS</button>
+    <button class="mbtn" data-a="set">SETTINGS</button>
     <div class="hint">W / S TO SELECT · ENTER TO CONFIRM</div>
   </div>
   <div class="panel" id="ctrlPanel">
@@ -189,15 +221,13 @@ button{font-family:inherit}
       <tr><td class="k">Q (tap)</td><td>Quick melee · chain up to 3</td></tr>
       <tr><td class="k">Q (hold)</td><td>Charge heavy · full charge knocks down</td></tr>
       <tr><td class="k">Q (in air)</td><td>Launcher · knocks enemy into the air</td></tr>
+      <tr><td class="k">HOLD BACK</td><td>Block · grabs go through it</td></tr>
       <tr><td class="k">F</td><td>Parry melee/heavies · stuns · 5s cooldown on miss</td></tr>
-      <tr><td class="k">1</td><td>Throwing Knife · knock-up · 3 charges · point-blank throws them all and hops back</td></tr>
-      <tr><td class="k">2</td><td>Rush · dash through the enemy</td></tr>
-      <tr><td class="k">3</td><td>Shotgun · short range knockback</td></tr>
-      <tr><td class="k">4</td><td>Spike Kick · smashes airborne enemies down, they bounce back up</td></tr>
+      <tr><td class="k">1 – 4</td><td>Abilities (see Characters for each fighter's kit)</td></tr>
       <tr><td class="k">S + Q (in air)</td><td>Down Slam · hits the enemy down to the ground</td></tr>
-      <tr><td class="k">ESC</td><td>Pause</td></tr>
+      <tr><td class="k">ESC</td><td>Pause · close this panel</td></tr>
     </table>
-    <p>Combo idea: Q, Q, Q → 3 · or air Q to launch, then 4 to spike them into the floor.</p>
+    <p>Combo idea: Q, Q, Q, then cancel into an ability.</p>
   </div>
 </div>
 
@@ -212,6 +242,7 @@ button{font-family:inherit}
 
 <div id="csel" class="screen">
   <h2><small id="cmode">VS CPU</small><span id="ctitle">CHOOSE YOUR FIGHTER</span></h2>
+  <div class="hint" id="cdiffrow" style="margin:0 0 1vh">DIFFICULTY <b id="dlabel">NORMAL</b> · W / S TO CHANGE</div>
   <div class="cprev"><img id="cidle" alt=""><button class="mbtn" id="cgo" style="visibility:hidden">SELECT</button></div>
   <div class="cname2" id="cname2">&nbsp;</div>
   <div class="hint" id="cdesc" style="margin:-1vh 0 1.5vh;color:#c9bfc3;min-height:1.2em"></div>
@@ -257,6 +288,14 @@ button{font-family:inherit}
 <div id="cutin"><div class="cbar"><div class="cface"></div><div class="cname"><small>SUPER</small>RED VERDICT</div></div></div>
 <div id="flash"></div>
 
+<div class="ovl" id="settings">
+  <h2>SETTINGS</h2>
+  <button class="mbtn sel" data-a="snd">SOUND <small id="sSnd">ON</small></button>
+  <button class="mbtn" data-a="vol">VOLUME <small id="sVol">100%</small></button>
+  <button class="mbtn" data-a="shk">SCREEN SHAKE <small id="sShk">ON</small></button>
+  <button class="mbtn" data-a="ctrl">CONTROLS</button>
+  <button class="mbtn" data-a="sback">BACK</button>
+</div>
 <div class="ovl" id="pause">
   <h2>PAUSED</h2>
   <button class="mbtn sel" data-a="resume">RESUME</button>
