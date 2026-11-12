@@ -7,7 +7,8 @@ const ULTS={rift:{name:'PHANTOM RUSH'}}; // fighters without an entry show ULT a
 /* ---- Rift: PHANTOM RUSH ----
    Lunge grab (unblockable, dodgeable). On a hit: punch them up, blink to the other side, punch again,
    rising in a zig-zag (N hits), then blink above them and slam them into the floor. */
-const RU={N:5,L:13,DMG:28,SLAM:70,RISE:0.72,SWAY:2.5} // SWAY: how far each punch knocks them sideways (zig-zag width);
+// N hits, L frames each; HIT_FREEZE / SLAM_FREEZE = impact freeze frames; SWAY = how far each punch knocks them sideways (zig-zag is 2x SWAY wide)
+const RU={N:5,L:13,DMG:28,SLAM:70,HIT_FREEZE:10,SLAM_FREEZE:20,RISE:0.72,SWAY:2.5};
 MOVES.rult={base:'stance',startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[0,0.75],y:[0,2.0],grab:1,shake:0.15,
   react:(a,d)=>riftUltStart(a,d)};
 
@@ -28,7 +29,7 @@ function ultHit(a,d,dmg,px,py,big){
   d.hp=Math.max(G.training?1:0,d.hp-dmg);d.comboTaken=(d.comboTaken||0)+1;d.comboDmg=(d.comboDmg||0)+dmg;a.combo=d.comboTaken;
   showCombo(a,d.comboTaken,d.comboDmg);d.lastHitT=G.time;
   spark(px,py,big?0xffb347:0xc9a0ff,big?22:12,big?0.18:0.12);(big?sfx.heavy:sfx.hit)();
-  G.hitstop=Math.max(G.hitstop,big?12:4);G.shake=Math.max(G.shake,big?0.28:0.08);
+  G.hitstop=Math.max(G.hitstop,big?RU.SLAM_FREEZE:RU.HIT_FREEZE);G.shake=Math.max(G.shake,big?0.3:0.14);flash(big?0.3:0.1); // impact freeze on every hit
   if(d.hp<=0)KO(a,d);}
 
 function blinkTo(f,x,y){afterimage(f);spark(f.x,f.y+1,0x8a3cff,8,0.1,0.1);f.x=x;f.y=y;spark(x,y+1,0x8a3cff,10,0.12,0.1);sfx.whoosh();}
@@ -47,7 +48,7 @@ function riftUltTick(f,o){
     const k2=t-RU.N*RU.L,P=ruPoint(f,RU.N);
     if(k2===0){f.facing=f.udir;blinkTo(f,clamp(P.x-f.udir*0.25,-STAGE,STAGE),P.y+0.95);}
     if(k2<8){o.x=P.x;o.y=P.y;}
-    if(k2===8){o.state='airhit';o.slammed=true;o.spiked=false;o.soft=false;o.vy=-0.6;o.pass=false;flash(0.25);ultHit(f,o,RU.SLAM,o.x,o.y+0.8,true);}
+    if(k2===8){o.state='airhit';o.slammed=true;o.spiked=false;o.soft=false;o.vy=-0.6;o.pass=false;ultHit(f,o,RU.SLAM,o.x,o.y+0.8,true);}
   }
 }
 function ruEnd(f,o){f.uFollow=1;f.state='jump';f.vy=-0.05;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;
