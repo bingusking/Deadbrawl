@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 23 files · ~7,255 words
+- 23 files · ~7,328 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 258 nodes · 384 edges · 19 communities (15 shown, 4 thin omitted)
+- 259 nodes · 387 edges · 19 communities (15 shown, 4 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `58cb2345`
+- Built from commit: `31e4ecd4`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,8 +42,8 @@
 4. `stepFighter()` - 9 edges
 5. `services` - 8 edges
 6. `goOnline()` - 7 edges
-7. `netLost()` - 6 edges
-8. `cvShow()` - 5 edges
+7. `cvShow()` - 6 edges
+8. `netLost()` - 6 edges
 9. `phaseLogic()` - 5 edges
 10. `splash()` - 5 edges
 
@@ -113,8 +113,8 @@ Cohesion: 0.67
 Nodes (3): aiCore(), aiThink(), DIFF
 
 ### Community 16 - "viewer.js"
-Cohesion: 0.25
-Nodes (8): CVDATA, cvInit(), CVMETA, cvNav(), cvPlace(), cvShow(), cvStep(), VANIMS
+Cohesion: 0.26
+Nodes (9): CVDATA, cvInit(), CVMETA, cvName(), cvNav(), cvPlace(), cvShow(), cvStep() (+1 more)
 
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50

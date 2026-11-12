@@ -38,7 +38,12 @@ function cvPlace(){const im=$('#cvsplash'),M=CVMETA[vChar];if(!M||!M.splash||!im
   const vw=innerWidth/100,vh=innerHeight/100,bw=44*vw,bh=72*vh,bot=10*vh,s=Math.min(bw/im.naturalWidth,bh/im.naturalHeight),w=im.naturalWidth*s,h=im.naturalHeight*s,l=vw+(bw-w)*M.ax;
   Object.assign(im.style,{width:w+'px',height:h+'px',left:l+'px',bottom:bot+'px'});
   const fl=$('.cvfloor'),f0=l+M.feet[0]*w,f1=l+M.feet[1]*w,pad=(f1-f0)*0.12;
-  Object.assign(fl.style,{left:(f0-pad)+'px',width:(f1-f0+2*pad)+'px',bottom:(bot-2.6*vh)+'px'});}
+  Object.assign(fl.style,{left:(f0-pad)+'px',width:(f1-f0+2*pad)+'px',bottom:(bot-2.6*vh)+'px'});
+  cvName(l+w*0.5);}
+// big outlined name behind the fighter: centred on them, sized to fill the stage width (two-word names stack)
+function cvName(cx){const n=$('#cvname'),vw=innerWidth/100,vh=innerHeight/100;
+  n.style.fontSize='22vh';const fs=22*Math.min(42*vw/n.offsetWidth,1.35);n.style.fontSize=fs+'vh'; // one line, about the width of the stage
+  const half=n.offsetWidth/2;n.style.left=Math.min(Math.max(cx,half+2*vw),46*vw-half)+'px';}
 addEventListener('resize',()=>{if(G.mode==='viewer')cvPlace();});
 function cvShow(c){cvInit();vChar=c;const M=CVMETA[c],rows=CVDATA[c];
   $('#cvnm').textContent=CHARS[c].name;$('#cvname').textContent=CHARS[c].name;$('#cvtag').textContent=M.tag;$('#cvbio').textContent=M.bio;
@@ -47,7 +52,7 @@ function cvShow(c){cvInit();vChar=c;const M=CVMETA[c],rows=CVDATA[c];
   const kit=rows.filter(r=>!/^[1-4]$/.test(r[0]));kit.splice(kit.findIndex(r=>r[0]==='SHIFT')+1,0,['HOLD BACK','Block','—','Block on the ground. Grabs go through it.']);
   $('#cvkit').innerHTML=kit.map(r=>'<div title="'+r[3].replace(/"/g,'&quot;')+'"><b>'+r[0]+'</b>'+r[1]+'</div>').join('');
   $$('#cvroster .rp').forEach(e=>e.classList.toggle('on',e.dataset.c===c));
-  const v=$('#viewer');v.classList.toggle('hasSplash',!!M.splash);if(M.splash){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';}
+  const v=$('#viewer');v.classList.toggle('hasSplash',!!M.splash);if(M.splash){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';cvName(23*innerWidth/100);}
   v.style.setProperty('--cvbg',M.bg?'url('+M.bg+')':'url(assets/arena_bg.webp)');v.classList.remove('swap');void v.offsetWidth;v.classList.add('swap');cvT=0;cvStep(true);}
 function cvStep(force){if(G.mode!=='viewer'&&!force)return;cvT++;
   const fr=SPR[vChar==='vish'?'vish_menu':vChar+'_idle'],f=fr[cvT%fr.length],k=f.k||SPRK,hv=68*(f.h*k/1.92),wv=hv*f.w/f.h,im=$('#cvimg');
@@ -55,3 +60,5 @@ function cvStep(force){if(G.mode!=='viewer'&&!force)return;cvT++;
 setInterval(()=>cvStep(),110);
 function cvNav(d){sfx.sel();cvShow(CIDS[(CIDS.indexOf(vChar)+d+CIDS.length)%CIDS.length]);}
 $('#vback').addEventListener('click',()=>{sfx.sel();toMenu();});
+// the marker font can arrive after the page opens: re-fit the name once it has loaded
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{if(G.mode==='viewer')cvPlace();});
