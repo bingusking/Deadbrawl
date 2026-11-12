@@ -7,15 +7,36 @@ const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 const CHARS = ['vish', 'rift', 'jacob'];
-// the game page can sit in public/ or next to this file
-const pagePath = [path.join(__dirname, 'public', 'index.html'), path.join(__dirname, 'index.html')].find(p => fs.existsSync(p));
-if (!pagePath) { console.error('index.html not found (looked in public/ and the repo root)'); process.exit(1); }
-const page = fs.readFileSync(pagePath);
+const zlib = require('zlib');
+
+// static files: index.html, js/ and assets/ are loaded into memory (gzipped) at startup
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const files = new Map();
+function load(rel) {
+  const full = path.join(__dirname, rel);
+  if (fs.statSync(full).isDirectory()) { for (const f of fs.readdirSync(full)) load(path.posix.join(rel, f)); return; }
+  const type = TYPES[path.extname(rel)];
+  if (!type) return;
+  const body = fs.readFileSync(full);
+  const zipped = /^(text|application)/.test(type) ? zlib.gzipSync(body, { level: 9 }) : null;
+  files.set('/' + rel, { body, zipped, type });
+}
+for (const rel of ['index.html', 'js', 'assets']) if (fs.existsSync(path.join(__dirname, rel))) load(rel);
+if (!files.has('/index.html')) { console.error('index.html not found next to server.js'); process.exit(1); }
+const BOOT = Date.now().toString(36); // changes each deploy so browsers fetch fresh files
 
 const server = http.createServer((req, res) => {
-  if (req.url === '/health') { res.writeHead(200); res.end('ok'); return; }
-  res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
-  res.end(page);
+  const url = req.url.split('?')[0];
+  if (url === '/health') { res.writeHead(200); res.end('ok'); return; }
+  if (url === '/favicon.ico') { res.writeHead(204); res.end(); return; }
+  const f = files.get(url === '/' ? '/index.html' : url);
+  if (!f) { res.writeHead(404); res.end('not found'); return; }
+  const etag = '"' + BOOT + '"';
+  const headers = { 'Content-Type': f.type, 'Cache-Control': 'no-cache', ETag: etag };
+  if (req.headers['if-none-match'] === etag) { res.writeHead(304, headers); res.end(); return; }
+  if (f.zipped && /\bgzip\b/.test(req.headers['accept-encoding'] || '')) {
+    res.writeHead(200, { ...headers, 'Content-Encoding': 'gzip' }); res.end(f.zipped);
+  } else { res.writeHead(200, headers); res.end(f.body); }
 });
 
 const wss = new WebSocketServer({ server, perMessageDeflate: false });
