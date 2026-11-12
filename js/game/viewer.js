@@ -25,7 +25,7 @@ function viewerTick(){
 const CVMETA={
   vish:{splash:'assets/splash_vish.webp',bg:'assets/bg_vish.webp',tag:'ALL-ROUNDER · ZONER',bio:'Keeps you at range with knives and a shotgun, then dashes through to start a combo. Strong at every distance.',st:{POWER:3,SPEED:4,RANGE:5,DIFFICULTY:2}},
   rift:{tag:'MIX-UPS · GRAPPLER',bio:'Teleports behind you and grabs through your guard. Hard to read, punishing up close, weak if you keep him guessing wrong.',st:{POWER:4,SPEED:3,RANGE:3,DIFFICULTY:4}},
-  jacob:{tag:'POWERHOUSE · HOOK',bio:'Drags you in with the grapple hook and flattens you with slams. Slow on foot, huge damage once he connects.',st:{POWER:5,SPEED:2,RANGE:3,DIFFICULTY:3}},
+  jacob:{splash:'assets/splash_jacob.webp',bg:'assets/bg_jacob.webp',splashPos:'60% bottom',tag:'POWERHOUSE · HOOK',bio:'Drags you in with the grapple hook and flattens you with slams. Slow on foot, huge damage once he connects.',st:{POWER:5,SPEED:2,RANGE:3,DIFFICULTY:3}},
 };
 const CVDATA={};
 function cvInit(){if(cvInit.done)return;cvInit.done=1; // runs on first open (the fighter list is defined in menus.js, which loads after this file)
@@ -40,7 +40,7 @@ function cvShow(c){cvInit();vChar=c;const M=CVMETA[c],rows=CVDATA[c];
   const kit=rows.filter(r=>!/^[1-4]$/.test(r[0]));kit.splice(kit.findIndex(r=>r[0]==='SHIFT')+1,0,['HOLD BACK','Block','—','Block on the ground. Grabs go through it.']);
   $('#cvkit').innerHTML=kit.map(r=>'<div title="'+r[3].replace(/"/g,'&quot;')+'"><b>'+r[0]+'</b>'+r[1]+'</div>').join('');
   $$('#cvroster .rp').forEach(e=>e.classList.toggle('on',e.dataset.c===c));
-  const v=$('#viewer');v.classList.toggle('hasSplash',!!M.splash);if(M.splash)$('#cvsplash').src=M.splash;
+  const v=$('#viewer');v.classList.toggle('hasSplash',!!M.splash);if(M.splash){$('#cvsplash').src=M.splash;$('#cvsplash').style.objectPosition=M.splashPos||'left bottom';}
   v.style.setProperty('--cvbg',M.bg?'url('+M.bg+')':'url(assets/arena_bg.webp)');v.classList.remove('swap');void v.offsetWidth;v.classList.add('swap');cvT=0;cvStep(true);}
 function cvStep(force){if(G.mode!=='viewer'&&!force)return;cvT++;
   const fr=SPR[vChar==='vish'?'vish_menu':vChar+'_idle'],f=fr[cvT%fr.length],k=f.k||SPRK,hv=68*(f.h*k/1.92),wv=hv*f.w/f.h,im=$('#cvimg');
