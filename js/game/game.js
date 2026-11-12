@@ -76,7 +76,7 @@ function updCam(snap){
   const tx=clamp(mid,-5,5),tz=6.4+d*0.42,ty=1.75+hy*0.35;
   const lo=Math.min(p1.y,p2.y)*0.5;
   const want=new THREE.Vector3(tx,ty+lo,tz),look=new THREE.Vector3(tx,1.15+hy*0.3+lo,0);
-  if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.x+=k*1.5;want.z-=k*2.2;want.y-=k*0.6;}
+  if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.z-=k*2.2;want.y-=k*0.6;} // intro: start close, pull back, centred between both fighters
   if(G.phase==='ko'&&G.pt<130&&G.koBy){const w=G.koBy===p1?p2:p1;want.set(w.x*0.6+tx*0.4,1.6,6.5);look.set(w.x*0.6+tx*0.4,0.8,0);}
   if(snap){camPos.copy(want);camLook.copy(look);}else{camPos.lerp(want,0.08);camLook.lerp(look,0.1);}
   cam.position.copy(camPos);

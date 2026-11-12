@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 23 files · ~6,708 words
+- 23 files · ~6,839 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 249 nodes · 368 edges · 19 communities (15 shown, 4 thin omitted)
+- 251 nodes · 373 edges · 19 communities (15 shown, 4 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `de1a7831`
+- Built from commit: `0ff18df0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -48,12 +48,12 @@
 10. `phaseLogic()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/sprites.js
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/sprites.js
 
 ## Import Cycles
 - None detected.
@@ -81,8 +81,8 @@ Cohesion: 0.11
 Nodes (14): BOOT, CHARS, files, fs, http, load(), path, send() (+6 more)
 
 ### Community 5 - "menus.js"
-Cohesion: 0.16
-Nodes (24): act(), applySet(), cChoose(), charIntro(), CIDS, closeOvl(), cReset(), DIFFS (+16 more)
+Cohesion: 0.15
+Nodes (26): act(), applySet(), cChoose(), charIntro(), CIDS, closeOvl(), cNav(), cReset() (+18 more)
 
 ### Community 6 - "moves.js"
 Cohesion: 0.08

@@ -1,13 +1,23 @@
 'use strict';
 /* =============== SCREENS / MENUS =============== */
 p1=new Fighter(PAL1,0);p2=new Fighter(PAL2,1);
-$('#ccard0').style.backgroundImage='url('+HUDIMG.face_vish+')';$$('.cib .art').forEach(e=>e.style.backgroundImage='url('+HUDIMG.intro+')');let cPick=null,cCur=0,cT=0;const CIDS=['vish','rift','jacob'];$('#ccard2').style.backgroundImage='url('+HUDIMG.face_jacob+')';$('#ccard1').style.backgroundImage='url('+HUDIMG.face_rift+')';$('#ccard1').textContent='';$('#ccard2').addEventListener('click',()=>cChoose(2));
-function cReset(keep){if(!keep){G.selStage=0;$('#ctitle').textContent='CHOOSE YOUR FIGHTER';}cPick=null;cCur=0;$('#cidle').style.display='none';$('#cname2').innerHTML='&nbsp;';$('#cdesc').textContent='';$('#cgo').style.visibility='hidden';$$('.ccard').forEach(c=>c.classList.remove('sel'));$('#chint').textContent='PICK A CHARACTER (A / D) · ESC TO GO BACK';}
-function cChoose(i){if(i===undefined)i=cCur;const id=CIDS[i];if(cPick===id){if(G.selStage===1){G.p2char=id;act('fight');return;}G.p1char=id;if(G.training){act('fight');return;}sfx.ok();G.selStage=1;cReset(true);$('#ctitle').textContent='CHOOSE YOUR OPPONENT';return;}sfx.ok();cPick=id;cCur=i;
-  const im=$('#cidle');im.style.display='block';im.style.filter='';im.removeAttribute('src');
-  $('#cname2').textContent=CHARS[id].name;$('#cdesc').textContent=CHARS[id].desc;$('#cgo').style.visibility='visible';
-  $$('.ccard').forEach((c,k)=>c.classList.toggle('sel',k===i));$('#chint').textContent='SELECT AGAIN OR ENTER TO CONFIRM · ESC TO GO BACK';}
-setInterval(()=>{if(G.mode==='select'&&cPick){cT++;const fr=SPR[cPick==='vish'?'vish_menu':cPick+'_idle'];$('#cidle').src=fr[(fr.length>10?cT*2:cT)%fr.length].src;}},150);
+$('#ccard0').style.backgroundImage='url('+HUDIMG.face_vish+')';$$('.cib .art').forEach(e=>e.style.backgroundImage='url('+HUDIMG.intro+')');let cPick=null,cCur=0,cT=0;const CIDS=['vish','rift','jacob'];$('#ccard2').style.backgroundImage='url('+HUDIMG.face_jacob+')';$('#ccard1').style.backgroundImage='url('+HUDIMG.face_rift+')';$('#ccard1').textContent='';$('#ccard2').addEventListener('click',()=>cChoose(2));$('#ccard3').addEventListener('click',()=>cChoose(3));
+function cReset(keep){if(!keep){G.selStage=0;$('#ctitle').textContent='CHOOSE YOUR FIGHTER';}cPick=null;cCur=-1;$('#cidle').style.display='none';$('#cname2').innerHTML='&nbsp;';$('#cdesc').textContent='';$('#cgo').style.visibility='hidden';
+  // vs CPU: the opponent can't be the fighter you picked
+  $$('#csel .ccard').forEach((c,k)=>{c.classList.remove('sel');c.classList.toggle('taken',G.selStage===1&&!G.training&&CIDS[k]===G.p1char);});
+  $('#chint').textContent='PICK A CHARACTER (A / D) · ESC TO GO BACK';}
+const cTaken=i=>i<3&&G.selStage===1&&!G.training&&CIDS[i]===G.p1char;
+function cNav(d){let i=cCur;for(let n=0;n<4;n++){i=(i+d+4)%4;if(!cTaken(i))return cChoose(i);}}
+function cChoose(i){if(i===undefined){if(cCur<0)return cNav(1);i=cCur;}if(cTaken(i)){sfx.block();return;}
+  const rand=i===3,id=rand?'random':CIDS[i];
+  if(cPick===id){ // second press confirms; RANDOM rolls from whoever is allowed
+    const pool=CIDS.filter((c,k)=>!cTaken(k)),real=rand?pool[rnd()*pool.length|0]:id;
+    if(G.selStage===1){G.p2char=real;act('fight');return;}G.p1char=real;if(G.training){act('fight');return;}sfx.ok();G.selStage=1;cReset(true);$('#ctitle').textContent='CHOOSE YOUR OPPONENT';return;}
+  sfx.ok();cPick=id;cCur=i;
+  const im=$('#cidle');im.style.display='block';im.style.filter=rand?'brightness(0) drop-shadow(0 0 .4vw #d8232f)':'';im.removeAttribute('src');
+  $('#cname2').textContent=rand?'RANDOM':CHARS[id].name;$('#cdesc').textContent=rand?(G.selStage===1?'A surprise opponent':'A surprise fighter'):CHARS[id].desc;$('#cgo').style.visibility='visible';
+  $$('#csel .ccard').forEach((c,k)=>c.classList.toggle('sel',k===i));$('#chint').textContent='SELECT AGAIN OR ENTER TO CONFIRM · ESC TO GO BACK';}
+setInterval(()=>{if(G.mode==='select'&&cPick){cT++;const pk=cPick==='random'?CIDS.filter((c,k)=>!cTaken(k))[Math.floor(cT/4)%CIDS.filter((c,k)=>!cTaken(k)).length]:cPick;const fr=SPR[pk==='vish'?'vish_menu':pk+'_idle'];$('#cidle').src=fr[(fr.length>10?cT*2:cT)%fr.length].src;}},150);
 $('#ccard0').addEventListener('click',()=>cChoose(0));$('#ccard1').addEventListener('click',()=>cChoose(1));$('#cgo').addEventListener('click',()=>cChoose());
 $$('.ink').forEach((el,n)=>{let r=n*7+3;const R=()=>{r=(r*9301+49297)%233280;return r/233280;};const pts=[],N=26;
   const slant=el.classList.contains('plate')?6:el.classList.contains('splash')?14:4;
@@ -25,7 +35,7 @@ function applySet(){muted=!SET.sound;VOL=SET.vol;$('#sSnd').textContent=SET.soun
 /* ---------- main menu scene: three fighters, embers, intro ---------- */
 const MF={front:'vish',t:0};
 const mfAnim=id=>SPR[id==='vish'?'vish_menu':id+'_idle'];
-function mfBuild(){const box=$('#mfs');box.innerHTML='';const others=CIDS.filter(c=>c!==MF.front);
+function mfBuild(){if($('#menu').classList.contains('art'))return;const box=$('#mfs');box.innerHTML='';const others=CIDS.filter(c=>c!==MF.front);
   // [char, x position (vw), height (vh), back?]
   [[others[0],60,46,1],[others[1],88,46,1],[MF.front,74,64,0]].forEach(([id,x,h,bk],n)=>{
     const sh=document.createElement('div');sh.className='mshad';sh.style.cssText+=`left:${x-6}vw;width:12vw;${bk?'bottom:11.5vh;opacity:.6':''}`;box.appendChild(sh);
@@ -59,7 +69,7 @@ let ovl=null;
 function openOvl(id){ovl=id;$$('.ovl').forEach(o=>o.classList.toggle('on',o.id===id));setSel($$('#'+id+' .mbtn'),0);}
 function closeOvl(){ovl=null;$$('.ovl').forEach(o=>o.classList.remove('on'));}
 function setSel(list,i){const was=list.findIndex(b=>b.classList.contains('sel'));list.forEach((b,k)=>b.classList.toggle('sel',k===i));
-  if(G.mode==='menu'&&!ovl&&was!==i&&list[i]&&list[i].dataset.a==='char')mfCycle();} // landing on Characters swaps who stands in front
+  if(G.mode==='menu'&&!ovl&&was!==i&&list[i]&&list[i].dataset.a==='char'&&!$('#menu').classList.contains('art'))mfCycle();} // landing on Characters swaps who stands in front
 function curList(){if(ovl)return $$('#'+ovl+' .mbtn');if(G.mode==='menu')return $$('#menu .mbtn');return [];}
 function act(a){
   sfx.ok();
@@ -100,7 +110,7 @@ addEventListener('keydown',e=>{
   }
   if(G.mode==='onl'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();toMenu();}return;}
   if(G.mode==='select'&&!G.training&&['KeyW','ArrowUp','KeyS','ArrowDown'].includes(e.code)){const d=e.code==='KeyW'||e.code==='ArrowUp'?-1:1;G.diff=DIFFS[(DIFFS.indexOf(G.diff)+d+3)%3];$('#dlabel').textContent=G.diff;sfx.sel();return;}
-  if(G.mode==='select'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();if(G.selStage===1)cReset();else toMenu();}else if(['Enter','Space','KeyJ'].includes(e.code)&&!e.repeat)cChoose();else if(['KeyA','ArrowLeft','KeyD','ArrowRight'].includes(e.code))cChoose((cCur+(cPick?1:0))%CIDS.length);return;}
+  if(G.mode==='select'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();if(G.selStage===1)cReset();else toMenu();}else if(['Enter','Space','KeyJ'].includes(e.code)&&!e.repeat)cChoose();else if(['KeyA','ArrowLeft'].includes(e.code))cNav(-1);else if(['KeyD','ArrowRight'].includes(e.code))cNav(1);return;}
   if(G.mode==='viewer'){if(e.code==='Escape'||e.code==='Backspace')toMenu();return;}
   if(G.mode==='fight'){
     if(e.code==='Escape'){if(G.phase!=='done'){if(!G.online)G.paused=true;openOvl('pause');}return;}

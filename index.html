@@ -24,6 +24,13 @@ button{font-family:inherit}
 .mf.back{filter:brightness(.32) saturate(.6) contrast(1.1);bottom:13vh}
 .mf.front{filter:drop-shadow(0 0 .25vw #ff3b2f) drop-shadow(0 1.2vh 1vh #000)}
 .mshad{position:absolute;bottom:7.5vh;height:3vh;border-radius:50%;background:radial-gradient(#000c,#0000 70%)}
+/* painted menu art: the fighters are in the picture, so the stand-in pieces switch off */
+#menu.art .mbg{background:#0c070e;animation:kb 40s ease-in-out infinite alternate;transform-origin:80% 60%}
+/* art anchored bottom-right at 88% height so the fighters sit clear of the menu; edges fade into the dark */
+#menu.art .mbg::before{content:'';position:absolute;right:0;bottom:0;top:auto;left:auto;height:88vh;width:auto;aspect-ratio:1672/941;max-width:none;transform:none;opacity:1;background:url(assets/menu_bg.webp) center/cover no-repeat;-webkit-mask-image:linear-gradient(#0000,#000 14%);mask-image:linear-gradient(#0000,#000 14%)}
+#menu.art .mbg::after{content:'';position:absolute;inset:0;height:auto;border:none;background:linear-gradient(90deg,#0c070e 0%,#0c070ee6 22%,#0c070e66 40%,#0000 56%)}
+#menu.art .mpil,#menu.art #mfs{display:none}
+@keyframes kb{0%{transform:scale(1)}100%{transform:scale(1.07) translate(-1%,-1%)}}
 #mflash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none}
 #mflash.go{animation:mflash .35s ease-out}
 @keyframes mflash{0%{opacity:.55}100%{opacity:0}}
@@ -164,7 +171,7 @@ button{font-family:inherit}
 .pips{position:absolute;right:6px;top:6px;display:flex;flex-direction:column;gap:2px;z-index:4}
 .pips u{display:block;width:7px;height:7px;background:#333;transform:rotate(45deg);border:1px solid #000}
 .pips u.on{background:#eef3f8;box-shadow:0 0 5px #fff}
-#csel{background:#000;flex-direction:column;align-items:center;justify-content:center}
+#csel{background:linear-gradient(#000b,#000e 85%),url(assets/arena_bg.webp) center/cover;flex-direction:column;align-items:center;justify-content:center}
 #csel h2,#onl h2{font-family:'Permanent Marker',cursive;font-size:clamp(40px,5vw,76px);transform:rotate(-3deg);text-shadow:4px 4px 0 #000;margin-bottom:1vh}
 #csel h2 small,#onl h2 small{display:block;font-family:Teko;font-size:.4em;letter-spacing:5px;color:#d8232f}
 .cprev{height:42vh;display:flex;align-items:flex-end;justify-content:center;margin-bottom:1vh}
@@ -176,8 +183,10 @@ button{font-family:inherit}
 .ccard{width:120px;height:132px;background:#141016 50% 100%/cover no-repeat;border:3px solid #3a2e34;clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);cursor:pointer;position:relative;font-size:54px;color:#3a2e34;display:flex;align-items:center;justify-content:center}
 .ccard.sel{border-color:#d8232f;box-shadow:inset 0 0 0 3px #d8232f}
 .ccard.lock{cursor:default}
+.ccard.rand{color:#d8232f;font-family:'Permanent Marker',cursive}
+.ccard.rand::after{content:'RANDOM';position:absolute;left:0;right:0;bottom:6px;text-align:center;font-family:Teko,sans-serif;font-size:18px;color:#fff;letter-spacing:2px}
 #csel .hint{margin-top:3vh}
-#onl{background:#000;flex-direction:column;align-items:center;justify-content:center}
+#onl{background:linear-gradient(#000b,#000e 85%),url(assets/arena_bg.webp) center/cover;flex-direction:column;align-items:center;justify-content:center}
 #onl h2{text-align:center}
 .ccard.taken{opacity:.25;cursor:default}.ccard.taken::after{content:'TAKEN';position:absolute;left:0;right:0;bottom:6px;text-align:center;font-size:20px;color:#fff;letter-spacing:2px}
 .ccard.mine{border-color:#ffcc33;box-shadow:inset 0 0 0 3px #ffcc33}.ccard.off{opacity:.45;cursor:default}
@@ -198,7 +207,7 @@ button{font-family:inherit}
 <body>
 <canvas id="c"></canvas>
 
-<div id="menu" class="screen on intro">
+<div id="menu" class="screen on intro art">
   <div class="mbg"><div class="mpil" style="left:52vw;top:8vh"></div><div class="mpil" style="left:93vw;top:5vh"></div><div class="mpil" style="left:64vw;top:16vh;opacity:.6"></div></div>
   <canvas id="membr"></canvas>
   <div id="mfs"></div>
@@ -246,7 +255,7 @@ button{font-family:inherit}
   <div class="cprev"><img id="cidle" alt=""><button class="mbtn" id="cgo" style="visibility:hidden">SELECT</button></div>
   <div class="cname2" id="cname2">&nbsp;</div>
   <div class="hint" id="cdesc" style="margin:-1vh 0 1.5vh;color:#c9bfc3;min-height:1.2em"></div>
-  <div class="cgrid"><div class="ccard" id="ccard0"></div><div class="ccard" id="ccard1" style="font-size:30px;color:#c09cff;font-weight:700;letter-spacing:2px">RIFT</div><div class="ccard" id="ccard2"></div><div class="ccard lock">?</div></div>
+  <div class="cgrid"><div class="ccard" id="ccard0"></div><div class="ccard" id="ccard1" style="font-size:30px;color:#c09cff;font-weight:700;letter-spacing:2px">RIFT</div><div class="ccard" id="ccard2"></div><div class="ccard rand" id="ccard3">?</div></div>
   <div class="hint" id="chint">PICK A CHARACTER · ESC TO GO BACK</div>
 </div>
 <div id="onl" class="screen">
