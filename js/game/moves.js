@@ -113,7 +113,7 @@ function riftFrame(f){
   const jf=()=>f.flip>0?[J,4,'flip']:(st<6&&f.vy>0.12)?[J,2]:f.vy>0.05?[J,3]:f.vy>-0.07?[J,4]:f.vy>-0.17?[J,5]:[J,6];
   switch(f.state){
     case 'walkf':return [R,Math.floor(st/6)%SPR[R].length];
-    case 'walkb':return ['rift_runb',Math.floor(st/7)%SPR.rift_runb.length];
+    case 'walkb':return ['rift_runb',Math.floor(st/10)%SPR.rift_runb.length];
     case 'jump':return jf();
     case 'land':return G.time-(f.throwBackT||-99)<18?['rift_throwb',0]:G.time-(f.throwFwdT||-99)<18?['rift_throwf',0]:G.time-(f.slamT||-99)<18?['rift_slamd',0]:G.time-(f.upT||-99)<18?['rift_throwu',0]:[J,7];
     case 'wakeup':return [J,1];
@@ -122,9 +122,9 @@ function riftFrame(f){
     case 'ghold':return ['rift_grab',2];
     case 'hold':return ['rift_grab',2];
     case 'parry':case 'guard':case 'block':return [H,0];
-    case 'hitstun':case 'stun':return [I,0];
-    case 'airhit':return [I,0,'tumble'];
-    case 'kd':case 'ko':return [I,0,'down'];
+    case 'hitstun':case 'stun':return ['rift_hit',0];
+    case 'airhit':return ['rift_hit',0,'tumble'];
+    case 'kd':case 'ko':return ['rift_hit',0,'down'];
     case 'attack':{const m=f.move,s=m?m.startup:0,a=m?m.active:0,k=f.mt;
       if(f.mname==='heavy')return [H,k<=s?1:k<=s+a+10?2:1];
       if(f.mname==='rslash'){const e=s+a+6,r=m.recovery-6,q=(k-e)/r;return ['rift_slash',k<=4?0:k<=8?1:k<=s?2:k<=e?4:q<0.34?2:q<0.67?1:0];}
@@ -142,16 +142,16 @@ function jacobFrame(f){
   const st=f.st||0,t=G.time,I='jacob_idle',R='jacob_run',T='jacob_taunt';
   switch(f.state){
     case 'walkf':return [R,Math.floor(st/5)%6];
-    case 'walkb':return ['jacob_runb',Math.floor(st/6)%6];
+    case 'walkb':return ['jacob_runb',Math.floor(st/9)%6];
     case 'taunt':return [T,Math.min(5,Math.floor(f.mt/9))];
     case 'jump':case 'dodge':return [R,3,f.state==='jump'&&f.flip>0?'flip':undefined];
     case 'land':case 'wakeup':return [I,0];
     case 'charge':return [T,f.charge<TAP?0:1];
     case 'parry':return [T,2];
     case 'guard':case 'block':return [T,0];
-    case 'hitstun':case 'stun':return [I,3];
-    case 'airhit':return [I,3,'tumble'];
-    case 'kd':case 'ko':return [I,3,'down'];
+    case 'hitstun':case 'stun':return ['jacob_hit',0];
+    case 'airhit':return ['jacob_hit',0,'tumble'];
+    case 'kd':case 'ko':return ['jacob_hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0;
       if(f.mname==='jslam')return k<=s?[T,3]:[R,3];
       if(f.mname==='jupper')return [T,k<=s?1:3];

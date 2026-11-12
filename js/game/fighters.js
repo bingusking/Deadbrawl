@@ -1,6 +1,6 @@
 'use strict';
 /* =============== FIGHTERS =============== */
-const MAXHP=1000, STAGE=8.2, GRAV=0.0115, JUMPV=0.22, DJUMPV=0.2, RUNF=0.085, RUNB=0.068;
+const MAXHP=1000, STAGE=8.2, GRAV=0.0115, JUMPV=0.22, DJUMPV=0.2, RUNF=0.085, RUNB=0.045; // walking back is about half run speed
 class Fighter{
   constructor(pal,idx){this.idx=idx;this.rig=buildRig(pal);scene.add(this.rig.root);
     const sh=new THREE.Mesh(new THREE.CircleGeometry(0.5,24),new THREE.MeshBasicMaterial({color:0x000000,transparent:true,opacity:0.4,depthWrite:false}));sh.rotation.x=-Math.PI/2;sh.position.y=0.015;scene.add(sh);this.shadow=sh;

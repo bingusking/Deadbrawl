@@ -24,7 +24,7 @@ function spriteFrame(f){
   switch(f.state){
     case 'intro':case 'idle':case 'victory':return ['idle',Math.floor(t/5+f.idx*3)%SPR.idle.length];
     case 'walkf':return ['run',Math.floor(st/5)%SPR.run.length];
-    case 'walkb':return ['runb',Math.floor(st/7)%SPR.runb.length];
+    case 'walkb':return ['runb',Math.floor(st/10)%SPR.runb.length];
     case 'jump':
       if(f.flip>0)return ['jump',3,'flip'];
       if(st<6&&f.vy>0.12)return ['jump',1];
