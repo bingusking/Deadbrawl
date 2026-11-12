@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "js/game/viewer.js": {
-    "mtime": 1794475397.4634333,
-    "seen": 1794475491.5020225,
-    "ast_hash": "2f07d29530829bffccce95bcdaae1bce",
+    "mtime": 1794476070.1307378,
+    "seen": 1794476101.7674046,
+    "ast_hash": "f5c86517ca7832d1166d675875acc552",
     "semantic_hash": ""
   },
   "package.json": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794475370.3292682,
-    "seen": 1794475491.5020337,
-    "ast_hash": "d12b8a625586dc8ff0d1ea4fc5b19e62",
+    "mtime": 1794476087.1126354,
+    "seen": 1794476101.767416,
+    "ast_hash": "bf2410c10de58cd8cf689be715c10d23",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {

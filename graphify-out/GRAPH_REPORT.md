@@ -1,7 +1,7 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 23 files · ~7,146 words
+- 23 files · ~7,184 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `42b23c87`
+- Built from commit: `56a56f16`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -36,16 +36,16 @@
 - Deadbrawl: notes for Claude
 
 ## God Nodes (most connected - your core abstractions)
-1. `act()` - 11 edges
-2. `runMove()` - 11 edges
+1. `runMove()` - 11 edges
+2. `act()` - 11 edges
 3. `buildRig()` - 9 edges
 4. `stepFighter()` - 9 edges
 5. `services` - 8 edges
 6. `goOnline()` - 7 edges
 7. `netLost()` - 6 edges
-8. `cChoose()` - 5 edges
-9. `show()` - 5 edges
-10. `toSelect()` - 5 edges
+8. `phaseLogic()` - 5 edges
+9. `splash()` - 5 edges
+10. `startRound()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
