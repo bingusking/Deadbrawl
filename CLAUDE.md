@@ -12,4 +12,4 @@ Note: "The Lash" is the display name; in code his id is still `jacob` (jacobFram
 
 ## After changing code
 - Run `graphify update .` so the map stays current (no API key needed; `.graphifyignore` skips the data files).
-- Test with `npm start` and open http://localhost:3000.
+- Test with `npm start` and open http://localhost:3000. The server loads files into memory at startup, so restart it after every edit.

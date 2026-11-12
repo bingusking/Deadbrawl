@@ -4,11 +4,15 @@ const G={mode:'menu',diff:'NORMAL',paused:false,time:0,phase:'intro',pt:0,round:
 const CHARS={vish:{name:'VISH',ab:['KNIFE','RUSH','BLAST','KICK'],desc:'1 Throwing knife · 2 Dash · 3 Shotgun · 4 Spike kick'},jacob:{name:'THE LASH',ab:['HOOK','SLAM','UPPER','KICK'],desc:'1 Grapple hook: then 1 again zip in, W launch above, S pull them · 2 Slam · 3 Uppercut · 4 Kick off · T taunt'},rift:{name:'RIFT',ab:['SLASH','BLINK','GRAB','LUNGE'],desc:'1 Big slash · 2 Teleport behind (2nd use pushes) · 3 Grab and hold, then S slam, A/D throw, W toss up · 4 Lunge grab'}};
 const keys={};
 function readPlayer(){p1.inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ};if(G.phase!=='fight'){p1.inp={l:0,r:0,u:0,d:0,q:0};p1.buf={};}}
-function callout(f,txt,col){const el=$('#combo'+(f.idx+1));el.innerHTML='<b style="color:'+col+';font-size:1.1em">'+txt+'</b>';el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),900);}
+function callout(f,txt,col){const el=$('#call'+(f.idx+1));el.innerHTML='<b style="color:'+col+'">'+txt+'</b>';el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),900);}
 function splash(html,dur=1.2){const s=$('#splash');s.innerHTML=html;s.classList.remove('show');void s.offsetWidth;s.style.setProperty('--d',dur+'s');s.classList.add('show');}
 function flash(a){const f=$('#flash');f.style.transition='none';f.style.opacity=a;void f.offsetWidth;f.style.transition='opacity .35s';f.style.opacity=0;}
 function cutin(){const c=$('#cutin');c.classList.remove('on');void c.offsetWidth;c.classList.add('on');const bar=c.querySelector('.cbar');bar.style.animation='none';void bar.offsetWidth;bar.style.animation='';flash(0.35);}
-function showCombo(a){if(a.combo<2)return;const el=$('#combo'+(a.idx+1));el.innerHTML='<b>'+a.combo+'</b>HITS';el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1100);}
+// combo counter: grows, shakes and heats up with each hit, shows the running damage total
+function showCombo(a,n,dmg){if(n===undefined)n=a.combo;if(n<2)return;const el=$('#combo'+(a.idx+1));
+  el.innerHTML='<b>'+n+'</b>HITS'+(dmg?'<em>'+dmg+' DMG</em>':'');el.style.setProperty('--s',Math.min(1.6,1+(n-2)*0.07));
+  el.classList.toggle('hot',n>=5);el.classList.toggle('fire',n>=9);el.classList.add('on');el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
+  clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1400);}
 function KO(a,d){if(G.training){d.hp=1;return;}if(G.phase!=='fight')return;G.phase='ko';G.pt=0;G.koBy=a;G.wins[a.idx]++;d.state='airhit';sfx.ko();flash(0.6);splash('K.O.<span class="u"></span>',2.2);G.hitstop=20;}
 function hudSetup(){const me=G.me||p1;CHARS[me.char].ab.forEach((n,i)=>$('#ab-'+(i+1)+' .n').textContent=n);$('#ab-1 .pips').style.display=me.char==='rift'?'none':'';$('#ab-2').classList.remove('charging');}
 function startMatch(){p1.char=G.p1char;p2.char=G.p2char;hudSetup();G.wins=[0,0];G.round=1;p1.tension=p2.tension=0;startRound();}

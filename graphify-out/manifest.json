@@ -1,8 +1,8 @@
 {
   "js/game/ai.js": {
-    "mtime": 1794468361.4332302,
-    "seen": 1794469219.9031248,
-    "ast_hash": "4c42f379538265c69610cfc42b3fed67",
+    "mtime": 1794471623.0626073,
+    "seen": 1794471750.4229257,
+    "ast_hash": "f240c967ed5cbbcf04dd11f64acec3d1",
     "semantic_hash": ""
   },
   "js/game/animation.js": {
@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "js/game/fighters.js": {
-    "mtime": 1794468361.4331505,
-    "seen": 1794469219.9031446,
-    "ast_hash": "b58657b0246dc86201aefbb19f06eb02",
+    "mtime": 1794471310.652781,
+    "seen": 1794471750.4229414,
+    "ast_hash": "1ae39fb606ba6ef9ae05b7796a31d5d3",
     "semantic_hash": ""
   },
   "js/game/fx.js": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794469998.008833,
-    "seen": 1794470068.5049403,
-    "ast_hash": "779dc9e2db8136da665569b133ce2853",
+    "mtime": 1794471191.842872,
+    "seen": 1794471193.1985967,
+    "ast_hash": "e841029958e2ee052a2d334ec6238846",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "js/game/moves.js": {
-    "mtime": 1794468361.4329264,
-    "seen": 1794469219.903159,
-    "ast_hash": "421791f956abf19f2f0b8a51ff4f3692",
+    "mtime": 1794471638.5518985,
+    "seen": 1794471750.422949,
+    "ast_hash": "8e9b99ef60d4f8d1b624c0751bd38ac3",
     "semantic_hash": ""
   },
   "js/game/online.js": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "js/game/sprites.js": {
-    "mtime": 1794468361.433073,
-    "seen": 1794469219.903164,
-    "ast_hash": "4f48f14f516bc528f17b23f4cab4abc7",
+    "mtime": 1794471638.538213,
+    "seen": 1794471750.4229515,
+    "ast_hash": "0e6f09d1302598814b20f225d93d92bb",
     "semantic_hash": ""
   },
   "js/game/stage.js": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794469998.0110846,
-    "seen": 1794470068.504961,
-    "ast_hash": "d7689f40960cd14e3930aec25f433431",
+    "mtime": 1794471460.95553,
+    "seen": 1794471750.4229653,
+    "ast_hash": "3e19a08d303b8b64ca9e831ecd3fccbe",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1794470067.5671716,
-    "seen": 1794470068.5049584,
-    "ast_hash": "74a5ad67202d28ede9fc238b0d8ca3e3",
+    "mtime": 1794471749.543581,
+    "seen": 1794471750.4229627,
+    "ast_hash": "b330fe9bb9ba197dfa6012e1f4ed5734",
     "semantic_hash": ""
   },
   "tools/sprites/README.md": {

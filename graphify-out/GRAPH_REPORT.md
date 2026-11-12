@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 23 files · ~6,137 words
+- 23 files · ~6,424 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 238 nodes · 344 edges · 21 communities (16 shown, 5 thin omitted)
+- 240 nodes · 348 edges · 20 communities (16 shown, 4 thin omitted)
 - Extraction: 93% EXTRACTED · 7% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `00478f3c`
+- Built from commit: `7a4db4ae`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,7 +31,6 @@
 - animation.js
 - audio.js
 - ai.js
-- Fighter
 - viewer.js
 - loop.js
 - stage.js
@@ -39,44 +38,44 @@
 
 ## God Nodes (most connected - your core abstractions)
 1. `runMove()` - 11 edges
-2. `buildRig()` - 9 edges
-3. `stepFighter()` - 8 edges
+2. `stepFighter()` - 9 edges
+3. `buildRig()` - 9 edges
 4. `services` - 8 edges
 5. `goOnline()` - 7 edges
 6. `act()` - 7 edges
 7. `netLost()` - 6 edges
-8. `splash()` - 5 edges
-9. `startRound()` - 5 edges
-10. `phaseLogic()` - 5 edges
+8. `startMove()` - 5 edges
+9. `tryAbility()` - 5 edges
+10. `applyHit()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/sprites.js
-- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (21 total, 5 thin omitted)
+## Communities (20 total, 4 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
 Nodes (27): BLOCKARMS, BOX(), buildRig(), cam, canvas, CYL(), dirQ(), gmap (+19 more)
 
 ### Community 1 - "game.js"
-Cohesion: 0.17
-Nodes (18): camLook, camPos, CHARS, cutin(), endMatch(), flash(), G, hudSetup() (+10 more)
+Cohesion: 0.15
+Nodes (20): callout(), camLook, camPos, CHARS, cutin(), endMatch(), flash(), G (+12 more)
 
 ### Community 2 - "online.js"
-Cohesion: 0.17
-Nodes (22): callout(), showCombo(), goOnline(), GPR, guestProj(), guestTick(), NET, netClose() (+14 more)
+Cohesion: 0.19
+Nodes (20): goOnline(), GPR, guestProj(), guestTick(), NET, netClose(), netDec(), netEnc() (+12 more)
 
 ### Community 3 - "fighters.js"
-Cohesion: 0.22
-Nodes (16): afterimage(), applyHit(), burstKnife(), overlap(), projectiles, runMove(), shotgunFx(), spawnKnife() (+8 more)
+Cohesion: 0.16
+Nodes (19): afterimage(), applyHit(), burstKnife(), canBlock(), Fighter, overlap(), projectiles, runMove() (+11 more)
 
 ### Community 4 - "server.js"
 Cohesion: 0.11
@@ -127,20 +126,22 @@ Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
 ## Knowledge Gaps
-- **5 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **4 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+  _High betweenness centrality (0.011) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
-- **Why does `afterimage()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+- **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
+- **Should `game.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
+- **Why does `shotgunFx()` connect `fighters.js` to `online.js`?**
+  _High betweenness centrality (0.010) - this node is a cross-community bridge._
 - **Should `server.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
-- **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Should `moves.js` be split into smaller, more focused modules?**
   _Cohesion score 0.09956709956709957 - nodes in this community are weakly interconnected._

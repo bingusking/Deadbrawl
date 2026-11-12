@@ -61,10 +61,18 @@ button{font-family:inherit}
 .ten.p2 .tb i{left:auto;right:0;background:linear-gradient(270deg,#2d6cdf,#7ec8ff)}
 .tb i.full{background:linear-gradient(90deg,#ff3d5a,#ffcf6b);box-shadow:0 0 12px #ff6a3d}
 .ten b{font-size:22px;width:44px;text-align:center;color:#7ec8ff}
-.combo{position:absolute;top:24vh;font-size:clamp(34px,3.5vw,54px);font-weight:700;font-style:italic;line-height:.85;text-shadow:3px 3px 0 #000;opacity:0;transition:opacity .25s}
-.combo b{font-size:1.8em;color:#ffcc33;display:block}
-#combo1{left:3vw}#combo2{right:3vw;text-align:right}
+.combo{position:absolute;top:24vh;font-size:clamp(34px,3.5vw,54px);font-weight:700;font-style:italic;line-height:.85;text-shadow:3px 3px 0 #000;opacity:0;transition:opacity .25s;--s:1}
+.combo b{font-size:calc(1.8em * var(--s));color:#ffcc33;display:block;transition:color .2s}
+.combo em{display:block;font-style:normal;padding-left:.15em;font-size:.42em;letter-spacing:.12em;margin-top:.5em;color:#fff;opacity:.9}
+.combo.hot b{color:#ff8a2a}.combo.fire b{color:#ff3b2f;text-shadow:3px 3px 0 #000,0 0 18px rgba(255,60,40,.8)}
+#combo1{left:3vw;transform-origin:left center}#combo2{right:3vw;text-align:right;transform-origin:right center}
 .combo.on{opacity:1}
+.combo.pop{animation:cpop .26s ease-out}
+@keyframes cpop{0%{transform:scale(1.35) rotate(-3deg)}35%{transform:scale(.94) translateX(5px)}65%{transform:scale(1.03) translateX(-4px)}100%{transform:none}}
+.call{position:absolute;top:calc(24vh + 190px);font-size:clamp(26px,2.6vw,40px);font-weight:800;font-style:italic;letter-spacing:.04em;text-shadow:3px 3px 0 #000;opacity:0;pointer-events:none}
+#call1{left:3vw}#call2{right:3vw;text-align:right}
+.call.on{animation:callin .9s ease-out forwards}
+@keyframes callin{0%{opacity:0;transform:scale(1.8)}12%{opacity:1;transform:scale(.95)}22%{transform:scale(1)}75%{opacity:1}100%{opacity:0;transform:translateY(-10px)}}
 #splash{position:fixed;left:0;right:0;top:34%;text-align:center;pointer-events:none;font-family:'Permanent Marker',cursive;font-size:clamp(64px,11vw,170px);line-height:1;color:#fff;text-shadow:6px 6px 0 #000;opacity:0;z-index:5}
 #splash .s1{font-size:.42em;color:#d8232f;display:block;transform:translateX(-1.4em)}
 #splash .u{display:block;height:.07em;background:#d8232f;width:min(560px,48vw);margin:.02em auto 0;transform:skewX(-40deg) translateX(-.3em)}
@@ -238,6 +246,8 @@ button{font-family:inherit}
   </div>
   <div class="combo" id="combo1"><b>0</b>HITS</div>
   <div class="combo" id="combo2"><b>0</b>HITS</div>
+  <div class="call" id="call1"></div>
+  <div class="call" id="call2"></div>
   <div class="bot">
     <div class="ten"><span>ULT</span><div class="tb"><i id="tn1"></i></div><b id="tv1">0</b></div>
     <div class="ten p2"><span>ULT</span><div class="tb"><i id="tn2"></i></div><b id="tv2">0</b></div>

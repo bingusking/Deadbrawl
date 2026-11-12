@@ -35,6 +35,7 @@ function spriteFrame(f){
     case 'charge':return ['heavy',f.charge<TAP?1:f.charge<18?2:3];
     case 'parry':return ['parry',f.mt<3?1:f.mt<5?2:f.mt<7?3:f.mt<=PARRY_WIN?4:5];
     case 'hold':case 'ghold':return ['knife',3];
+    case 'guard':case 'block':return ['parry',1];
     case 'hitstun':case 'stun':return ['hit',0];
     case 'airhit':return ['hit',0,'tumble'];
     case 'kd':case 'ko':return ['hit',0,'down'];

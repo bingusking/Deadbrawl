@@ -25,8 +25,8 @@ const MOVES={
 Object.assign(MOVES,{
   rslash:{base:'stance',impact:1,startup:12,active:5,recovery:20,dmg:85,reach:[-0.2,2.1],y:[-0.2,2.8],hitstun:22,push:0.4,shake:0.18},
   tele:{base:'stance',startup:4,active:1,recovery:8},
-  grab:{base:'stance',impact:1,startup:7,active:4,recovery:18,dmg:60,reach:[0,1.3],y:[-0.3,2.0],shake:0.15,react:grabReact},
-  lunge:{base:'stance',impact:1,startup:6,active:18,recovery:16,dmg:40,vx:0.3,reach:[0,0.4],y:[0.1,1.9],shake:0.1,react:lungeReact}
+  grab:{grab:1,base:'stance',impact:1,startup:7,active:4,recovery:18,dmg:60,reach:[0,1.3],y:[-0.3,2.0],shake:0.15,react:grabReact},
+  lunge:{grab:1,base:'stance',impact:1,startup:6,active:18,recovery:16,dmg:40,vx:0.3,reach:[0,0.4],y:[0.1,1.9],shake:0.1,react:lungeReact}
 });
 function grabReact(a,d){d.state='stun';d.stun=80;d.vx=0;d.vy=0;a.state='ghold';a.mt=0;a.move=null;a.vx=0;callout(a,'GRAB!','#c9a0ff');}
 function holdThroat(f,o,stay){ // held up by the throat: enemy's neck sits at Rift's raised fist
@@ -82,7 +82,7 @@ function spawnHook(f){
 }
 function jacobTick(f,o){
   if(f.hooks<2){if(++f.hookT>=JHOOK_REGEN){f.hooks++;f.hookT=0;}}else f.hookT=0;
-  const free=['idle','walkf','walkb','jump','land'].includes(f.state);
+  const free=['idle','walkf','walkb','guard','jump','land'].includes(f.state);
   if(free&&!f.air()&&f.state!=='land'&&take(f,'taunt')){f.state='taunt';f.mt=0;f.vx=0;}
   if(f.flyT>0&&--f.flyT===0&&f.state==='jump')f.vx=0;
   if(f.pulling){ // S: drag the enemy in
@@ -121,7 +121,7 @@ function riftFrame(f){
     case 'charge':return [H,f.charge<TAP?0:0];
     case 'ghold':return ['rift_grab',2];
     case 'hold':return ['rift_grab',2];
-    case 'parry':return [H,0];
+    case 'parry':case 'guard':case 'block':return [H,0];
     case 'hitstun':case 'stun':return [I,0];
     case 'airhit':return [I,0,'tumble'];
     case 'kd':case 'ko':return [I,0,'down'];
@@ -148,6 +148,7 @@ function jacobFrame(f){
     case 'land':case 'wakeup':return [I,0];
     case 'charge':return [T,f.charge<TAP?0:1];
     case 'parry':return [T,2];
+    case 'guard':case 'block':return [T,0];
     case 'hitstun':case 'stun':return [I,3];
     case 'airhit':return [I,3,'tumble'];
     case 'kd':case 'ko':return [I,3,'down'];

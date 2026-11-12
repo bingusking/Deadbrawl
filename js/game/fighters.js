@@ -10,7 +10,8 @@ class Fighter{
     cd:{parry:0,dash:0,shotgun:0,kick:0,dodge:0,air:0,r1:0,r2:0,r3:0,r4:0,j2:0,j3:0,j4:0},hooks:2,hookT:0,hookOn:0,pulling:false,tpWin:0,grabDir:null,knives:3,knifeT:0});this.buf={};this.cur=ov(P.intro);}
   air(){return this.y>0.001||this.vy>0;}
 }
-function press(f,b){f.buf[b]=8;}
+const BUF=12; // frames an early press is remembered for
+function press(f,b){f.buf[b]=BUF;}
 function take(f,b){if(f.buf[b]>0){f.buf[b]=0;return true;}return false;}
 const projectiles=[];
 let p1,p2;
@@ -61,6 +62,14 @@ function overlap(a,d,m){
   if(ay1<d.y||ay0>d.y+1.8)return null;
   return {x:clamp(d.x-a.facing*0.25,lo,hi),y:(Math.max(ay0,d.y)+Math.min(ay1,d.y+1.8))/2};
 }
+// something about to hit f? (used to stand still in guard instead of walking away)
+function threatOf(f,o){const dx=Math.abs(o.x-f.x);
+  if((o.state==='attack'&&o.move&&o.move.dmg&&dx<3.4)||(o.state==='charge'&&dx<3))return true;
+  return projectiles.some(p=>p.owner===o&&Math.abs(p.x-f.x)<4&&Math.sign(f.x-p.x)===Math.sign(p.vx));}
+// blocking: grounded, not busy, holding away from the attacker
+function canBlock(d,a){
+  if(d.air()||!['idle','walkf','walkb','guard','block'].includes(d.state))return false;
+  const s=Math.sign(a.x-d.x)||d.facing;return s>0?(d.inp.l&&!d.inp.r):(d.inp.r&&!d.inp.l);}
 function applyHit(a,d,m,px,py){
   // PARRY: only melee and charged heavies can be parried
   if(m.melee&&d.state==='parry'&&d.mt>=1&&d.mt<=PARRY_WIN){
@@ -69,9 +78,28 @@ function applyHit(a,d,m,px,py){
     G.hitstop=16;G.shake=0.18;spark(px,py,0x7ec8ff,22,0.18,0.14);sfx.parry();flash(0.35);callout(d,'PARRY!','#7ec8ff');
     return;
   }
+  const real=a instanceof Fighter;
+  // BLOCK: everything except grabs; abilities and knives do a little chip damage
+  if(!m.grab&&canBlock(d,a)){
+    const dir=Math.sign(d.x-a.x)||a.facing,chip=m.melee?0:Math.max(1,Math.round(m.dmg*0.12));
+    d.hp=Math.max(G.training?1:0,d.hp-chip);if(chip)d.lastHitT=G.time;
+    d.state='block';d.stun=Math.max(10,Math.round((m.hitstun||16)*0.7))+(m.impact?4:0);d.vx=dir*Math.max(0.06,(m.push||0.05)*0.8);
+    d.move=null;d.charge=0;d.comboTaken=0;
+    if(real){a.lastRes='block';if(!a.air())a.vx=-dir*0.04;if(m.react&&a.move)a.mt=Math.max(a.mt,a.move.startup+a.move.active);}
+    a.tension=Math.min(100,a.tension+2);d.tension=Math.min(100,d.tension+4);
+    G.hitstop=Math.max(G.hitstop,m.impact?8:5);G.shake=Math.max(G.shake,0.03);
+    spark(px,py,0x8fd0ff,10,0.1,0.12);sfx.block();
+    if(d.hp<=0)KO(a,d);
+    return;
+  }
   const lvl=m.heavy?(a.chargeLvl||0):0, full=false;
-  const sc=Math.max(0.35,1-d.comboTaken*0.1);
-  d.hp-=Math.round(m.dmg*(1+lvl)*sc);d.comboTaken++;a.combo=d.comboTaken;showCombo(a);
+  // COUNTER: hit them while their own attack is starting up or out
+  const counter=real&&((d.state==='attack'&&d.move&&d.mt<=d.move.startup+d.move.active)||d.state==='charge');
+  const sc=Math.max(0.35,1-d.comboTaken*0.1); // damage scaling: 100%, 90%, 80%... down to 35%
+  const dealt=Math.round(m.dmg*(1+lvl)*sc*(counter?1.25:1));
+  if(d.comboTaken===0)d.comboDmg=0;
+  d.hp-=dealt;d.comboDmg=(d.comboDmg||0)+dealt;d.comboTaken++;a.combo=d.comboTaken;showCombo(a,d.comboTaken,d.comboDmg);
+  if(counter){callout(a,'COUNTER!','#ff4a3a');flash(0.1);}
   const dir=Math.sign(d.x-a.x)||a.facing, inAir=d.air()||d.state==='airhit';
   d.soft=false;
   if(m.react)m.react(a,d,dir,inAir);
@@ -80,10 +108,10 @@ function applyHit(a,d,m,px,py){
   else if(m.juggle){d.state='airhit';d.vy=m.launch;d.vx=dir*m.kb;d.y=Math.max(d.y,0.02);if(a.air&&a.air())a.vy=Math.max(a.vy,0.14);}
   else if(m.soft){d.state='airhit';d.vy=m.launch;d.vx=dir*m.kb;d.y=Math.max(d.y,0.02);d.soft=!inAir;}
   else if(m.kd||full||inAir||d.hp<=0){d.state='airhit';d.vy=m.launch||(full?0.15:0.12);d.vx=dir*(m.kb||(full?0.17:0.07));d.y=Math.max(d.y,0.02);}
-  else{d.state='hitstun';d.stun=m.hitstun;d.vx=dir*m.push*(1+lvl*0.5);}
+  else{d.state='hitstun';d.stun=m.hitstun+(counter?8:0);d.vx=dir*m.push*(1+lvl*0.5)*(real&&a.mname==='light'&&a.lightChain<2?0.12:1);} // chained jabs barely push, so the string stays in range
   d.move=null;d.charge=0;d.pass=false;a.lastRes='hit';a.airUsed=false;d.lastHitT=G.time;
   a.tension=Math.min(100,a.tension+6);d.tension=Math.min(100,d.tension+3);
-  G.hitstop=Math.max(G.hitstop,m.impact?15:(m.stop||7));if(m.impact)flash(0.12);G.shake=Math.max(G.shake,(m.shake||0.05)+lvl*0.12);
+  G.hitstop=Math.max(G.hitstop,(m.impact?15:(m.stop||7))+(counter?4:0));if(m.impact)flash(0.12);G.shake=Math.max(G.shake,(m.shake||0.05)+lvl*0.12);
   const big=m.dmg*(1+lvl)>=80;
   spark(px,py,big?0xffb347:0xfff0c0,big?18:11,big?0.16:0.11);
   (big?sfx.heavy:sfx.hit)();
@@ -99,17 +127,18 @@ function stepFighter(f,o){
   f.t++;
   const wasAir=f.air();
   const fwd=()=>f.facing>0?f.inp.r:f.inp.l, back=()=>f.facing>0?f.inp.l:f.inp.r;
-  if(['idle','walkf','walkb','jump','land'].includes(f.state))f.comboTaken=0;
+  if(['idle','walkf','walkb','guard','jump','land'].includes(f.state))f.comboTaken=0;
   // always face the enemy, except mid-dash and mid-roll
   if(!(G.time-(f.heldT||-9)<=1)&&!(f.state==='attack'&&(f.mname==='dash'||f.mname==='jkick'||f.mname==='lunge'))&&f.state!=='dodge'&&f.state!=='ghold'&&f.state!=='hold'&&!['kd','ko','intro','victory'].includes(f.state)&&Math.abs(o.x-f.x)>0.08)f.facing=o.x>=f.x?1:-1;
   switch(f.state){
-    case 'idle':case 'walkf':case 'walkb':{f.jumps=0;f.airUsed=false;f.lightChain=0;
+    case 'idle':case 'walkf':case 'walkb':case 'guard':{f.jumps=0;f.airUsed=false;f.lightChain=0;
       if(tryAbility(f)||tryMelee(f))break;
       if(take(f,'jump')){f.state='jump';f.vy=JUMPV;f.vx=(fwd()?1:back()?-0.85:0)*f.facing*0.085;f.jumps=1;f.flip=0;sfx.jump();dust(f.x,4);break;}
       if(fwd()){f.state='walkf';f.vx=f.facing*RUNF;}
       else if(back()){f.state='walkb';f.vx=-f.facing*RUNB;}
       else{f.state='idle';f.vx*=0.5;}
-      if(f.state!=='idle'&&G.time%12===0)dust(f.x-f.vx*4,1);
+      if(f.state==='walkb'&&threatOf(f,o)){f.state='guard';f.vx=0;} // hold back near an attack = stand and block
+      if((f.state==='walkf'||f.state==='walkb')&&G.time%12===0)dust(f.x-f.vx*4,1);
       break;}
     case 'jump':{
       const dir=(f.inp.r?1:0)-(f.inp.l?1:0);if(dir)f.vx+=(dir*0.085-f.vx)*0.06;
@@ -142,6 +171,7 @@ function stepFighter(f,o){
       if(f.mt>=24){f.state=f.air()?'jump':'idle';f.pass=false;f.cd.dodge=CD.dodge;f.flip=0;}
       break;
     case 'hitstun':f.stun--;f.vx*=0.9;if(f.stun<=0)f.state='idle';break;
+    case 'block':f.stun--;f.vx*=0.85;if(f.stun<=0)f.state='idle';break;
     case 'stun':f.stun--;f.vx*=0.85;if(f.stun%16===0)stars(f);if(f.stun<=0)f.state='idle';break;
     case 'land':f.stun--;f.vx*=0.6;if(f.stun<=0)f.state='idle';break;
     case 'kd':f.stun--;f.vx*=0.8;if(f.stun<=0){f.state='wakeup';f.stun=14;}break;
@@ -209,10 +239,11 @@ function runMove(f,o){
   if(f.mname==='dash'&&f.mt>m.startup&&f.mt%2===0)afterimage(f);
   if(m.dmg&&!f.hasHit&&f.mt>m.startup&&f.mt<=m.startup+m.active){const h=overlap(f,o,m);if(h){f.hasHit=true;applyHit(f,o,m,h.x,h.y);}}
   if(f.state!=='attack'||f.move!==m)return;
-  if(f.lastRes==='hit'&&f.mt>m.startup){
-    if(f.mname==='light'&&f.buf.melee>0&&f.lightChain<2&&f.inp.q===0){f.buf.melee=0;f.lightChain++;startMove(f,'light');return;}
-    if(tryAbility(f))return;
-    if((f.mname==='light'||f.mname==='zip')&&tryMelee(f))return;
+  // cancels: once a move connects (hit or block), the next melee or an ability can interrupt its recovery
+  if((f.lastRes==='hit'||f.lastRes==='block')&&f.mt>m.startup){
+    if(f.mname==='light'&&f.buf.melee>0&&f.lightChain<2){f.buf.melee=0;f.lightChain++;startMove(f,'light');return;} // jab chain: up to 3
+    if(tryAbility(f)){if(f.state==='attack')afterimage(f);return;}
+    if(f.mname==='zip'&&tryMelee(f))return;
   }
   if(f.mt>=m.startup+m.active+m.recovery){f.move=null;f.pass=false;f.state=f.air()?'jump':'idle';}
 }
