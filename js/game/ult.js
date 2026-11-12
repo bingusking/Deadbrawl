@@ -7,7 +7,7 @@ const ULTS={rift:{name:'PHANTOM RUSH'}}; // fighters without an entry show ULT a
 /* ---- Rift: PHANTOM RUSH ----
    Lunge grab (unblockable, dodgeable). On a hit: punch them up, blink to the other side, punch again,
    rising in a zig-zag (N hits), then blink above them and slam them into the floor. */
-const RU={N:5,L:13,DMG:28,SLAM:70,RISE:0.72,SWAY:1.6} // SWAY: how far each punch knocks them sideways (zig-zag width);
+const RU={N:5,L:13,DMG:28,SLAM:70,RISE:0.72,SWAY:2.5} // SWAY: how far each punch knocks them sideways (zig-zag width);
 MOVES.rult={base:'stance',startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[0,0.75],y:[0,2.0],grab:1,shake:0.15,
   react:(a,d)=>riftUltStart(a,d)};
 
