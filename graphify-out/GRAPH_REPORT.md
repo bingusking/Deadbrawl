@@ -1,7 +1,7 @@
 # Graph Report - deadbrawl  (2026-11-12)
 
 ## Corpus Check
-- 24 files · ~7,687 words
+- 24 files · ~7,750 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4f3a1824`
+- Built from commit: `c23466ec`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -44,8 +44,8 @@
 6. `goOnline()` - 7 edges
 7. `cvShow()` - 6 edges
 8. `netLost()` - 6 edges
-9. `riftUltTick()` - 5 edges
-10. `phaseLogic()` - 5 edges
+9. `phaseLogic()` - 5 edges
+10. `splash()` - 5 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]

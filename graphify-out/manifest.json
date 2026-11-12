@@ -54,9 +54,9 @@
     "semantic_hash": ""
   },
   "js/game/moves.js": {
-    "mtime": 1794485293.9691534,
-    "seen": 1794485417.0732923,
-    "ast_hash": "623554825d0e41514b1366ff6ce3e5e1",
+    "mtime": 1794487142.980511,
+    "seen": 1794487276.6789088,
+    "ast_hash": "b2f5d833d7ae96383f4470e130d11a91",
     "semantic_hash": ""
   },
   "js/game/online.js": {
@@ -66,9 +66,9 @@
     "semantic_hash": ""
   },
   "js/game/sprites.js": {
-    "mtime": 1794485293.9687288,
-    "seen": 1794485417.0732958,
-    "ast_hash": "af184c5e8166f39378b33b5b526a1756",
+    "mtime": 1794487142.9802525,
+    "seen": 1794487276.678912,
+    "ast_hash": "0823c671c366427aeff4b1d522288710",
     "semantic_hash": ""
   },
   "js/game/stage.js": {

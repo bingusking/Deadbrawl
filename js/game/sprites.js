@@ -33,7 +33,7 @@ function spriteFrame(f){
     case 'land':return ['vish_jump2',0];
     case 'wakeup':return st<7?['vish_jump2',0]:['idle',0];
     case 'dodge':return [f.dodgeDir===f.facing?'roll':'dodgeb',1+Math.min(4,Math.floor(f.mt/5))];
-    case 'charge':return ['heavy',f.charge<TAP?1:f.charge<18?2:3];
+    case 'charge':return ['vish_heavy2',0];
     case 'parry':return ['parry',f.mt<3?1:f.mt<5?2:f.mt<7?3:f.mt<=PARRY_WIN?4:5];
     case 'hold':case 'ghold':return ['knife',3];
     case 'guard':case 'block':return ['parry',1];
@@ -43,8 +43,8 @@ function spriteFrame(f){
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0,a=m?m.active:0;
       switch(f.mname){
         case 'light':return ['light',k<=2?1:k<=s?2:k<=s+a+5?3:2];
-        case 'heavy':return ['heavy',k<=s?4:k<=s+a+8?5:k<=s+a+13?4:1];
-        case 'air':return ['air',k<=2?0:k<=s?1:k<=s+3?2:3];
+        case 'heavy':return ['vish_heavy2',k<=s?0:k<=s+5?1:k<=s+a+8?2:0]; // wind-up, thrust, follow-through
+        case 'air':return k<=s?['vish_jump2',2]:['vish_airup',0];
         case 'rslash':return k<=s?['heavy',3]:['light',3];
         case 'tele':return ['dash',1];
         case 'grab':return ['knife',k<=s?3:4];
@@ -53,7 +53,7 @@ function spriteFrame(f){
         case 'knife':return ['knife',k<4?1:k<=s?2:k<=s+4?3:k<=s+9?4:5];
         case 'dash':return ['dash',k<=2?0:k<=s?1:k<=s+a?2+Math.min(2,Math.floor((k-s-1)/5)):5];
         case 'shotgun':return ['shotgun',k<4?0:k<s?1:k<=s+a+5?2:3];
-        case 'slam':return k<=s?['heavy',3]:f.airMove&&k<=s+a?['kick',3]:['heavy',5];
+        case 'slam':return k<=s?['vish_airup',0]:f.airMove&&k<=s+a?['kick',3]:['vish_jump2',4];
         case 'kick':return ['kick',k<4?1:k<=s?2:k<=s+a?3:4]; // rise, chamber, axe kick, recover
       }}
   }

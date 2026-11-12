@@ -24,7 +24,7 @@ const MOVES={
 };
 Object.assign(MOVES,{
   rslash:{base:'stance',impact:1,startup:12,active:5,recovery:20,dmg:85,reach:[-0.2,2.1],y:[-0.2,2.8],hitstun:22,push:0.4,shake:0.18},
-  tele:{base:'stance',startup:4,active:1,recovery:8},
+  tele:{base:'stance',startup:7,active:1,recovery:8}, // startup long enough to show the smoke dissolve
   grab:{grab:1,base:'stance',impact:1,startup:7,active:4,recovery:18,dmg:60,reach:[0,1.3],y:[-0.3,2.0],shake:0.15,react:grabReact},
   lunge:{grab:1,base:'stance',impact:1,startup:6,active:18,recovery:16,dmg:40,vx:0.3,reach:[0,0.4],y:[0.1,1.9],shake:0.1,react:lungeReact}
 });
@@ -117,7 +117,7 @@ function riftFrame(f){
     case 'jump':return jf();
     case 'land':return G.time-(f.throwBackT||-99)<18?['rift_throwb',0]:G.time-(f.throwFwdT||-99)<18?['rift_throwf',0]:G.time-(f.slamT||-99)<18?['rift_slamd',0]:G.time-(f.upT||-99)<18?['rift_throwu',0]:[J,7];
     case 'wakeup':return [J,1];
-    case 'dodge':return f.dodgeDir===f.facing?[R,3]:['rift_dodgeb',Math.min(3,Math.floor(f.mt/6))];
+    case 'dodge':return f.dodgeDir===f.facing?['rift_roll',Math.min(4,Math.floor(f.mt/5))]:['rift_dodgeb',Math.min(3,Math.floor(f.mt/6))];
     case 'victory':return ['rift_win',Math.min(4,Math.floor(st/12))];
     case 'charge':return [H,f.charge<TAP?0:0];
     case 'ghold':return ['rift_grab',2];
@@ -132,10 +132,11 @@ function riftFrame(f){
       if(f.mname==='heavy')return [H,k<=s?1:k<=s+a+10?2:1];
       if(f.mname==='rslash'){const e=s+a+6,r=m.recovery-6,q=(k-e)/r;return ['rift_slash',k<=4?0:k<=8?1:k<=s?2:k<=e?4:q<0.34?2:q<0.67?1:0];}
       if(f.mname==='grab')return ['rift_grab',0];
-      if(f.mname==='light')return [H,k<=s?0:2];
+      if(f.mname==='light')return k<=s?[H,0]:['rift_jab',0];
       if(f.mname==='air')return k<=s?['rift_air',1]:k<=s+4?['rift_air',2]:k<=s+m.active?['rift_air',3]:[J,4];
       if(f.mname==='slam')return ['rift_slam',k<=s?1:2];
-      if(f.mname==='tele'&&f.tpPush)return [H,k<=s?0:2];
+      if(f.mname==='tele'&&f.tpPush)return k<=s?[H,0]:['rift_jab',0];
+      if(f.mname==='tele')return k<=2?['rift_bout',0]:k<=4?['rift_bout',1]:k<=s?['rift_bout',2]:k<=s+4?['rift_bin',0]:['rift_bin',1]; // dissolve, then re-form
       if(f.mname==='lunge'||f.mname==='rult')return ['rift_lunge',k<=s?0:1];
       if(f.mname==='tele'||f.mname==='dash')return [R,3];
       return f.mt<=s?[H,0]:[H,2];}
@@ -161,13 +162,13 @@ function jacobFrame(f){
     case 'kd':case 'ko':return ['jacob_hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0;
       if(f.mname==='heavy')return ['jacob_heavy',k<=s?2:k<=s+m.active+6?3:4];
-      if(f.mname==='light')return ['jacob_heavy',k<=s?2:k<=s+m.active+2?3:4]; // jab borrows the heavy's strike until a jab sheet exists
+      if(f.mname==='light')return ['jacob_jab',k<=s?0:k<=s+m.active+2?1:0];
       if(f.mname==='jslam')return k<=s?[T,3]:[R,3];
       if(f.mname==='jupper')return [T,k<=s?1:3];
       if(f.mname==='zip')return [R,3];
       return k<=s?[T,1]:[R,2];}
   }
-  return [I,Math.floor(t/5+f.idx*3)%SPR.jacob_idle.length];
+  return [I,Math.floor(t/7+f.idx*3)%SPR.jacob_idle.length];
 }
 const KNIFE_HIT={impact:1,dmg:45,soft:1,launch:0.11,kb:0.02,stop:5,shake:0.05};
 const PARRY_WIN=36,TAP=8,CHARGE=30;
