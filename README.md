@@ -30,6 +30,7 @@ Then open http://localhost:3000. Open it in two tabs and pick **Online** in both
 | `js/lib/three.min.js` | Three.js r128 |
 | `assets/` | HUD frame and menu art |
 | `server.js` | Serves the files and runs matchmaking |
+| `tools/sprites/` | Scripts that cut sprite sheets into frames and add them to the game (see its README) |
 
 The game scripts are plain scripts loaded in order (see the bottom of `index.html`) and share top-level names.
 

@@ -102,15 +102,45 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794468498.6686807,
-    "seen": 1794469219.903179,
-    "ast_hash": "e04edd122ded241433d604403b7a9c61",
+    "mtime": 1794469745.445261,
+    "seen": 1794469747.2732618,
+    "ast_hash": "e0d4c6448daa84bb572b9a5d99a2d086",
     "semantic_hash": ""
   },
   "index.html": {
     "mtime": 1794468361.4383502,
     "seen": 1794469219.9031813,
     "ast_hash": "7cab6815382e6dbd0fd3a0f92f9dab94",
+    "semantic_hash": ""
+  },
+  "tools/sprites/add_anim.py": {
+    "mtime": 1794469723.9379017,
+    "seen": 1794469747.273255,
+    "ast_hash": "6376bec66776e5160f6d56e0fcc72a54",
+    "semantic_hash": ""
+  },
+  "tools/sprites/grid.py": {
+    "mtime": 1794469722.7641082,
+    "seen": 1794469747.2732573,
+    "ast_hash": "9f4da09145c2852e8fad97a85c0e164b",
+    "semantic_hash": ""
+  },
+  "tools/sprites/strip.py": {
+    "mtime": 1794469722.764086,
+    "seen": 1794469747.2732584,
+    "ast_hash": "12c4418999049c417048db72859de2ed",
+    "semantic_hash": ""
+  },
+  "CLAUDE.md": {
+    "mtime": 1794469745.4454162,
+    "seen": 1794469747.2732604,
+    "ast_hash": "ff14d9db9eb01eba3321b47b4345b1f4",
+    "semantic_hash": ""
+  },
+  "tools/sprites/README.md": {
+    "mtime": 1794469745.4448347,
+    "seen": 1794469747.2732646,
+    "ast_hash": "fb70c21f3ddff4bd0b4a4525c450d8df",
     "semantic_hash": ""
   },
   "package-lock.json": {
