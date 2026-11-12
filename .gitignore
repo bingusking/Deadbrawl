@@ -1,1 +1,6 @@
 node_modules/
+
+# Graphify
+graphify-out/cache/
+graphify-out/.graphify_*
+graphify-out/graph.html
