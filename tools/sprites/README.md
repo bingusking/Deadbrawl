@@ -1,6 +1,6 @@
 # Sprite tools
 
-How new animation frames get into the game. All sprite frames live in `js/data/sprites.js` (one big `SPR` object: animation name → list of frames). That file is the source of truth; these tools add to it.
+How new animation frames get into the game. All sprite frames live in `js/data/sprites_vish.js`, `sprites_rift.js` and `sprites_jacob.js`, which fill one `SPR` object (animation name → list of frames). Those files are the source of truth; `add_anim.py` picks the right one from the animation name (`rift_…`, `jacob_…`, everything else goes to Vish).
 
 Needs Python 3 with `numpy`, `pillow` and `scipy` (`pip install numpy pillow scipy`).
 

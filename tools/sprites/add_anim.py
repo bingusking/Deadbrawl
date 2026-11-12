@@ -1,5 +1,5 @@
 # usage: python3 tools/sprites/add_anim.py <hd_name.json> [anim_name] [--flip]
-# Merges a cut animation (from strip.py or grid.py) into js/data/sprites.js.
+# Merges a cut animation (from strip.py or grid.py) into js/data/sprites_<fighter>.js.
 # anim_name defaults to the file name without "hd_" and ".json" (hd_rift_run.json -> rift_run).
 # Replaces the animation if it already exists. Run from the repo root.
 import sys, os, json, io, base64
@@ -10,12 +10,14 @@ args = [a for a in sys.argv[1:] if not a.startswith('--')]
 flip = '--flip' in sys.argv
 src = args[0]
 name = args[1] if len(args) > 1 else os.path.basename(src)[:-5].removeprefix('hd_')
-DATA = os.path.join(os.path.dirname(__file__), '..', '..', 'js', 'data', 'sprites.js')
-
+DATA_DIR = os.path.join(os.path.dirname(__file__), '..', '..', 'js', 'data')
+# sprite data is split per fighter: rift_* -> sprites_rift.js, jacob_* -> sprites_jacob.js, everything else -> sprites_vish.js
+group = 'rift' if name.startswith('rift_') else 'jacob' if name.startswith('jacob_') else 'vish'
+DATA = os.path.join(DATA_DIR, f'sprites_{group}.js')
 text = open(DATA).read()
-pre, post = 'const SPR=', ';\n'
-assert text.startswith(pre), 'unexpected sprites.js format'
-spr = json.loads(text[len(pre):].rstrip().rstrip(';'))
+pre, post = 'Object.assign(SPR,', ');\n'
+assert text.startswith(pre), 'unexpected sprites file format'
+spr = json.loads(text[len(pre):].rstrip().rstrip(';').rstrip(')'))
 
 frames = json.load(open(src))
 for f in frames:

@@ -108,15 +108,15 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794483971.9232256,
-    "seen": 1794484371.6880121,
-    "ast_hash": "c41b6bf601173aa794d26c7f049ff8d7",
+    "mtime": 1794485438.9747298,
+    "seen": 1794485529.7303715,
+    "ast_hash": "f36b79a96b84ec96d31bb1f2d78c3940",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
-    "mtime": 1794469723.9379017,
-    "seen": 1794469747.273255,
-    "ast_hash": "6376bec66776e5160f6d56e0fcc72a54",
+    "mtime": 1794485448.8895888,
+    "seen": 1794485529.7303634,
+    "ast_hash": "634c9618e722ef047c410db4d984afc2",
     "semantic_hash": ""
   },
   "tools/sprites/grid.py": {
@@ -132,15 +132,15 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1794471749.543581,
-    "seen": 1794471750.4229627,
-    "ast_hash": "b330fe9bb9ba197dfa6012e1f4ed5734",
+    "mtime": 1794485449.141483,
+    "seen": 1794485529.7303686,
+    "ast_hash": "dcef5e757b1ab8eac72b5a5945acdb75",
     "semantic_hash": ""
   },
   "tools/sprites/README.md": {
-    "mtime": 1794469745.4448347,
-    "seen": 1794469747.2732646,
-    "ast_hash": "fb70c21f3ddff4bd0b4a4525c450d8df",
+    "mtime": 1794485449.135168,
+    "seen": 1794485529.730373,
+    "ast_hash": "e1903343c4a87a826479d18fdac082fe",
     "semantic_hash": ""
   },
   "js/game/ult.js": {
