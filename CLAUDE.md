@@ -1,6 +1,8 @@
 # Deadbrawl: notes for Claude
 
-Browser 2D fighting game (Vish, Rift, Jacob) with CPU, training and online modes. See README.md for the file table.
+Browser 2D fighting game (Vish, Rift, The Lash) with CPU, training and online modes. See README.md for the file table.
+
+Note: "The Lash" is the display name; in code his id is still `jacob` (jacobFrame, tryJacob, jacob_run, etc.).
 
 ## Finding code
 1. Read `graphify-out/GRAPH_REPORT.md` (or query `graphify-out/graph.json`) to find which file and function handles something.

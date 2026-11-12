@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794468361.4332883,
-    "seen": 1794469219.9031506,
-    "ast_hash": "080ebcf2db4d3fd888c527a53a5d7246",
+    "mtime": 1794469998.008833,
+    "seen": 1794470068.5049403,
+    "ast_hash": "779dc9e2db8136da665569b133ce2853",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
@@ -102,15 +102,15 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794469745.445261,
-    "seen": 1794469747.2732618,
-    "ast_hash": "e0d4c6448daa84bb572b9a5d99a2d086",
+    "mtime": 1794470067.5645683,
+    "seen": 1794470068.5049598,
+    "ast_hash": "5a30f587edd26b647350bf948eb78627",
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794468361.4383502,
-    "seen": 1794469219.9031813,
-    "ast_hash": "7cab6815382e6dbd0fd3a0f92f9dab94",
+    "mtime": 1794469998.0110846,
+    "seen": 1794470068.504961,
+    "ast_hash": "d7689f40960cd14e3930aec25f433431",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1794469745.4454162,
-    "seen": 1794469747.2732604,
-    "ast_hash": "ff14d9db9eb01eba3321b47b4345b1f4",
+    "mtime": 1794470067.5671716,
+    "seen": 1794470068.5049584,
+    "ast_hash": "74a5ad67202d28ede9fc238b0d8ca3e3",
     "semantic_hash": ""
   },
   "tools/sprites/README.md": {

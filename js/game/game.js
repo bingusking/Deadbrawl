@@ -1,7 +1,7 @@
 'use strict';
 /* =============== GAME STATE =============== */
 const G={mode:'menu',diff:'NORMAL',paused:false,time:0,phase:'intro',pt:0,round:1,wins:[0,0],timer:99*60,hitstop:0,freeze:0,shake:0,koBy:null,p1char:'vish',p2char:'vish'};
-const CHARS={vish:{name:'VISH',ab:['KNIFE','RUSH','BLAST','KICK'],desc:'1 Throwing knife · 2 Dash · 3 Shotgun · 4 Spike kick'},jacob:{name:'JACOB',ab:['HOOK','SLAM','UPPER','KICK'],desc:'1 Grapple hook: then 1 again zip in, W launch above, S pull them · 2 Slam · 3 Uppercut · 4 Kick off · T taunt'},rift:{name:'RIFT',ab:['SLASH','BLINK','GRAB','LUNGE'],desc:'1 Big slash · 2 Teleport behind (2nd use pushes) · 3 Grab and hold, then S slam, A/D throw, W toss up · 4 Lunge grab'}};
+const CHARS={vish:{name:'VISH',ab:['KNIFE','RUSH','BLAST','KICK'],desc:'1 Throwing knife · 2 Dash · 3 Shotgun · 4 Spike kick'},jacob:{name:'THE LASH',ab:['HOOK','SLAM','UPPER','KICK'],desc:'1 Grapple hook: then 1 again zip in, W launch above, S pull them · 2 Slam · 3 Uppercut · 4 Kick off · T taunt'},rift:{name:'RIFT',ab:['SLASH','BLINK','GRAB','LUNGE'],desc:'1 Big slash · 2 Teleport behind (2nd use pushes) · 3 Grab and hold, then S slam, A/D throw, W toss up · 4 Lunge grab'}};
 const keys={};
 function readPlayer(){p1.inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ};if(G.phase!=='fight'){p1.inp={l:0,r:0,u:0,d:0,q:0};p1.buf={};}}
 function callout(f,txt,col){const el=$('#combo'+(f.idx+1));el.innerHTML='<b style="color:'+col+';font-size:1.1em">'+txt+'</b>';el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),900);}

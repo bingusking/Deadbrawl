@@ -1,6 +1,6 @@
 # Deadbrawl
 
-A 2D browser fighting game with three fighters (Vish, Rift, Jacob), a CPU mode, a training dummy and online matchmaking.
+A 2D browser fighting game with three fighters (Vish, Rift, The Lash), a CPU mode, a training dummy and online matchmaking.
 
 ## Run locally
 
@@ -18,7 +18,7 @@ Then open http://localhost:3000. Open it in two tabs and pick **Online** in both
 | `index.html` | Page markup and styles (menus, HUD, character select) |
 | `js/game/core.js` | Shared helpers, renderer, scenes |
 | `js/game/moves.js` | Move data: frame timings, damage, reach, hit reactions |
-| `js/game/fighters.js` | Fighter state machine, character abilities (Vish, Rift, Jacob), hits, grabs |
+| `js/game/fighters.js` | Fighter state machine, character abilities (Vish, Rift, The Lash), hits, grabs |
 | `js/game/sprites.js` | Sprite drawing and per-character frame mapping |
 | `js/game/animation.js` | Animation timing |
 | `js/game/ai.js` | CPU opponent |
