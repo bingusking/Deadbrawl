@@ -7,7 +7,10 @@ const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 3000;
 const CHARS = ['vish', 'rift', 'jacob'];
-const page = fs.readFileSync(path.join(__dirname, 'public', 'index.html'));
+// the game page can sit in public/ or next to this file
+const pagePath = [path.join(__dirname, 'public', 'index.html'), path.join(__dirname, 'index.html')].find(p => fs.existsSync(p));
+if (!pagePath) { console.error('index.html not found (looked in public/ and the repo root)'); process.exit(1); }
+const page = fs.readFileSync(pagePath);
 
 const server = http.createServer((req, res) => {
   if (req.url === '/health') { res.writeHead(200); res.end('ok'); return; }
