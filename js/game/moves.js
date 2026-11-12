@@ -130,7 +130,8 @@ function riftFrame(f){
       if(f.mname==='rslash'){const e=s+a+6,r=m.recovery-6,q=(k-e)/r;return ['rift_slash',k<=4?0:k<=8?1:k<=s?2:k<=e?4:q<0.34?2:q<0.67?1:0];}
       if(f.mname==='grab')return ['rift_grab',0];
       if(f.mname==='light')return [H,k<=s?0:2];
-      if(f.mname==='air'||f.mname==='slam')return [J,k<=s?3:4];
+      if(f.mname==='air')return k<=s?['rift_air',1]:k<=s+4?['rift_air',2]:k<=s+m.active?['rift_air',3]:[J,4];
+      if(f.mname==='slam')return ['rift_slam',k<=s?1:2];
       if(f.mname==='tele'&&f.tpPush)return [H,k<=s?0:2];
       if(f.mname==='lunge')return ['rift_lunge',k<=s?0:1];
       if(f.mname==='tele'||f.mname==='dash')return [R,3];
@@ -144,15 +145,20 @@ function jacobFrame(f){
     case 'walkf':return [R,Math.floor(st/5)%6];
     case 'walkb':return ['jacob_runb',Math.floor(st/9)%6];
     case 'taunt':return [T,Math.min(5,Math.floor(f.mt/9))];
-    case 'jump':case 'dodge':return [R,3,f.state==='jump'&&f.flip>0?'flip':undefined];
-    case 'land':case 'wakeup':return [I,0];
-    case 'charge':return [T,f.charge<TAP?0:1];
+    case 'jump':{const J='jacob_jump';if(f.flip>0)return [J,3,'flip'];if(st<6&&f.vy>0.12)return [J,1];return [J,f.vy>0.05?2:f.vy>-0.07?3:4];}
+    case 'dodge':return [R,3];
+    case 'land':return ['jacob_jump',0];
+    case 'wakeup':return [I,0];
+    case 'victory':return ['jacob_win',Math.min(4,Math.floor(st/12))];
+    case 'charge':return ['jacob_heavy',f.charge<TAP?0:1];
     case 'parry':return [T,2];
     case 'guard':case 'block':return [T,0];
     case 'hitstun':case 'stun':return ['jacob_hit',0];
     case 'airhit':return ['jacob_hit',0,'tumble'];
     case 'kd':case 'ko':return ['jacob_hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0;
+      if(f.mname==='heavy')return ['jacob_heavy',k<=s?2:k<=s+m.active+6?3:4];
+      if(f.mname==='light')return ['jacob_heavy',k<=s?2:k<=s+m.active+2?3:4]; // jab borrows the heavy's strike until a jab sheet exists
       if(f.mname==='jslam')return k<=s?[T,3]:[R,3];
       if(f.mname==='jupper')return [T,k<=s?1:3];
       if(f.mname==='zip')return [R,3];

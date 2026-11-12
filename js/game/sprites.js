@@ -22,15 +22,16 @@ function makeSpriteMesh(order){
 function spriteFrame(f){
   const t=G.time,st=f.st||0;
   switch(f.state){
-    case 'intro':case 'idle':case 'victory':return ['idle',Math.floor(t/5+f.idx*3)%SPR.idle.length];
+    case 'intro':case 'idle':return ['idle',Math.floor(t/5+f.idx*3)%SPR.idle.length];
+    case 'victory':return ['vish_win',Math.min(4,Math.floor(st/12))]; // plays once, holds the last pose
     case 'walkf':return ['run',Math.floor(st/5)%SPR.run.length];
     case 'walkb':return ['runb',Math.floor(st/10)%SPR.runb.length];
-    case 'jump':
-      if(f.flip>0)return ['jump',3,'flip'];
-      if(st<6&&f.vy>0.12)return ['jump',1];
-      return ['jump',f.vy>0.05?2:f.vy>-0.07?3:4];
-    case 'land':return ['jump',5];
-    case 'wakeup':return ['jump',st<7?5:0];
+    case 'jump':{const J='vish_jump2';
+      if(f.flip>0)return [J,3,'flip'];
+      if(st<6&&f.vy>0.12)return [J,1];
+      return [J,f.vy>0.05?2:f.vy>-0.07?3:4];}
+    case 'land':return ['vish_jump2',0];
+    case 'wakeup':return st<7?['vish_jump2',0]:['idle',0];
     case 'dodge':return [f.dodgeDir===f.facing?'roll':'dodgeb',1+Math.min(4,Math.floor(f.mt/5))];
     case 'charge':return ['heavy',f.charge<TAP?1:f.charge<18?2:3];
     case 'parry':return ['parry',f.mt<3?1:f.mt<5?2:f.mt<7?3:f.mt<=PARRY_WIN?4:5];
