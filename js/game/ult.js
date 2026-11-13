@@ -15,7 +15,7 @@ MOVES.rult={base:'stance',startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[
 function tryUlt(f){
   if(!(f.buf.ult>0))return false;f.buf.ult=0;
   if(!ULTS[f.char]||f.tension<ULT_COST)return false;
-  f.tension=0;startMove(f,'rult');
+  f.tension=0;startMove(f,f.char==='rift'?'rult':'jult');
   cutin(f);G.freeze=40;sfx.super();return true;}
 
 function riftUltStart(a,d){
@@ -58,3 +58,50 @@ function ruEnd(f,o){f.uFollow=1;f.state='jump';f.vy=-0.05;f.jumps=1;f.flip=0;f.p
 function riftUltFrame(f){const t=Math.max(0,(f.ut||1)-1);
   if(t<RU.N*RU.L){const k=t%RU.L;return k<3?['rift_air',1]:k<=7?['rift_air',2]:['rift_air',3];}
   return (t-RU.N*RU.L)<8?['rift_slam',1]:['rift_slam',2];}
+
+/* ---- The Lash: HOOK, LINE & SINKER ----
+   Grapple shot (long range, unblockable, dodgeable). On a hit:
+   1. zip in along the rope and punch them high into the air
+   2. hook them again and drag them back down to him, punch them up again
+   3. ride the rope up with them, get above them
+   4. body slam: drop together and crush them into the floor */
+const LU={RANGE:6,HOOK:10,P1:45,P2:45,SLAM:110,UP1:4.2,UP2:5.0};
+ULTS.jacob={name:'HOOK, LINE & SINKER'};
+MOVES.jult={base:'stance',startup:10,active:7,recovery:26,dmg:1,reach:[0,LU.RANGE],y:[-1,4],grab:1,
+  react:(a,d)=>lashUltStart(a,d)};
+
+function lashUltStart(a,d){
+  a.state='jult';a.move=null;a.ut=0;a.udir=a.facing;a.ux0=a.x;a.uy0=a.y;a.uRope=1;
+  d.state='ultd';d.vx=d.vy=0;a.pass=d.pass=true;ultHit(a,d,LU.HOOK,d.x,d.y+1.1,false);}
+
+function lashUltTick(f,o){
+  f.ut++;f.uFollow=0;f.vx=f.vy=0;o.vx=o.vy=0;f.pass=o.pass=true;
+  if(o.state!=='ultd'){luEnd(f,o);return;}
+  const t=f.ut,d=f.udir,ease=p=>1-Math.pow(1-clamp(p,0,1),2),cx=x=>clamp(x,-STAGE,STAGE);
+  f.facing=d;o.facing=-d;
+  if(t<=14){ // 1. zip in along the rope
+    if(t===1)sfx.whoosh();f.uRope=1;const p=ease(t/14);
+    f.x=cx(f.ux0+(o.x-d*0.85-f.ux0)*p);f.y=f.uy0+(o.y-f.uy0)*p;
+  }else if(t<=42){ // ...and punch them high
+    f.uRope=0;if(t===15){ultHit(f,o,LU.P1,o.x,o.y+1.1,true);f.lx=o.x;f.ly=o.y;}
+    const p=ease((t-15)/25);o.y=f.ly+LU.UP1*p;o.x=cx(f.lx+d*0.6*p);f.y=Math.max(0,f.y-0.15);
+  }else if(t<=62){ // 2. hook them again and drag them back down to him
+    f.uRope=1;f.y=Math.max(0,f.y-0.15);if(t===43){sfx.whoosh();f.lx=o.x;f.ly=o.y;}
+    const p=ease((t-43)/19);o.x=cx(f.lx+(f.x+d*0.85-f.lx)*p);o.y=f.ly+(Math.max(0.2,f.y+0.2)-f.ly)*p;
+  }else if(t<=96){ // ...punch them up again, then 3. ride the rope up with them and get above
+    if(t===63){f.uRope=0;ultHit(f,o,LU.P2,o.x,o.y+1.1,true);f.lx=o.x;f.ly=o.y;f.sx=f.x;f.sy=f.y;}
+    const p=ease((t-63)/30);o.y=f.ly+LU.UP2*p;o.x=cx(f.lx+d*0.4*p);
+    if(t===68)sfx.whoosh();
+    if(t>=68){f.uRope=1;const q=ease((t-68)/26);f.x=cx(f.sx+(o.x-f.sx)*q);f.y=f.sy+(o.y+1.3-f.sy)*q;}
+  }else{ // 4. body slam: fall together and crush them into the floor
+    f.uRope=0;o.y=Math.max(0,o.y-(0.15+(t-97)*0.035));f.x=o.x;f.y=o.y+1.0;
+    if(o.y<=0.05){o.y=0.02;o.state='airhit';o.slammed=true;o.spiked=false;o.soft=false;o.vy=-0.5;o.pass=false;
+      ultHit(f,o,LU.SLAM,o.x,0.4,true);dust(o.x,24);}
+  }
+}
+function luEnd(f,o){f.uFollow=1;f.uRope=0;f.state='jump';f.vy=0.18;f.vx=-f.udir*0.04;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;
+  if(o.state==='ultd'){o.state='airhit';o.vy=-0.3;}o.pass=false;}
+
+// which sprite frame The Lash shows during the cinematic
+function lashUltFrame(f){const t=f.ut||0;
+  return t<=14?['jacob_heavy',2]:t<=26?['jacob_heavy',3]:t<=42?['jacob_heavy',4]:t<=62?['jacob_heavy',1]:t<=72?['jacob_heavy',3]:t<=96?['jacob_jump',2]:['jacob_jump',3];}

@@ -126,7 +126,8 @@ function stepFighter(f,o){
   if(f.char==='jacob')jacobTick(f,o);else if(f.rope)f.rope.visible=false;
   if(f.knives<3){if(++f.knifeT>=CD.knifeRegen){f.knives++;f.knifeT=0;}}else f.knifeT=0;
   f.t++;
-  if(f.state==='rult'){riftUltTick(f,o);return;} // the ultimate drives both fighters' positions
+  if(f.state==='rult'){riftUltTick(f,o);return;} // the ultimates drive both fighters' positions
+  if(f.state==='jult'){lashUltTick(f,o);return;}
   if(f.state==='ultd'){f.vx=f.vy=0;return;}
   const wasAir=f.air();
   const fwd=()=>f.facing>0?f.inp.r:f.inp.l, back=()=>f.facing>0?f.inp.l:f.inp.r;

@@ -19,7 +19,7 @@ Then open http://localhost:3000. Open it in two tabs and pick **Online** in both
 | `js/game/core.js` | Shared helpers, renderer, scenes |
 | `js/game/moves.js` | Move data: frame timings, damage, reach, hit reactions |
 | `js/game/fighters.js` | Fighter state machine, character abilities (Vish, Rift, The Lash), hits, grabs |
-| `js/game/ult.js` | Ultimates (R with a full ULT meter): Rift's Phantom Rush |
+| `js/game/ult.js` | Ultimates (R with a full ULT meter): Rift's Phantom Rush, The Lash's Hook, Line & Sinker |
 | `js/game/sprites.js` | Sprite drawing and per-character frame mapping |
 | `js/game/animation.js` | Animation timing |
 | `js/game/ai.js` | CPU opponent |

@@ -7,7 +7,8 @@ function aiThink(b,p){
     if(b.buf.a2>0&&dist>1.6){b.buf.a2=0;b.buf.a1=8;}
     if(b.buf.a4>0&&dist>1.5){b.buf.a4=0;b.buf.a1=8;}
     if(b.hookOn>0&&b.hookOn<48&&rnd()<0.08)press(b,['a1','kD','kD','kU'][rnd()*4|0]);
-    if(p.state==='stun'&&dist<1.5&&rnd()<0.2)press(b,rnd()<0.5?'a3':'melee');}
+    if(p.state==='stun'&&dist<1.5&&rnd()<0.2)press(b,rnd()<0.5?'a3':'melee');
+    if(b.tension>=ULT_COST&&dist<5&&!b.air()&&rnd()<0.03)press(b,'ult');}
   if(b.char==='rift'&&G.phase==='fight'&&!G.training){const dist=Math.abs(p.x-b.x);
     if(b.buf.a1>0&&dist>2.3){b.buf.a1=0;b.buf[dist<4?'a4':'a2']=8;}
     if(b.buf.a3>0){if(dist>1.5){b.buf.a3=0;b.buf.a4=8;}else b.grabDir=['down','up','fwd'][rnd()*3|0];}

@@ -80,7 +80,7 @@ function updCam(snap){
   const lo=Math.min(p1.y,p2.y)*0.5;
   const want=new THREE.Vector3(tx,ty+lo,tz),look=new THREE.Vector3(tx,1.15+hy*0.3+lo,0);
   for(const f of[p1,p2])if(f.uFollow&&!f.air()&&!(f===p1?p2:p1).air())f.uFollow=0;
-  {const U=[p1,p2].find(f=>f.state==='rult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
+  {const U=[p1,p2].find(f=>f.state==='rult'||f.state==='jult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
    if(U){const top=Math.max(U.y,V.y)+2.3,bot=Math.min(U.y,V.y),cy=(top+bot)/2;want.set(clamp((U.x+V.x)/2,-5,5),cy+0.2,6.6+(top-bot)*1.15);look.set(want.x,cy,0);G.ultCam=30;}else if(G.ultCam>0)G.ultCam--;}
   if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.z-=k*2.2;want.y-=k*0.6;} // intro: start close, pull back, centred between both fighters
   if(G.phase==='ko'&&G.pt<130&&G.koBy){const w=G.koBy===p1?p2:p1;want.set(w.x*0.6+tx*0.4,1.6,6.5);look.set(w.x*0.6+tx*0.4,0.8,0);}
