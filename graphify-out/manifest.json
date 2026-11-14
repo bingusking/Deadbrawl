@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "js/game/fighters.js": {
-    "mtime": 1794663101.442363,
-    "seen": 1794663506.2024999,
-    "ast_hash": "214e9b4df72eb1b03a5b60fdd475e96a",
+    "mtime": 1794665104.387185,
+    "seen": 1794665215.1826487,
+    "ast_hash": "27d999ddc2d8c15d22ff0c5d7092fa5c",
     "semantic_hash": ""
   },
   "js/game/fx.js": {
@@ -36,15 +36,15 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794663273.4798372,
-    "seen": 1794663506.2025023,
-    "ast_hash": "331ac59c59f4e8d0cc7500691cff72cf",
+    "mtime": 1794665104.387185,
+    "seen": 1794665215.1826527,
+    "ast_hash": "92f92c45719fcfb2427c1599115b7848",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
-    "mtime": 1794664223.180615,
-    "seen": 1794664281.3473933,
-    "ast_hash": "6269624466baeb98666f85caea24b1e6",
+    "mtime": 1794665104.387185,
+    "seen": 1794665215.1826544,
+    "ast_hash": "4a8966927bb0b442f551f31ab5472fdb",
     "semantic_hash": ""
   },
   "js/game/menus.js": {

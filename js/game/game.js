@@ -19,6 +19,7 @@ function startMatch(){setArena(0);p1.char=G.p1char;p2.char=G.p2char;hudSetup();G
 function startRound(){
   $('#cutin').classList.remove('on');
   for(const p of projectiles)scene.remove(p.mesh);projectiles.length=0;clearFx();
+  for(const f of[p1,p2])Object.assign(f,{um:'',ut:0,u2:0,ucOn:0,hide:0,uRope:0,uSl:0,uSh:0,uPose:'',uFollow:0,udT:0,uLong:0});if(arenaNext>=0)setArena(arenaIdx);
   p1.reset(-2.2);p2.reset(2.2);G.timer=99*60;G.phase='intro';G.pt=0;G.hitstop=0;G.freeze=0;
   p2.ai={think:30,plan:0,dir:0};
   const final=G.wins[0]===1&&G.wins[1]===1;
@@ -110,7 +111,7 @@ function tick(){
   if(G.hitstop>0){G.hitstop--;return;}
   phaseLogic();
   if(G.phase==='ko'&&G.pt<70&&G.time%2)return;
-  stepFighter(p1,p2);stepFighter(p2,p1);pushbox();updProj();
+  stepFighter(p1,p2);stepFighter(p2,p1);ultWatchdog();pushbox();updProj();
   animFighter(p1,p2);animFighter(p2,p1);
   updHud();
 }

@@ -23,6 +23,7 @@ function aimDir(f,o,oy=1.2){const aimed=f.uAimT!==undefined&&G.time-f.uAimT<40&&
 const AIM_MOVES=new Set(['knife','burst','rult']);
 function take(f,b){if(f.buf[b]>0){f.buf[b]=0;return true;}return false;}
 const projectiles=[];
+const ULT_STATES=['rult','jult','vult','ultd'];
 let p1,p2;
 function startMove(f,name){
   const m=MOVES[name];f.state='attack';f.move=m;f.mname=name;f.mt=0;f.hasHit=false;f.lastRes='';f.atkId++;f.airMove=f.air();
@@ -81,6 +82,7 @@ function canBlock(d,a){
   if(d.air()||!['idle','walkf','walkb','guard','block'].includes(d.state))return false;
   const s=Math.sign(a.x-d.x)||d.facing;return s>0?(d.inp.l&&!d.inp.r):(d.inp.r&&!d.inp.l);}
 function applyHit(a,d,m,px,py){
+  if(ULT_STATES.includes(d.state))return; // nothing outside an ultimate can interrupt it (a stray knife used to knock the attacker out and leave the victim frozen)
   // PARRY: only melee and charged heavies can be parried
   if(m.melee&&d.state==='parry'&&d.mt>=1&&d.mt<=PARRY_WIN){
     d.parried=true;d.cd.parry=0;
@@ -347,12 +349,21 @@ function updProj(){
   for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.x+=p.vx;p.y+=p.vy||0;p.life--;p.mesh.position.set(p.x,p.y,0.2);if(!p.noSpin)p.mesh.rotation.z-=0.55*Math.sign(p.vx);
     const o=p.owner===p1?p2:p1;let dead=p.life<=0||p.x<BL-3||p.x>BR+3||p.y<0.05||p.y>16;if(p.y<0.05)dust(p.x,3);
     for(const q of projectiles)if(q!==p&&q.owner!==p.owner&&Math.abs(q.x-p.x)<0.4){dead=true;q.life=0;spark(p.x,p.y,0xffffff,14,0.12);sfx.block();}
-    if(!dead&&Math.abs(p.x-o.x)<0.42&&p.y>o.y&&p.y<o.y+1.8&&o.invuln<=0&&o.state!=='ko'){
+    if(!dead&&Math.abs(p.x-o.x)<0.42&&p.y>o.y&&p.y<o.y+1.8&&o.invuln<=0&&o.state!=='ko'&&!ULT_STATES.includes(o.state)){
       if(p.hook){p.owner.hookOn=60;o.hp=Math.max(1,o.hp-15);o.lastHitT=G.time;spark(p.x,p.y,0xffffff,8,0.1);sfx.block();}
       else applyHit({x:p.x-p.vx*3,facing:Math.sign(p.vx),idx:p.owner.idx,tension:0,combo:0,lastRes:''},o,KNIFE_HIT,p.x,p.y);
       p.owner.tension=Math.min(100,p.owner.tension+5);dead=true;}
     if(dead){scene.remove(p.mesh);projectiles.splice(i,1);}
   }
+}
+// safety net: nobody can stay locked in an ultimate that isn't actually running
+function ultWatchdog(){
+  for(const f of[p1,p2]){const o=f===p1?p2:p1;
+    if(f.state==='ultd'&&!['rult','jult','vult'].includes(o.state)){if(++f.udT>20){f.state='airhit';f.uPose='';f.vy=-0.2;f.pass=false;f.udT=0;}}else f.udT=0;
+    if(['rult','jult','vult'].includes(f.state)){if(++f.uLong>1500){f.uLong=0;f.state=f.y>0?'jump':'idle';f.um='';}}else f.uLong=0;
+    if(!['rult','jult','vult'].includes(f.state)&&(f.hide||f.ucOn||f.uRope||f.uSl)){f.hide=0;f.ucOn=0;f.uRope=0;f.uSl=0;} // leftovers if an ult was cut short
+  }
+  if(arenaNext>=0&&![p1,p2].some(f=>['rult','jult','vult'].includes(f.state))){const X=ARENAS[arenaNext].px||0;if(Math.abs((p1.x+p2.x)/2-X)<Math.abs((p1.x+p2.x)/2)){worldShift(-X);arenaRecenter(X);}else setArena(arenaIdx);} // arena change left half done
 }
 function pushbox(){
   const a=p1,b=p2,dx=b.x-a.x;
