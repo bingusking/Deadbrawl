@@ -71,7 +71,8 @@ backdrop.position.set(0,3.4,-10);backdrop.renderOrder=-1;backdrop.visible=false;
 // Blender exports our colours as normalised ints in a second colour set; unpack them (dec: darken the palette to sit under the game's lights like the colosseum)
 function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=!at.normalized?1:A instanceof Uint16Array?65535:A instanceof Uint8Array?255:1,f=c=>(c/=D,dec?Math.pow(c,2.2):c);
   for(let i=0;i<n;i++){o[i*3]=f(at.getX(i));o[i*3+1]=f(at.getY(i));o[i*3+2]=f(at.getZ(i));}return new THREE.BufferAttribute(o,3);}
-(function loadArenas(){
+// (waits for the page's scripts to finish, since the arenas touch game state as they arrive)
+addEventListener('load',function loadArenas(){
   if(!THREE.GLTFLoader)return;const L=new THREE.GLTFLoader();
   ARENAS.forEach((A,i)=>{if(!A.glb)return;
     const key=A.glb.replace(/^.*arena_|\.glb$/g,'');
@@ -90,7 +91,7 @@ function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=
       if(A.door!==undefined)doorBuild(g,A.door);
       if(arenaIdx===i)setArena(i);else if(arenaNext===i)arenaPlace(i,A.px||0);
     },()=>{});};document.head.appendChild(sc);});
-})();
+});
 /* The Saloon's batwing doors: shut until a fighter goes through them, then they burst off their hinges */
 const DOOR={m:[],broken:0,t:0,dir:1};
 function doorBuild(g,x){
