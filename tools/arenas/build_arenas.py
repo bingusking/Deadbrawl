@@ -125,10 +125,20 @@ def build_ring():
             y0 = -4.2 + 7.6 * iy / 5; y1 = -4.2 + 7.6 * (iy + 1) / 5
             dx = ((x0 + x1) / 2) / 10.8; dy = ((y0 + y1) / 2 + 0.4) / 3.8
             k = max(0, 1 - (dx * dx + dy * dy) * 0.55)
-            c = int(0x6a + 0x30 * k) << 16 | int(0x5a + 0x26 * k) << 8 | int(0x48 + 0x1c * k)
+            c = int(0x66 + 0x34 * k) << 16 | int(0x60 + 0x32 * k) << 8 | int(0x5c + 0x2e * k)
             S.box(c, x0, x1, y0, y1, -0.05, 0.0, j=0.0)
     S.box(0x8a1820, -10.8, 10.8, -4.2, 3.4, -1.2, -0.05, j=0.01)
     S.box(0xc8962e, -10.85, 10.85, -4.25, 3.45, -0.32, -0.12, j=0.0)
+    # blue floor mats around the ring, steel barricade, commentary desk
+    S.box(0x1c2444, -13.5, 13.5, -7, 6.2, -1.19, -1.17, j=0)
+    for bx in range(-14, 15, 2):
+        S.cyl(0x4a4a56, bx, 6.1, -1.2, -0.1, 0.06, seg=6)
+    S.rod(0x5a5a66, (-14, 6.1, -0.15), (14, 6.1, -0.15), 0.05); S.rod(0x5a5a66, (-14, 6.1, -0.7), (14, 6.1, -0.7), 0.04)
+    S.box(0x2a2030, -3, 3, 4.6, 5.6, -1.2, -0.3, top=0x3a2c40)
+    for mx in (-1.8, 0, 1.8):
+        S.box(0x9ad0ff, mx - 0.4, mx + 0.4, 4.58, 4.6, -0.95, -0.5, kind='GLOW', j=0)
+    for k in range(4):     # apron: bold stripes along the ring skirt
+        S.box(0xd8d0c0, -9.5 + k * 5.4, -6.9 + k * 5.4, -4.22, -4.2, -0.95, -0.45, j=0)
     S.cyl(0x6a1418, 0, -0.4, 0.0, 0.012, 2.6, seg=32, j=0)   # centre logo
     S.cyl(0xc8962e, 0, -0.4, 0.012, 0.02, 2.0, seg=32, j=0)
     S.cyl(0x8a1820, 0, -0.4, 0.02, 0.025, 1.5, seg=32, j=0)
@@ -160,10 +170,10 @@ def build_ring():
             x += 0.55 + random.random() * 0.35
             if random.random() < 0.12:
                 continue
-            sh = random.choice([0x4a2a30, 0x5a3036, 0x3a2430, 0x6a3a2e, 0x7a2a2a, 0x8a5a3a, 0x3a3044])
+            sh = random.choice([0x3a2630, 0x44283a, 0x302638, 0x4a2c34, 0x3a2a44, 0x50303a])
             hgt = 0.75 + random.random() * 0.2
-            S.box(sh, x - 0.2, x + 0.2, y0 + 0.5, y0 + 0.9, zt, zt + hgt, j=0.1)
-            S.box(0x6a4a3a, x - 0.13, x + 0.13, y0 + 0.55, y0 + 0.85, zt + hgt, zt + hgt + 0.3, j=0.12)
+            S.box(sh, x - 0.2, x + 0.2, y0 + 0.5, y0 + 0.9, zt, zt + hgt, j=0.06)
+            S.box(0x5a4040, x - 0.13, x + 0.13, y0 + 0.55, y0 + 0.85, zt + hgt, zt + hgt + 0.3, j=0.06)
             if random.random() < 0.05:   # camera flashes / phone screens in the crowd
                 S.box(0xfff0c0, x - 0.06, x + 0.06, y0 + 0.45, y0 + 0.5, zt + hgt + 0.1, zt + hgt + 0.22, kind='GLOW', j=0)
     for sx in (-1, 1):  # side stands
@@ -208,7 +218,7 @@ def build_alley():
     for ix in range(-17, 17):  # asphalt, slightly patchy
         for iy in range(-8, 16):
             S.box(random.choice([0x3e3648, 0x443a4e, 0x3a3244, 0x483e56]), ix * 2, ix * 2 + 2, iy * 2, iy * 2 + 2, -0.3, 0.0, j=0.03)
-    for (x, y, r) in [(-5, -1.5, 1.4), (3.5, 1.5, 1.0), (9, -2.5, 1.6), (-12, 2, 1.2), (14, 0.5, 0.9)]:  # puddles catching the neon
+    for (x, y, r) in [(-5, -1.8, 1.2), (3.5, 2.6, 1.0), (8, -2.8, 1.3), (-9, 3.2, 1.1)]:  # puddles catching the neon
         S.cyl(0x5a3a7a, x, y, 0.0, 0.01, r, seg=20, j=0.05)
         S.cyl(0x8a4aa0, x + 0.2, y, 0.01, 0.015, r * 0.5, seg=16, j=0.05)
     # building facades across the back, with lit / dark windows
@@ -217,8 +227,24 @@ def build_alley():
         w = 6 + random.random() * 5; h = 9 + random.random() * 13; y0 = 8 + random.random() * 2
         if -4 < x + w / 2 < 4:     # leave a gap down the middle: the street continues
             x += w; continue
-        col = random.choice([0x4a2a2e, 0x3e2630, 0x3a2a40, 0x52302c])
+        col = random.choice([0x7a4640, 0x6a4250, 0x5a4a6e, 0x80503e])
         S.box(col, x, x + w, y0, y0 + 7, 0, h, j=0.03)
+        for bz in range(1, int(h / 0.9)):                      # brick courses
+            S.box(0x3a2430, x, x + w, y0 - 0.02, y0, bz * 0.9, bz * 0.9 + 0.05, j=0)
+        S.box(0x4a3040, x - 0.05, x + w + 0.05, y0 - 0.12, y0, 0, 0.9, j=0.02)      # plinth
+        if random.random() < 0.7:                              # a shuttered doorway with a lamp over it
+            dxx = x + 0.8 + random.random() * max(0.1, w - 3)
+            S.box(0x2a2a36, dxx, dxx + 1.5, y0 - 0.08, y0, 0, 2.6, j=0.03)
+            for k in range(6):
+                S.box(0x3a3a48, dxx + 0.1, dxx + 1.4, y0 - 0.1, y0 - 0.08, 0.3 + k * 0.38, 0.42 + k * 0.38, j=0)
+            S.box(0xffc070, dxx + 0.55, dxx + 0.95, y0 - 0.25, y0 - 0.05, 2.8, 3.0, kind='GLOW', j=0)
+        if random.random() < 0.8:                              # graffiti splash
+            gx = x + random.random() * max(0.1, w - 3); gc = random.choice([0xff3aa0, 0x40d0c0, 0xffc040, 0xa060ff])
+            for k in range(5):
+                S.box(gc, gx + k * 0.45, gx + k * 0.45 + 0.35, y0 - 0.03, y0 - 0.01, 1.0 + (k % 2) * 0.25, 1.9 - (k % 3) * 0.2, j=0.1)
+        if random.random() < 0.6:                              # air-con box
+            ax_ = x + 1 + random.random() * max(0.1, w - 3)
+            S.box(0x5a5a66, ax_, ax_ + 1.0, y0 - 0.5, y0, 3.2, 3.9, j=0.03); S.box(0x2a2a30, ax_ + 0.1, ax_ + 0.9, y0 - 0.52, y0 - 0.5, 3.3, 3.8, j=0)
         S.box(0x2a1c24, x - 0.1, x + w + 0.1, y0 - 0.15, y0 + 0.2, h - 0.5, h, j=0)   # roof ledge
         for fz in range(1, int(h / 2.6)):
             for fx in range(int(w / 1.8)):
@@ -256,7 +282,7 @@ def build_alley():
     S.quad([0x8a2a6a, 0x8a2a6a, 0x1a0a24, 0x1a0a24], (-40, 46, -1), (40, 46, -1), (40, 46, 40), (-40, 46, 40), kind='GLOW')
     # side walls receding toward the camera
     for sx in (-1, 1):
-        S.box(0x3a2430, sx * 19, sx * 26, -16, 8, 0, 16, j=0.03)
+        S.box(0x5a3a48, sx * 19, sx * 26, -16, 8, 0, 16, j=0.03)
         for k in range(3):
             wy = -1 + k * 3.4
             lit = random.random() < 0.35
@@ -297,6 +323,11 @@ def build_alley():
         S.cyl(0x5a5a62, tx, ty, 1.0, 1.08, 0.48, seg=12)
     for (bx, by, bz) in [(15, 5.5, 0), (15.6, 6.4, 0), (15.2, 5.9, 0.8)]:
         S.box(0x6a4a30, bx - 0.4, bx + 0.4, by - 0.4, by + 0.4, bz, bz + 0.8, j=0.08)
+    # steam rising from a manhole, crates, a parked scooter silhouette, a no-entry bollard row
+    S.cyl(0x2a2630, 1.5, 3.6, 0.0, 0.02, 0.7, seg=14, j=0)
+    S.cyl(0x2a2a3a, 1.5, 3.6, 0.0, 4.5, 0.5, 1.6, seg=12, kind='BEAM', j=0)
+    for bx in (-3.5, -1.5, 0.5):
+        S.cyl(0xd8b030, bx, 7.2, 0, 0.9, 0.12, seg=8); S.cyl(0x1a1a22, bx, 7.2, 0.55, 0.7, 0.13, seg=8, j=0)
     # burning barrel
     S.cyl(0x6a3420, 10.5, 5.2, 0, 1.25, 0.5, seg=12)
     S.cyl(0x4a2416, 10.5, 5.2, 0.4, 0.5, 0.52, seg=12)
@@ -339,7 +370,7 @@ def build_saloon():
             L = 3 + random.random() * 4
             d = min(abs(x + L / 2 - (-6)), abs(x + L / 2), abs(x + L / 2 - 6))
             k = max(0, 1 - d / 9) * max(0, 1 - abs(y - 1) / 12)
-            base = random.choice([0x5e361f, 0x6a3e24, 0x74442a, 0x583220])
+            base = random.choice([0x6e4a30, 0x7a5436, 0x845e3e, 0x66442c])
             r = min(255, ((base >> 16) & 255) + int(40 * k)); g = min(255, ((base >> 8) & 255) + int(24 * k)); b = (base & 255) + int(8 * k)
             S.box(r << 16 | g << 8 | b, x, min(12, x + L - 0.04), y, y + 0.86, -0.3, 0.0, j=0.03)
             x += L
@@ -348,7 +379,7 @@ def build_saloon():
     S.box(0x3a2014, -34, 12, 11, 12, 0, 1.6, j=0)
     xx = -34.0
     while xx < 11.9:
-        S.box(random.choice([0x4a2a1a, 0x52301c, 0x46261a]), xx, xx + 0.75, 11.05, 12, 1.6, 12, j=0.03)
+        S.box(random.choice([0x7a5236, 0x84593a, 0x704a30]), xx, xx + 0.75, 11.05, 12, 1.6, 12, j=0.03)
         xx += 0.75
     S.box(0x2a160e, -34, 12, 10.9, 11.0, 1.55, 1.75, j=0)
     # bar counter with brass rail and stools
@@ -390,6 +421,17 @@ def build_saloon():
     S.box(0x24120a, -34, 12.2, -16, 12, 11.8, 12.2, j=0)
     for k in range(-5, 6):
         S.box(0x3a2014, -34, 12, k * 2.4 - 0.25, k * 2.4 + 0.25, 11.2, 11.8, j=0.03)
+    # wagon-wheel chandelier, a rug, stairs up to the balcony
+    S.cyl(0x3a2014, 0, 3.5, 8.9, 9.05, 2.0, seg=20); S.cyl(0x24120a, 0, 3.5, 8.88, 9.07, 1.7, seg=20, j=0)
+    for k in range(8):
+        a = k * math.pi / 4
+        S.rod(0x3a2014, (0, 3.5, 8.97), (math.cos(a) * 2.0, 3.5 + math.sin(a) * 2.0, 8.97), 0.05, seg=4)
+        S.cyl(0xffd080, math.cos(a) * 1.9, 3.5 + math.sin(a) * 1.9, 9.05, 9.4, 0.07, seg=6, kind='GLOW', j=0)
+    S.rod(0x1a120e, (0, 3.5, 9.0), (0, 3.5, 11.2), 0.04)
+    S.box(0x6a1e1e, -5, 5, 2.2, 4.4, 0.0, 0.012, j=0.03); S.box(0xb08a3a, -4.7, 4.7, 2.4, 4.2, 0.012, 0.016, j=0); S.box(0x6a1e1e, -4.5, 4.5, 2.55, 4.05, 0.016, 0.02, j=0.03)
+    for k in range(12):
+        S.box(0x5a3418, -21.5 + k * 0.45, -21.05 + k * 0.45, 9.0, 10.9, 0, 0.52 * (k + 1), j=0.03)
+    S.rod(0x5a3018, (-21.5, 9.0, 1.5), (-16.2, 9.0, 7.6), 0.07)
     # hanging oil lamps
     for lx in (-6, 0, 6):
         S.rod(0x1a120e, (lx, 1.5, 11.2), (lx, 1.5, 7.6), 0.03)
@@ -444,12 +486,6 @@ def build_saloon():
     S.box(0x3a2014, 11.8, 12.2, -1.5, 1.5, 3.5, 3.85, j=0)                       # lintel
     S.box(0xc8902a, 11.78, 12.22, -1.1, 1.1, 3.9, 4.6, j=0)                      # sign board over the door
     S.box(0x5a1a14, 11.76, 12.24, -0.9, 0.9, 4.05, 4.45, j=0)
-    for (hy, sg) in ((1.2, -1), (-1.2, 1)):                                      # two swing doors, pushed open toward the street
-        dx_, dy_ = math.sin(0.7), sg * math.cos(0.7)
-        cx, cy = 12 + dx_ * 0.55, hy + dy_ * 0.55
-        S.obox(0x8a5a30, cx, cy, 1.65, 1.1, 0.07, 1.5, rot=(0, 0, math.atan2(dy_, dx_)), j=0.03)
-        for k in range(4):
-            S.obox(0x5a3418, cx, cy, 1.15 + k * 0.3, 0.9, 0.09, 0.08, rot=(0, 0, math.atan2(dy_, dx_)), j=0)
     # ---------------- MAIN STREET, outside through the doors ----------------
     S.box(0x7a5a3e, 12, 60, -16, 44, -0.3, -0.01, j=0)                             # dusty road
     for _ in range(70):

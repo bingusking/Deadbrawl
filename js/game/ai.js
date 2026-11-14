@@ -1,6 +1,8 @@
 'use strict';
 /* =============== AI =============== */
-const DIFF={EASY:{think:28,react:16,block:0.15,parry:0.08,dodge:0.1,combo:0.2,aggr:0.6,juggle:0.2},NORMAL:{think:15,react:8,block:0.35,parry:0.25,dodge:0.2,combo:0.6,aggr:1,juggle:0.55},HARD:{think:7,react:3,block:0.5,parry:0.45,dodge:0.25,combo:0.9,aggr:1.3,juggle:0.85}};
+const DIFF={EASY:{think:28,react:16,block:0.15,parry:0.08,dodge:0.1,combo:0.2,aggr:0.6,juggle:0.2},NORMAL:{think:15,react:8,block:0.35,parry:0.25,dodge:0.2,combo:0.6,aggr:1,juggle:0.55},HARD:{think:7,react:3,block:0.5,parry:0.45,dodge:0.25,combo:0.9,aggr:1.3,juggle:0.85},
+  IMPOSSIBLE:{think:2,react:0,block:0.26,parry:0.7,dodge:0.04,combo:1,aggr:1.7,juggle:1,god:1}};
+const GOD=()=>!!DIFF[G.diff].god;
 function aiThink(b,p){
   aiCore(b,p);
   if(b.char==='jacob'&&G.phase==='fight'&&!G.training){const dist=Math.abs(p.x-b.x);
@@ -8,14 +10,22 @@ function aiThink(b,p){
     if(b.buf.a4>0&&dist>1.5){b.buf.a4=0;b.buf.a1=8;}
     if(b.hookOn>0&&b.hookOn<48&&rnd()<0.08)press(b,['a1','kD','kD','kU'][rnd()*4|0]);
     if(p.state==='stun'&&dist<1.5&&rnd()<0.2)press(b,rnd()<0.5?'a3':'melee');
-    if(b.tension>=ULT_COST&&dist<5&&!b.air()&&rnd()<0.03)press(b,'ult');}
+    if(b.tension>=ULT_COST&&dist<5&&!b.air()&&rnd()<(GOD()?0.5:0.03))press(b,'ult');}
   if(b.char==='rift'&&G.phase==='fight'&&!G.training){const dist=Math.abs(p.x-b.x);
     if(b.buf.a1>0&&dist>2.3){b.buf.a1=0;b.buf[dist<4?'a4':'a2']=8;}
     if(b.buf.a3>0){if(dist>1.5){b.buf.a3=0;b.buf.a4=8;}else b.grabDir=['down','up','fwd'][rnd()*3|0];}
     if(b.buf.a4>0&&dist>4.5){b.buf.a4=0;b.buf.a2=8;}
     if(b.tpWin>0&&b.tpWin<100&&rnd()<0.02)b.buf.a2=8;
-    if(b.tension>=ULT_COST&&dist<2.4&&!b.air()&&rnd()<0.04)press(b,'ult');}
-  if(b.char==='vish'&&G.phase==='fight'&&!G.training&&b.tension>=ULT_COST&&Math.abs(p.x-b.x)<1.6&&!b.air()&&rnd()<0.05)press(b,'ult');
+    if(b.tension>=ULT_COST&&dist<2.4&&!b.air()&&rnd()<(GOD()?0.6:0.04))press(b,'ult');}
+  if(b.char==='vish'&&G.phase==='fight'&&!G.training){const A=b.ai,dx=p.x-b.x,dist=Math.abs(dx),tw=Math.sign(dx)||1,D=DIFF[G.diff];
+    if(b.tension>=ULT_COST&&dist<1.6&&!b.air()&&rnd()<(GOD()?0.6:0.05))press(b,'ult');
+    // slide tech: run in, hold slide, fire the shotgun behind him for a burst of speed, then attack out of the slide
+    if(A.aimClr>0&&--A.aimClr===0)b.uAimT=undefined;
+    if(!A.slT&&dist>4.2&&b.ammo>0&&!b.air()&&['idle','walkf'].includes(b.state)&&rnd()<0.012*D.aggr){A.slT=50;A.slShot=0;}
+    if(A.slT>0){A.slT--;if(tw>0)b.inp.r=1;else b.inp.l=1;b.inp.s=1;
+      if(b.state==='slide'&&!A.slShot&&b.mt>=2&&b.ammo>0){A.slShot=1;b.uAX=b.x-Math.sign(b.vx)*3;b.uAY=b.y+0.8;b.uAimT=G.time;A.aimClr=3;press(b,'shot');}
+      if(dist<1.8||(A.slShot&&b.state!=='slide'&&A.slT<34)||['hitstun','airhit','block','stun'].includes(b.state)){A.slT=0;if(dist<2.2&&A.slShot)press(b,b.ammo>0&&rnd()<0.5?'shot':'melee');}}
+  }
 }
 function aiCore(b,p){
   const A=b.ai,D=DIFF[G.diff];b.inp={l:0,r:0,u:0,d:0,q:0};
@@ -28,6 +38,11 @@ function aiCore(b,p){
   const anyThreat=threat||threatOf(b,p);
   if(anyThreat){const id=p.atkId;if(A.tid!==id){A.tid=id;A.react=D.react+(rnd()*6|0);const r=rnd();
     A.def=threat&&r<D.parry?'parry':threat&&r<D.parry+D.dodge?'dodge':r<D.parry+D.dodge+D.block?'block':null;}}
+  if(D.god&&threat&&A.pid!==p.atkId){A.pid=p.atkId;if(b.cd.parry<=0&&rnd()<0.9){A.def='parry';A.blockT=0;}} // a melee hit is really coming: go for the parry
+  if(D.god&&A.def==='parry'&&b.cd.parry>0)A.def='block';
+  if(D.god&&A.def==='parry'&&threat&&p.state==='attack'&&p.move){ // IMPOSSIBLE: parry on the exact frame
+    if(p.mt>=p.move.startup-2&&!b.air()&&['idle','walkf','walkb','guard'].includes(b.state)){press(b,'parry');A.def=null;}
+    else if(!b.air()&&['idle','walkf','walkb','guard'].includes(b.state))return;} // stand still and wait for it
   // blocking: keep holding away while the attack (or a blockstring) is coming
   if(A.def==='block'&&anyThreat&&!b.air()){A.react-=2;if(A.react<=0){A.blockT=24;A.def=null;}} // blocking reacts twice as fast as parry/dodge
   if(A.blockT>0&&['idle','walkf','walkb','guard','block'].includes(b.state)){A.blockT--;if(b.state==='block'||anyThreat)A.blockT=Math.max(A.blockT,10);hold(-tw);return;}

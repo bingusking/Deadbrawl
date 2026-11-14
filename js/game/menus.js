@@ -25,7 +25,7 @@ $$('.ink').forEach((el,n)=>{let r=n*7+3;const R=()=>{r=(r*9301+49297)%233280;ret
   if(el.classList.contains('splash')){pts.length=0;for(let i=0;i<40;i++){const a=i/40*Math.PI*2,rr=38+R()*14+(i%3==0?R()*10:0);pts.push([50+Math.cos(a)*rr*1.1,55+Math.sin(a)*rr]);}}
   el.style.clipPath='polygon('+pts.map(p=>p[0].toFixed(1)+'% '+p[1].toFixed(1)+'%').join(',')+')';});
 
-const DIFFS=['EASY','NORMAL','HARD'];
+const DIFFS=['EASY','NORMAL','HARD','IMPOSSIBLE'];
 /* ---------- settings (saved in this browser) ---------- */
 const SET={sound:1,vol:1,shake:1};
 try{Object.assign(SET,JSON.parse(localStorage.getItem('deadbrawl.set')||'{}'));}catch(e){}
@@ -85,7 +85,7 @@ function act(a){
     case 'online':goOnline();break;
     case 'train':G.training=true;toSelect();break;
     case 'fight':toFight();break;
-    case 'diff':{const i=(DIFFS.indexOf(G.diff)+1)%3;G.diff=DIFFS[i];$('#dlabel').textContent=G.diff;break;}
+    case 'diff':{const i=(DIFFS.indexOf(G.diff)+1)%DIFFS.length;G.diff=DIFFS[i];$('#dlabel').textContent=G.diff;break;}
     case 'char':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));toViewer();break;
     case 'set':applySet();openOvl('settings');break;
     case 'snd':SET.sound=SET.sound?0:1;applySet();saveSet();break;
@@ -117,7 +117,7 @@ addEventListener('keydown',e=>{
     return;
   }
   if(G.mode==='onl'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();toMenu();}return;}
-  if(G.mode==='select'&&!G.training&&['KeyW','ArrowUp','KeyS','ArrowDown'].includes(e.code)){const d=e.code==='KeyW'||e.code==='ArrowUp'?-1:1;G.diff=DIFFS[(DIFFS.indexOf(G.diff)+d+3)%3];$('#dlabel').textContent=G.diff;sfx.sel();return;}
+  if(G.mode==='select'&&!G.training&&['KeyW','ArrowUp','KeyS','ArrowDown'].includes(e.code)){const d=e.code==='KeyW'||e.code==='ArrowUp'?-1:1;G.diff=DIFFS[(DIFFS.indexOf(G.diff)+d+DIFFS.length)%DIFFS.length];$('#dlabel').textContent=G.diff;sfx.sel();return;}
   if(G.mode==='select'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();if(G.selStage===1)cReset();else toMenu();}else if(['Enter','Space','KeyJ'].includes(e.code)&&!e.repeat)cChoose();else if(['KeyA','ArrowLeft'].includes(e.code))cNav(-1);else if(['KeyD','ArrowRight'].includes(e.code))cNav(1);return;}
   if(G.mode==='viewer'){if(e.code==='Escape'||e.code==='Backspace')toMenu();else if(e.code==='KeyA'||e.code==='ArrowLeft')cvNav(-1);else if(e.code==='KeyD'||e.code==='ArrowRight')cvNav(1);return;}
   if(G.mode==='fight'){
@@ -130,7 +130,7 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 function toggleMute(){SET.sound=SET.sound?0:1;applySet();saveSet();}
-$('#dlabel').addEventListener('click',()=>{G.diff=DIFFS[(DIFFS.indexOf(G.diff)+1)%3];$('#dlabel').textContent=G.diff;sfx.sel();});
+$('#dlabel').addEventListener('click',()=>{G.diff=DIFFS[(DIFFS.indexOf(G.diff)+1)%DIFFS.length];$('#dlabel').textContent=G.diff;sfx.sel();});
 applySet();mfBuild();
 $('#mute').addEventListener('click',toggleMute);
 document.addEventListener('pointerdown',()=>ac(),{once:true});

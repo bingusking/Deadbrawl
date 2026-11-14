@@ -130,7 +130,7 @@ function lashUltTick(f,o){
    (arenaPlace), they fly across in an arc while the camera follows YOUR fighter, and when they crash down
    the whole world shifts back so the new arena sits at the centre (worldShift + arenaRecenter): no cut. */
 const KN={N:66,H:3.6,LAND_X:1.5};
-const SHIFT_KEYS=['x','bX','vlx','ux0','lx0','sAX'];
+const SHIFT_KEYS=['x','bX','vlx','ux0','lx0','sAX','lastX'];
 function worldShift(dx){ // host: move everything by dx (fighters, stored targets, projectiles)
   for(const g of[p1,p2])for(const k of SHIFT_KEYS)if(typeof g[k]==='number')g[k]+=dx;
   for(const q of projectiles){q.x+=dx;q.mesh.position.x+=dx;}}
@@ -203,7 +203,7 @@ function lashUltFrame(f){const t=f.ut||0,u=f.u2||0;
      W      juggle   : toss them up, slide-blast one way, slide back under them, blast them back up, keep sliding, blast again, final blast as they drop
    Every route ends by blasting them into the next arena, and Vish dashes in after them. */
 ULTS.vish={name:'LAST ROUND'};
-const VU={PICK:75,SHOT:35,KNIFE:20,FIN:60,SLAM:20,POUND:22,AIR:40,AIRFIN:70,C:30};
+const VU={PICK:75,SHOT:35,KNIFE:20,FIN:60,SLAM:20,POUND:22,AIR:40,AIRFIN:70,C:44,PG:13,T:68};
 MOVES.vult={base:'stance',startup:8,active:7,recovery:22,vx:0.2,dmg:1,reach:[0,1.3],y:[0,2.0],grab:1,shake:0.15,react:(a,d)=>vishUltStart(a,d)};
 // the W/A/S/D prompt, shown only to the player who landed the grab
 function vultPrompt(){} // (the prompt follows the fighter's state: see vultPromptUpd, called from the HUD update)
@@ -251,37 +251,38 @@ function vishUltTick(f,o){
     if(i>=3){vuFinal(f,o,s);return;}
     if(k===0){if(Math.sign(o.x-f.x)!==dir){afterimage(f);f.x=lim(o.x-dir*0.8);} // picked the far side: step through them first
       f.kA=o.x;f.kB=clamp(o.x+dir*4.2,BL+1.2,BR-1.2);vuShot(f,o,VU.SHOT,false,o.x,o.y+1);o.facing=-dir;}
-    if(k>=1&&k<=12){const p=k/12;o.x=f.kA+(f.kB-f.kA)*ease(p);o.y=0.25+Math.sin(p*Math.PI)*0.7;}
-    if(k===8){f.facing=dir;burstKnife(f,o,1);sfx.whoosh();}
-    if(k===15)ultHit(f,o,VU.KNIFE,o.x,o.y+1.1,false);
-    if(k===10)f.kF=f.x;
-    if(k>=10&&k<=22){const dest=lim(f.kB+(i<2?dir:-dir)*0.9),p=(k-10)/12;f.x=f.kF+(dest-f.kF)*ease(p);f.facing=k<22?dir:Math.sign(o.x-f.x)||dir;if(k%3===0)afterimage(f);if(k===10)trail(f,true);}
+    if(k>=1&&k<=16){const p=k/16;o.x=f.kA+(f.kB-f.kA)*ease(p);o.y=0.25+Math.sin(p*Math.PI)*0.8;}
+    if(k===14){f.facing=dir;burstKnife(f,o,1);sfx.whoosh();}
+    if(k===21)ultHit(f,o,VU.KNIFE,o.x,o.y+1.1,false);
+    if(k===18)f.kF=f.x;
+    if(k>=18&&k<=34){const dest=lim(f.kB+(i<2?dir:-dir)*0.9),p=(k-18)/16;f.x=f.kF+(dest-f.kF)*ease(p);f.facing=k<34?dir:Math.sign(o.x-f.x)||dir;if(k%3===0)afterimage(f);if(k===18)trail(f,true);}
     return;}
   if(f.um==='down'){ // slam, seven blasts into the floor, lift, blast away
     const d=f.udir;
-    if(t<8){o.x=f.x+d*0.75;o.y=0.25+t/8*0.9;}
-    if(t===8){o.y=0;o.uPose='down';ultHit(f,o,VU.SLAM,o.x,0.4,true);dust(o.x,20);f.x=lim(o.x-d*0.55);}
-    const j=(t-18)/9;
-    if(t>=18&&t<=72&&Number.isInteger(j)){f.facing=d;vuShot(f,o,VU.POUND,false,o.x+d*0.05,0.15);impactFrame(j%2);dust(o.x,10);G.shake=Math.max(G.shake,0.26);f.kB=0.16;}
-    if(t>8&&t<82){f.kB=(f.kB||0)-0.03;o.y=Math.max(0,o.y+f.kB);}
-    if(t>=82&&t<96){o.uPose='';const p=(t-82)/12;o.x=f.x+d*0.75;o.y=Math.min(0.5,p*0.5);}
-    if(t>=100){f.ufin=VU.FIN;vuFinal(f,o,d);}
+    if(t<14){o.x=f.x+d*0.75;o.y=0.25+t/14*1.1;}
+    if(t===14){o.y=0;o.uPose='down';ultHit(f,o,VU.SLAM,o.x,0.4,true);dust(o.x,20);f.x=lim(o.x-d*0.55);}
+    const j=(t-30)/VU.PG;
+    if(t>=30&&t<=30+6*VU.PG&&Number.isInteger(j)){f.facing=d;vuShot(f,o,VU.POUND,false,o.x+d*0.05,0.15);impactFrame(j%2);dust(o.x,10);G.shake=Math.max(G.shake,0.26);f.kB=0.16;}
+    const E=30+6*VU.PG+16; // pounding done
+    if(t>14&&t<E){f.kB=(f.kB||0)-0.03;o.y=Math.max(0,o.y+f.kB);}
+    if(t>=E&&t<E+20){o.uPose='';const p=(t-E)/16;o.x=f.x+d*0.75;o.y=Math.min(0.5,p*0.5);}
+    if(t>=E+26){f.ufin=VU.FIN;vuFinal(f,o,d);}
     return;}
   if(f.um==='up'){ // toss them up and juggle with slide blasts from both sides
-    const s=f.udir,X=f.ux0,T=54;
+    const s=f.udir,X=f.ux0,T=VU.T;
     if(t===0)f.kF=f.x;
     const ph=t<T?t/T:(t-T)/T;o.x=X;o.y=0.4+(t<T?4.0:4.5)*4*ph*(1-ph);o.uPose=t>2?'fly':'';
     let vx=f.kF;f.uSl=0;
-    if(t>=4&&t<22){vx=f.kF+(X+s*3.4-f.kF)*ease((t-4)/18);f.uSl=1;f.facing=s;}
-    else if(t>=22&&t<26){vx=X+s*3.4;f.facing=-s;}
-    else if(t>=26&&t<T){vx=X+s*3.4*(1-(t-26)/(T-26));f.uSl=1;f.facing=-s;}
-    else if(t>=T&&t<80){vx=X-s*3.4*ease((t-T)/26);f.uSl=1;f.facing=-s;}
-    else if(t>=80){vx=X-s*(3.4-2.3*ease((t-80)/18));f.facing=s;}
-    if(t>=4)f.x=lim(vx);
+    if(t>=6&&t<28){vx=f.kF+(X+s*3.4-f.kF)*ease((t-6)/22);f.uSl=1;f.facing=s;}
+    else if(t>=28&&t<34){vx=X+s*3.4;f.facing=-s;}
+    else if(t>=34&&t<T){vx=X+s*3.4*(1-(t-34)/(T-34));f.uSl=1;f.facing=-s;}
+    else if(t>=T&&t<T+34){vx=X-s*3.4*ease((t-T)/34);f.uSl=1;f.facing=-s;}
+    else if(t>=T+34){vx=X-s*(3.4-2.3*ease((t-T-34)/22));f.facing=s;}
+    if(t>=6)f.x=lim(vx);
     if(f.uSl&&t%3===0)dust(f.x,1);
-    if(t===12||t===36||t===68)vuShot(f,o,VU.AIR,false,o.x,o.y+1);
+    if(t===16||t===46||t===T+18)vuShot(f,o,VU.AIR,false,o.x,o.y+1);
     if(t===T){vuShot(f,o,VU.AIR,true,o.x,o.y+1);callout(f,'PULL!','#ffcc33');}
-    if(t>=104){f.ufin=VU.AIRFIN;vuFinal(f,o,s);}
+    if(t>=2*T-5){f.ufin=VU.AIRFIN;vuFinal(f,o,s);}
     return;}
 }
 // which sprite frame Vish shows during the cinematic
@@ -289,7 +290,7 @@ function vishUltFrame(f){const t=f.ut||0;
   if(f.uSh>0)return ['shotgun',f.uSh>4?2:3,'aim'];
   if(f.um==='fin')return (f.u2||0)<11?['shotgun',3]:['dash',2+Math.floor(f.u2/4)%3];
   if(f.uSl)return ['dash',5];
-  if(f.um==='side'){const k=(t-1+VU.C)%VU.C;return k>=10&&k<=22?['dash',2+Math.floor(k/4)%3]:k>=7&&k<10?['knife',3]:['shotgun',1];}
-  if(f.um==='down')return t<9||(t>82&&t<100)?['knife',3]:['shotgun',1];
-  if(f.um==='up')return t<5?['knife',4]:['shotgun',1];
+  if(f.um==='side'){const k=(t-1+VU.C)%VU.C;return k>=18&&k<=34?['dash',2+Math.floor(k/4)%3]:k>=12&&k<18?['knife',3]:['shotgun',1];}
+  if(f.um==='down')return t<15||t>30+6*VU.PG+16?['knife',3]:['shotgun',1];
+  if(f.um==='up')return t<7?['knife',4]:['shotgun',1];
   return ['knife',3];}

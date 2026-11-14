@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-15)
 
 ## Corpus Check
-- 26 files · ~16,873 words
+- 26 files · ~17,514 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 374 nodes · 583 edges · 19 communities
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 33 edges (avg confidence: 0.86)
+- 381 nodes · 595 edges · 20 communities (19 shown, 1 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `21bad73d`
+- Built from commit: `ebb4ef3c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,16 +42,16 @@
 3. `act()` - 11 edges
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
-6. `build_colosseum()` - 8 edges
-7. `ultHit()` - 8 edges
-8. `vishUltTick()` - 8 edges
+6. `ultHit()` - 8 edges
+7. `vishUltTick()` - 8 edges
+8. `build_colosseum()` - 8 edges
 9. `services` - 8 edges
-10. `bindRender()` - 7 edges
+10. `goOnline()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/sprites.js
@@ -59,7 +59,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 0 thin omitted)
+## Communities (20 total, 1 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -90,8 +90,8 @@ Cohesion: 0.08
 Nodes (15): CD, jacobFrame(), jacobRope(), jacobTick(), KNIFE_HIT, MOVES, riftFrame(), drawSprite() (+7 more)
 
 ### Community 7 - "stage.js"
-Cohesion: 0.18
-Nodes (12): arena0, ARENA_TEX, arenaLook(), arenaPlace(), arenaRecenter(), ARENAS, arenaWipe(), backdrop (+4 more)
+Cohesion: 0.13
+Nodes (17): arena0, ARENA_TEX, arenaLook(), arenaPlace(), arenaRecenter(), ARENAS, arenaWipe(), backdrop (+9 more)
 
 ### Community 8 - "ult.js"
 Cohesion: 0.10
@@ -114,8 +114,8 @@ Cohesion: 0.60
 Nodes (4): ac(), noise(), sfx, tone()
 
 ### Community 14 - "ai.js"
-Cohesion: 0.67
-Nodes (3): aiCore(), aiThink(), DIFF
+Cohesion: 0.60
+Nodes (4): aiCore(), aiThink(), DIFF, GOD()
 
 ### Community 15 - "binds.js"
 Cohesion: 0.16
@@ -130,18 +130,21 @@ Cohesion: 0.67
 Nodes (3): last, loop(), reportErr()
 
 ### Community 19 - "build_arenas.py"
-Cohesion: 0.08
+Cohesion: 0.10
 Nodes (10): build_alley(), build_colosseum(), arcade(), bays(), P(), build_ring(), build_saloon(), hexc() (+2 more)
 
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
+## Knowledge Gaps
+- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `impactFrame()` connect `ult.js` to `online.js`?**
-  _High betweenness centrality (0.051) - this node is a cross-community bridge._
+  _High betweenness centrality (0.052) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `stars()` connect `fighters.js` to `online.js`?**

@@ -55,7 +55,7 @@ function netWrap(name,fn){ORIG[name]=fn;return function(...a){if(G.online&&G.onl
 spark=netWrap('spark',spark);trail=netWrap('trail',trail);dust=netWrap('dust',dust);flash=netWrap('flash',flash);splash=netWrap('splash',splash);
 callout=netWrap('callout',callout);showCombo=netWrap('showCombo',showCombo);cutin=netWrap('cutin',cutin);shotgunFx=netWrap('shotgunFx',shotgunFx);shotFx=netWrap('shotFx',shotFx);
 afterimage=netWrap('afterimage',afterimage);burstKnife=netWrap('burstKnife',burstKnife);muzzleFlash=netWrap('muzzleFlash',muzzleFlash);stars=netWrap('stars',stars);endMatch=netWrap('endMatch',endMatch);
-setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);impactFrame=netWrap('impactFrame',impactFrame);arenaPlace=netWrap('arenaPlace',arenaPlace);arenaRecenter=netWrap('arenaRecenter',arenaRecenter);
+setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);impactFrame=netWrap('impactFrame',impactFrame);doorBreak=netWrap('doorBreak',doorBreak);arenaPlace=netWrap('arenaPlace',arenaPlace);arenaRecenter=netWrap('arenaRecenter',arenaRecenter);
 for(const k in sfx){const fn=sfx[k];ORIG['sfx.'+k]=fn;sfx[k]=function(...a){if(G.online&&G.online.role==='host')G.netEv.push(['sfx.'+k,a]);return fn.apply(this,a);};}
 function netSer(f){const o={};for(const k in f){if(k==='_face')continue;const v=f[k],t=typeof v;if(t==='number')o[k]=Math.round(v*1000)/1000;else if(t==='string'||t==='boolean')o[k]=v;}o.cd=f.cd;return o;}
 function netSnap(){

@@ -23,7 +23,7 @@ function spriteFrame(f){
   const t=G.time,st=f.st||0;
   if(f.shotT>0&&['idle','walkf','walkb','guard','jump','slide','land'].includes(f.state))return ['shotgun',f.shotT>7?2:3,'aim']; // fired toward the mouse
   switch(f.state){
-    case 'intro':case 'idle':return ['idle',Math.floor(t/7+f.idx*3)%SPR.idle.length];
+    case 'intro':case 'idle':return ['idle',Math.floor(t/4+f.idx*3)%SPR.idle.length];
     case 'victory':return ['vish_win',Math.min(4,Math.floor(st/12))]; // plays once, holds the last pose
     case 'walkf':return ['run',Math.floor(st/5)%SPR.run.length];
     case 'walkb':return ['runb',Math.floor(st/10)%SPR.runb.length];

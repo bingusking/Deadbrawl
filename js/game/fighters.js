@@ -151,7 +151,7 @@ function stepFighter(f,o){
   // always face the enemy, except mid-dash and mid-roll
   if(!(G.time-(f.heldT||-9)<=1)&&!(f.state==='attack'&&(f.mname==='dash'||f.mname==='jkick'||f.mname==='lunge'||f.mname==='rult'||f.mname==='knife'))&&f.state!=='dodge'&&f.state!=='slide'&&!(f.shotT>0)&&f.state!=='ghold'&&f.state!=='hold'&&!['kd','ko','intro','victory'].includes(f.state)&&Math.abs(o.x-f.x)>0.08)f.facing=o.x>=f.x?1:-1;
   switch(f.state){
-    case 'idle':case 'walkf':case 'walkb':case 'guard':{f.jumps=0;f.airUsed=false;f.lightChain=0;
+    case 'idle':case 'walkf':case 'walkb':case 'guard':{f.jumps=0;f.wj=0;f.airUsed=false;f.lightChain=0;
       if(tryAbility(f)||tryMelee(f))break;
       if(f.char==='vish'&&f.inp.s&&Math.abs(f.vx)>SLIDE.MIN){f.state='slide';f.mt=0;f.facing=Math.sign(f.vx);dust(f.x,4);break;}
       if(take(f,'jump')){f.state='jump';f.vy=JUMPV;f.vx=(fwd()?1:back()?-0.85:0)*f.facing*0.085;f.jumps=1;f.flip=0;sfx.jump();dust(f.x,4);break;}
@@ -165,6 +165,8 @@ function stepFighter(f,o){
       const dir=(f.inp.r?1:0)-(f.inp.l?1:0);if(dir)f.vx+=(dir*0.085-f.vx)*0.06;
       if(f.flip>0)f.flip--;
       if(tryAbility(f)||tryMelee(f))break;
+      {const wall=f.x>=BR-0.06?1:f.x<=BL+0.06?-1:0; // wall jump: jump again while against the edge of the arena; your double jump is kept
+       if(wall&&f.wj!==wall&&f.y>0.25&&f.buf.jump>0){f.buf.jump=0;f.wj=wall;f.vy=JUMPV*0.98;f.vx=-wall*0.12;f.jumps=1;f.flip=0;f.facing=-wall;sfx.jump();dust(f.x,5);spark(f.x+wall*0.3,f.y+0.6,0xffffff,6,0.06,0.08);callout(f,'WALL JUMP','#cfe8ff');break;}}
       if(f.jumps<2&&take(f,'jump')){f.vy=DJUMPV;f.jumps=2;f.flip=24;if(dir)f.vx=dir*0.08;sfx.jump();spark(f.x,f.y+0.2,0xffffff,6,0.06,0.08);}
       break;}
     case 'charge':

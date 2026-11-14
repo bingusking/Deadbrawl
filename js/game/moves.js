@@ -174,7 +174,7 @@ function jacobFrame(f){
       if(f.mname==='zip')return [R,3];
       return k<=s?[T,1]:[R,2];}
   }
-  return [I,Math.floor(t/7+f.idx*3)%SPR.jacob_idle.length];
+  return [I,Math.floor(t/9+f.idx*3)%SPR.jacob_idle.length];
 }
 const KNIFE_HIT={impact:1,dmg:45,soft:1,launch:0.11,kb:0.02,stop:5,shake:0.05};
 const PARRY_WIN=36,TAP=8,CHARGE=30;

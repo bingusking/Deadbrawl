@@ -87,11 +87,32 @@ function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=
         else{m=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gmap});o.add(new THREE.Mesh(prep(geo),outlineMat));}
         o.material=m;});
       g.add(gl.scene);if(g!==colo){g.visible=false;scene.add(g);}A.grp=g;
+      if(A.door!==undefined)doorBuild(g,A.door);
       if(arenaIdx===i)setArena(i);else if(arenaNext===i)arenaPlace(i,A.px||0);
     },()=>{});};document.head.appendChild(sc);});
 })();
+/* The Saloon's batwing doors: shut until a fighter goes through them, then they burst off their hinges */
+const DOOR={m:[],broken:0,t:0,dir:1};
+function doorBuild(g,x){
+  const wood=new THREE.MeshToonMaterial({color:0x6a3212,gradientMap:gmap}),slat=new THREE.MeshToonMaterial({color:0x3a1a08,gradientMap:gmap});
+  for(const sg of[-1,1]){const d=new THREE.Group();d.userData={sg,x};
+    const p=new THREE.Mesh(prep(new THREE.BoxGeometry(0.09,1.55,1.16)),wood);p.add(new THREE.Mesh(p.geometry,outlineMat));p.position.set(0,0,-sg*0.59);d.add(p);
+    for(let k=0;k<4;k++){const b=new THREE.Mesh(new THREE.BoxGeometry(0.13,0.09,0.95),slat);b.position.set(0,-0.5+k*0.33,-sg*0.59);d.add(b);}
+    g.add(d);DOOR.m.push(d);}
+  doorReset();}
+function doorReset(){DOOR.broken=0;DOOR.t=0;for(const d of DOOR.m){d.position.set(d.userData.x,1.68,d.userData.sg*1.2);d.rotation.set(0,0,0);}}
+function doorBreak(dir){if(DOOR.broken||!DOOR.m.length)return;DOOR.broken=1;DOOR.t=0;DOOR.dir=dir;
+  const x=ARENAS[arenaIdx].door;spark(x,1.6,0xffd9a0,18,0.16,0.14);dust(x+dir*0.6,12);sfx.heavy();G.shake=Math.max(G.shake,0.18);}
+function doorUpd(){if(!DOOR.broken||DOOR.t>=46)return;const t=++DOOR.t,p=Math.min(1,t/46);
+  for(const d of DOOR.m){const sg=d.userData.sg,far=sg<0?3.4:2.4; // each door is flung along the way you went, tumbles and comes to rest on the floor
+    d.position.x=d.userData.x+DOOR.dir*far*(1-Math.pow(1-p,2));d.position.y=Math.max(0.08,1.68+Math.sin(p*Math.PI)*0.9-p*1.6);d.position.z=sg*(1.2+p*0.5);
+    d.rotation.z=-DOOR.dir*Math.PI/2*Math.min(1,p*1.25);d.rotation.y=sg*DOOR.dir*p*2.2;d.rotation.x=sg*p*0.5;}}
+// host: has a fighter just crossed the doorway?
+function doorCheck(){const A=ARENAS[arenaIdx],on=A.door!==undefined&&arenaNext<0;
+  for(const f of[p1,p2]){if(on&&!DOOR.broken&&f.lastX!==undefined&&(f.lastX-A.door)*(f.x-A.door)<0&&Math.abs(f.x-f.lastX)<4)doorBreak(Math.sign(f.x-f.lastX));f.lastX=f.x;}}
 function arenaLook(A){ // fog + background + fight limits for an arena
   BL=A.l??-8.2;BR=A.r??8.2;G.zone=undefined;
+  doorReset();
   scene.fog.color.setHex(A.fog??ARENA0.fog);scene.fog.near=A.near??ARENA0.near;scene.fog.far=A.far??ARENA0.far;
   scene.background=A.bg!==undefined?new THREE.Color(A.bg):null;}
 function setArena(i){ // show one arena at the centre, everything else hidden

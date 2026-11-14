@@ -79,6 +79,7 @@ function updHud(force){
 /* =============== CAMERA =============== */
 const camPos=new THREE.Vector3(0,1.7,9),camLook=new THREE.Vector3(0,1.2,0);
 function updCam(snap){
+  doorUpd();
   {const A=ARENAS[arenaIdx]; // The Saloon: walk out through the doors onto Main Street (and back)
    if(A.door!==undefined&&G.phase==='fight'&&arenaNext<0&&!(G.online&&G.online.role==='guest')){const z=(p1.x+p2.x)/2>A.door?1:0;
      if(G.zone===undefined)G.zone=z;else if(z!==G.zone){G.zone=z;splash('<b>'+(z?'MAIN STREET':A.name)+'</b>',1.2);sfx.whoosh();}}}
@@ -111,7 +112,7 @@ function tick(){
   if(G.hitstop>0){G.hitstop--;return;}
   phaseLogic();
   if(G.phase==='ko'&&G.pt<70&&G.time%2)return;
-  stepFighter(p1,p2);stepFighter(p2,p1);ultWatchdog();pushbox();updProj();
+  stepFighter(p1,p2);stepFighter(p2,p1);ultWatchdog();doorCheck();pushbox();updProj();
   animFighter(p1,p2);animFighter(p2,p1);
   updHud();
 }
