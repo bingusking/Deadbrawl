@@ -1,8 +1,8 @@
 {
   "js/game/ai.js": {
-    "mtime": 1794662735.464917,
-    "seen": 1794663506.2024858,
-    "ast_hash": "33eef5754e290d564b95195d6273fc6f",
+    "mtime": 1794664223.1803951,
+    "seen": 1794664281.3473701,
+    "ast_hash": "281a31dcc8128b49977c4b9c29524144",
     "semantic_hash": ""
   },
   "js/game/animation.js": {
@@ -42,9 +42,9 @@
     "semantic_hash": ""
   },
   "js/game/loop.js": {
-    "mtime": 1794468361.4334474,
-    "seen": 1794469219.9031532,
-    "ast_hash": "7e4655fbe2a0255d176bf537f68c3dc4",
+    "mtime": 1794664223.180615,
+    "seen": 1794664281.3473933,
+    "ast_hash": "6269624466baeb98666f85caea24b1e6",
     "semantic_hash": ""
   },
   "js/game/menus.js": {

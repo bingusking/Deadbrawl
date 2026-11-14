@@ -1,7 +1,7 @@
 # Graph Report - deadbrawl  (2026-11-14)
 
 ## Corpus Check
-- 26 files · ~16,745 words
+- 26 files · ~16,767 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
@@ -11,7 +11,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `28fca0c0`
+- Built from commit: `6098a375`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -41,16 +41,16 @@
 3. `act()` - 11 edges
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
-6. `ultHit()` - 8 edges
-7. `vishUltTick()` - 8 edges
-8. `build_colosseum()` - 8 edges
+6. `build_colosseum()` - 8 edges
+7. `ultHit()` - 8 edges
+8. `vishUltTick()` - 8 edges
 9. `services` - 8 edges
 10. `bindRender()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/sprites.js
