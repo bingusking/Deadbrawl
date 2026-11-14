@@ -74,7 +74,11 @@ function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=
 (function loadArenas(){
   if(!THREE.GLTFLoader)return;const L=new THREE.GLTFLoader();
   ARENAS.forEach((A,i)=>{if(!A.glb)return;
-    L.load(A.glb,gl=>{const g=new THREE.Group();
+    const key=A.glb.replace(/^.*arena_|\.glb$/g,'');
+    // arena geometry ships as base64 in js/data/arena_<key>.js (loaded in the background after the page starts)
+    const sc=document.createElement('script');sc.src='js/data/arena_'+key+'.js';sc.async=true;
+    sc.onload=()=>{const b=atob(ARENA_GLB[key]),u=new Uint8Array(b.length);for(let k=0;k<b.length;k++)u[k]=b.charCodeAt(k);delete ARENA_GLB[key];
+    L.parse(u.buffer,'',gl=>{const g=new THREE.Group();
       const ms=[];gl.scene.traverse(o=>{if(o.isMesh)ms.push(o);});
       ms.forEach(o=>{const n=o.name||'',geo=o.geometry;if(geo.attributes.color_1){geo.setAttribute('color',arenaCol(geo.attributes.color_1,!n.startsWith('GLOW')));geo.deleteAttribute('color_1');}/* Blender exports a blank COLOR_0, then ours */let m;
         if(n.startsWith('GLOW'))m=new THREE.MeshBasicMaterial({vertexColors:true,fog:false});
@@ -83,7 +87,7 @@ function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=
         o.material=m;});
       g.add(gl.scene);g.visible=false;scene.add(g);A.grp=g;
       if(arenaIdx===i)setArena(i);else if(arenaNext===i)arenaPlace(i,A.px||0);
-    },undefined,()=>{});});
+    },()=>{});};document.head.appendChild(sc);});
 })();
 function arenaLook(A){ // fog + background for an arena
   scene.fog.color.setHex(A.fog??ARENA0.fog);scene.fog.near=A.near??ARENA0.near;scene.fog.far=A.far??ARENA0.far;

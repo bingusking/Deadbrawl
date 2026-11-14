@@ -72,9 +72,9 @@
     "semantic_hash": ""
   },
   "js/game/stage.js": {
-    "mtime": 1794653490.3112438,
-    "seen": 1794654005.7182157,
-    "ast_hash": "9779c7d0b3fb5f9daff92acde619e219",
+    "mtime": 1794654040.7703323,
+    "seen": 1794654105.6880271,
+    "ast_hash": "ae835c4f672cb4f06eaa8d1e887bc4e5",
     "semantic_hash": ""
   },
   "js/game/viewer.js": {
@@ -156,9 +156,9 @@
     "semantic_hash": ""
   },
   "tools/arenas/build_arenas.py": {
-    "mtime": 1794653612.2956185,
-    "seen": 1794654005.7182255,
-    "ast_hash": "04ddcc24b49a3a19334ff956db4522f8",
+    "mtime": 1794654040.1895347,
+    "seen": 1794654105.6880329,
+    "ast_hash": "2ed33e982735b34052bf8b177f5fbfa4",
     "semantic_hash": ""
   },
   "package-lock.json": {

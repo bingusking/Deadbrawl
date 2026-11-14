@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-14)
 
 ## Corpus Check
-- 26 files · ~13,284 words
+- 26 files · ~13,377 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 353 nodes · 543 edges · 19 communities (18 shown, 1 thin omitted)
+- 356 nodes · 547 edges · 20 communities (18 shown, 2 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 31 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `24bfd04e`
+- Built from commit: `eb41cdc0`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -43,15 +43,15 @@
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
 6. `services` - 8 edges
-7. `bindRender()` - 7 edges
-8. `goOnline()` - 7 edges
-9. `hexc()` - 7 edges
-10. `startMove()` - 6 edges
+7. `hexc()` - 7 edges
+8. `bindRender()` - 7 edges
+9. `goOnline()` - 7 edges
+10. `cvShow()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/sprites.js
@@ -59,7 +59,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 1 thin omitted)
+## Communities (20 total, 2 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -126,15 +126,15 @@ Cohesion: 0.18
 Nodes (12): arena0, ARENA_TEX, arenaLook(), arenaPlace(), arenaRecenter(), ARENAS, arenaWipe(), backdrop (+4 more)
 
 ### Community 19 - "build_arenas.py"
-Cohesion: 0.10
-Nodes (5): build_alley(), build_ring(), build_saloon(), hexc(), Scene
+Cohesion: 0.12
+Nodes (6): build_alley(), build_ring(), build_saloon(), hexc(), pack(), Scene
 
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
 ## Knowledge Gaps
-- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_

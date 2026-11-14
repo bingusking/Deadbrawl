@@ -97,6 +97,18 @@ class Scene:
         bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', export_vertex_color='ACTIVE',
                                   export_normals=True, export_texcoords=False, export_materials='EXPORT', export_yup=True)
         print('wrote', path, os.path.getsize(path))
+        pack(path)
+
+def pack(glb):
+    """also write the .glb as base64 in js/data/ (the published game page can't serve .glb files)"""
+    import base64
+    key = os.path.basename(glb)[len('arena_'):-len('.glb')]
+    js = os.path.abspath(os.path.join(OUT, '..', 'js', 'data', 'arena_' + key + '.js'))
+    with open(glb, 'rb') as f:
+        b64 = base64.b64encode(f.read()).decode()
+    with open(js, 'w') as f:
+        f.write('window.ARENA_GLB=window.ARENA_GLB||{};ARENA_GLB.%s="%s";\n' % (key, b64))
+    print('wrote', js, os.path.getsize(js))
 
 # ------------------------------------------------------------------ THE RING
 def build_ring():
@@ -401,6 +413,10 @@ def build_saloon():
     S.export('arena_saloon.glb')
 
 if __name__ == '__main__':
+    if sys.argv[1:2] == ['pack']:
+        import glob
+        for g in sorted(glob.glob(os.path.join(OUT, 'arena_*.glb'))): pack(g)
+        sys.exit()
     which = sys.argv[1:] or ['ring', 'alley', 'saloon']
     for w in which:
         {'ring': build_ring, 'alley': build_alley, 'saloon': build_saloon}[w]()
