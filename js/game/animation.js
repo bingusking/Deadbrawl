@@ -50,6 +50,6 @@ function animFighter(f,o){
   r.body.scale.x=f.facing>0?1:-1;
   r.body.rotation.y=(f.facing>0?1.02:-1.02)+(f.cur.yaw||0)*f.facing*-1;
   r.root.visible=!(f.invuln>0&&f.state==='wakeup'&&G.time%4<2);
-  f.shadow.position.x=f.x;const ss=Math.max(0.4,1-f.y*0.25);f.shadow.scale.set(ss*1.3,ss,1);
+  f.shadow.visible=!f.hide;f.shadow.position.x=f.x;const ss=Math.max(0.4,1-f.y*0.25);f.shadow.scale.set(ss*1.3,ss,1);
   drawSprite(f);
 }

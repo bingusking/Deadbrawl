@@ -37,7 +37,7 @@ function blinkTo(f,x,y){afterimage(f);spark(f.x,f.y+1,0x8a3cff,8,0.1,0.1);f.x=x;
 
 function riftUltTick(f,o){
   f.ut++;f.uFollow=0;f.vx=f.vy=0;o.vx=o.vy=0;f.pass=o.pass=true;
-  if(o.state!=='ultd'&&!(f.u2>RF.KICK+KN.SWAP)){ruEnd(f,o);return;} // KO'd mid-combo (once in the new arena they land on their own)
+  if(o.state!=='ultd'&&!(f.u2>=RF.KICK+KN.N)){ruEnd(f,o);return;} // KO'd mid-combo (once in the new arena they land on their own)
   if(f.u2){riftFinisher(f,o);return;}
   const t=f.ut-1,step=Math.floor(t/RU.L),k=t%RU.L;
   if(step<RU.N){
@@ -53,12 +53,12 @@ function riftUltTick(f,o){
     if(k2===8){ultHit(f,o,RU.SLAM,o.x,o.y+0.8,true);f.u2=1;f.uy1=o.y;o.uPose='fly';}
   }
 }
-function ruEnd(f,o){f.uFollow=1;f.u2=0;f.ucOn=0;f.state='jump';f.vy=-0.05;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;
+function ruEnd(f,o){f.uFollow=1;f.u2=0;f.ucOn=0;f.hide=0;f.state='jump';f.vy=-0.05;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;
   if(o.state==='ultd'){o.state='airhit';o.vy=-0.3;}o.pass=false;}
 
 // which sprite frame Rift shows during the cinematic
 function riftUltFrame(f){const t=Math.max(0,(f.ut||1)-1),u=f.u2||0;
-  if(u)return u<=RF.FALL?['rift_slam',2]:u<RF.KICK-5?['rift_heavy',0]:u<RF.KICK?['rift_heavy',1]:u<RF.KICK+22?['rift_throwf',0]:u<RF.ENTER?['rift_idle',0]:['rift_bin',u<RF.ENTER+5?0:1];
+  if(u)return u<=RF.FALL?['rift_slam',2]:u<RF.KICK?['rift_heavy',0]:u<RF.KICK+22?['rift_throwf',0]:u<RF.ENTER?['rift_idle',0]:['rift_bin',u<RF.ENTER+5?0:1];
   if(t<RU.N*RU.L){const k=t%RU.L;return k<3?['rift_air',1]:k<=7?['rift_air',2]:['rift_air',3];}
   return (t-RU.N*RU.L)<8?['rift_slam',1]:['rift_slam',2];}
 
@@ -102,7 +102,7 @@ function lashUltStart(a,d){d.uPose='';a.u2=0;a.ucOn=0;
 
 function lashUltTick(f,o){
   f.ut++;f.uFollow=0;f.vx=f.vy=0;o.vx=o.vy=0;f.pass=o.pass=true;
-  if(o.state!=='ultd'&&!(f.u2>LF.SWAP)){luEnd(f,o);return;} // KO'd mid-combo (after the swap they land on their own)
+  if(o.state!=='ultd'&&!(f.u2>=LF.SWAP)){luEnd(f,o);return;} // KO'd mid-combo (after the swap they land on their own)
   const t=f.ut,d=f.udir,ease=p=>1-Math.pow(1-clamp(p,0,1),2),cx=x=>clamp(x,-STAGE,STAGE);
   f.facing=d;o.facing=-d;
   if(t<=14){ // 1. zip in along the rope
@@ -126,22 +126,29 @@ function lashUltTick(f,o){
 }
 
 /* ---- shared: knocked off the screen into the next arena ----
-   r = frames since the knock-off hit, d = direction they were sent. They fly off, the screen wipes,
-   the arena changes, and they fly back in from the other edge and crash down at x = d*1.5. */
-const KN={WIPE:26,SWAP:40,LAND_X:1.5};
+   r = frames since the knock-off hit, d = direction they were sent. The next arena is placed ARENA_GAP away
+   (arenaPlace), they fly across in an arc while the camera follows YOUR fighter, and when they crash down
+   the whole world shifts back so the new arena sits at the centre (worldShift + arenaRecenter): no cut. */
+const KN={N:66,H:3.6,LAND_X:1.5};
+const SHIFT_KEYS=['x','bX','vlx','ux0','lx0','sAX'];
+function worldShift(dx){ // host: move everything by dx (fighters, stored targets, projectiles)
+  for(const g of[p1,p2])for(const k of SHIFT_KEYS)if(typeof g[k]==='number')g[k]+=dx;
+  for(const q of projectiles){q.x+=dx;q.mesh.position.x+=dx;}}
 function arenaKnock(f,o,r,d){
-  if(r>0&&r<KN.SWAP){o.x+=o.uvx;o.y=Math.max(0.3,o.y+o.uvy);o.uvy-=0.002;}
-  f.ucOn=1;f.ucx=r<KN.SWAP?clamp(f.x+d*2,-5,5):-d*0.5;f.ucy=r<KN.SWAP?1.5:1.6; // camera: stay on the attacker, then frame the landing
-  if(r===KN.WIPE)arenaWipe();
-  if(r===KN.SWAP){setArena(arenaIdx+1);splash('<b>'+ARENAS[arenaIdx].name+'</b>',1.4);
-    o.vlx=d*KN.LAND_X;o.x=-d*(STAGE+3);o.y=3.5;o.uvx=(o.vlx-o.x)/30;o.uvy=(0.5*GRAV*900-3.5)/30;} // lands at vlx after ~30 frames
-  if(r>KN.SWAP&&o.state==='ultd'){o.x+=o.uvx;o.uvy-=GRAV;o.y+=o.uvy;
-    if(o.y<=0){o.y=0.02;o.x=o.vlx;o.uPose='';o.state='airhit';o.slammed=true;o.spiked=false;o.soft=false;o.vy=-0.3;o.vx=d*0.05;o.pass=false;}}
+  f.ucOn=1; // camera: follow the local player's fighter (game.js updCam)
+  if(r===1){f.bX=d*ARENA_GAP;arenaPlace(arenaIdx+1,f.bX);o.ux0=o.x;o.uy0=o.y;o.vlx=f.bX+d*KN.LAND_X;o.uPose='fly';}
+  if(r>=1&&r<KN.N&&o.state==='ultd'){const p=r/KN.N,e=p*0.55+0.45*(1-(1-p)*(1-p));
+    o.x=o.ux0+(o.vlx-o.ux0)*e;o.y=Math.max(0,o.uy0*(1-p)+KN.H*4*p*(1-p));
+    if(r%3===0)spark(o.x-d*0.6,o.y+1,0xfff0d0,2,0.03,0.04);}
+  if(r===KN.N&&o.state==='ultd'){ // crash down in the new arena, then recentre the world on it
+    o.x=o.vlx;o.y=0.02;o.uPose='';o.state='airhit';o.slammed=true;o.spiked=false;o.soft=false;o.vy=-0.3;o.vx=d*0.05;o.pass=false;
+    dust(o.x,20);G.shake=Math.max(G.shake,0.3);flash(0.2);
+    const X=f.bX;worldShift(-X);arenaRecenter(X);splash('<b>'+ARENAS[arenaIdx].name+'</b>',1.4);}
 }
 
 /* Rift finisher: the slam drives them into the floor, they bounce, he blinks beside them and kicks them
-   off the screen, then blinks into the new arena after them */
-const RF={FALL:10,BLINK:12,KICK:28};RF.ENTER=RF.KICK+KN.SWAP+34;RF.END=RF.ENTER+10;
+   across into the next arena, dissolving into a phantom that streaks after them, then re-forms beside them */
+const RF={FALL:10,BLINK:12,KICK:28,OUT:8,IN:12};RF.ENTER=RF.KICK+KN.N+RF.IN;RF.END=RF.ENTER+10;
 function riftFinisher(f,o){
   const u=++f.u2,d=f.udir;
   if(u<=RF.FALL){const p=u/RF.FALL;o.y=f.uy1*(1-p*p);f.y=o.y+0.95;
@@ -149,16 +156,20 @@ function riftFinisher(f,o){
   else if(u<RF.KICK){o.uvy-=0.008;o.y=Math.max(0,o.y+o.uvy);} // ground bounce
   if(u===RF.BLINK){f.facing=d;o.facing=-d;blinkTo(f,clamp(o.x-d*0.95,-STAGE,STAGE),0);}
   if(u>RF.BLINK&&u<RF.KICK&&u%4===0)spark(f.x+d*0.3,f.y+0.5,0x8a3cff,3,0.05,0.05);
-  if(u===RF.KICK){ultHit(f,o,RU.KICK,o.x-d*0.2,o.y+0.9,true);o.uvx=d*0.8;o.uvy=0.1;flash(0.35);}
-  if(u>=RF.KICK)arenaKnock(f,o,u-RF.KICK,d);
-  if(u===RF.KICK+KN.SWAP){f.x=-d*(STAGE+8);f.y=0;} // he's gone (blinked out) until he blinks in
-  if(u===RF.ENTER){f.facing=d;blinkTo(f,o.vlx-d*2.6,1.2);}
-  if(u>=RF.END){f.u2=0;f.ucOn=0;f.state='jump';f.vy=0;f.vx=0;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;f.uFollow=1;}
+  if(u===RF.KICK){ultHit(f,o,RU.KICK,o.x-d*0.2,o.y+0.9,true);flash(0.35);}
+  if(u<RF.KICK)return;
+  const r=u-RF.KICK;arenaKnock(f,o,r,d);
+  if(r===RF.OUT){afterimage(f);spark(f.x,f.y+1,0x8a3cff,14,0.12,0.1);sfx.whoosh();f.hide=1;}
+  if(f.hide&&r>RF.OUT){ // phantom: a purple streak riding just behind them
+    const tx=r<KN.N?o.x-d*2.2:f.bX-d*2.6,ty=r<KN.N?o.y+0.4:1.2;f.x+=(tx-f.x)*0.35;f.y+=(ty-f.y)*0.35;
+    if(r%2===0)spark(f.x,f.y+1,0x8a3cff,3,0.06,0.05);}
+  if(u===RF.ENTER){f.hide=0;f.facing=d;blinkTo(f,f.bX-d*2.6,1.2);}
+  if(u>=RF.END){f.u2=0;f.ucOn=0;f.hide=0;f.state='jump';f.vy=0;f.vx=0;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;f.uFollow=1;}
 }
 
 /* 5. finisher: they stagger up dizzy, he flexes, winds up and punches them off the screen,
    6. then the fight is knocked into the next arena: they fly in, he swings in on his grapple */
-const LF={BOUNCE:24,UP:50,FLEX:60,WIND:118,PUNCH:150,SWING:200,SWING_LEN:38};LF.SWAP=LF.PUNCH+KN.SWAP;
+const LF={BOUNCE:24,UP:50,FLEX:60,WIND:118,PUNCH:150,CHASE:12,LAND:18};LF.SWAP=LF.PUNCH+KN.N;LF.END=LF.SWAP+LF.LAND;
 function lashFinisher(f,o){
   const u=++f.u2,d=f.udir;
   if(u<=LF.BOUNCE){const p=u/LF.BOUNCE;f.x=clamp(f.bx-d*1.4*p,-STAGE,STAGE);f.y=Math.max(0,(1-p)*1.0+Math.sin(p*Math.PI)*1.1);if(u===LF.BOUNCE)dust(f.x,6);}
@@ -167,11 +178,13 @@ function lashFinisher(f,o){
   if(u===LF.FLEX){callout(f,'FLEX!','#ffcc33');sfx.super();}
   if(u>LF.WIND&&u<LF.PUNCH&&u%3===0){spark(f.x-d*0.35,f.y+1.35,0xffb347,3,0.06,0.06);G.shake=Math.max(G.shake,0.02+(u-LF.WIND)*0.002);}
   if(u===LF.PUNCH){ultHit(f,o,LU.FIN,o.x-d*0.2,o.y+1.1,true);o.uPose='fly';o.uvx=d*0.75;o.uvy=0.1;flash(0.35);}
-  arenaKnock(f,o,u-LF.PUNCH,d);
-  if(u===LF.SWAP){f.lx=-d*2.5;f.sAX=f.lx-d*7*Math.sin(0.25);f.sAY=7.5;f.x=f.sAX+d*7*Math.sin(-1.25);f.y=f.sAY-7*Math.cos(-1.25);f.uRope=0;} // swing start, off screen
-  if(u>=LF.SWING&&u<LF.SWING+LF.SWING_LEN){ // he swings in on the grapple
-    const p=(u-LF.SWING)/LF.SWING_LEN,th=-1.25+1.5*p;f.uRope=2;f.x=f.sAX+d*7*Math.sin(th);f.y=Math.max(0,f.sAY-7*Math.cos(th));if(u===LF.SWING)sfx.whoosh();}
-  if(u>=LF.SWING+LF.SWING_LEN){f.uRope=0;f.u2=0;f.ucOn=0;f.state='jump';f.vy=0.05;f.vx=d*0.04;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;f.uFollow=1;}
+  if(u<LF.PUNCH)return;
+  const r=u-LF.PUNCH;arenaKnock(f,o,r,d);
+  if(r>=LF.CHASE&&r<KN.N+LF.LAND){ // grapple onto them and get dragged after them, landing behind them
+    if(r===LF.CHASE){f.lx0=f.x;f.ly0=f.y;sfx.whoosh();}
+    const p=(r-LF.CHASE)/(KN.N+LF.LAND-LF.CHASE),e=p*0.6+0.4*(1-(1-p)*(1-p)),tx=f.bX-d*2.5;
+    f.x=f.lx0+(tx-f.lx0)*e;f.y=Math.max(0,f.ly0*(1-p)+4.6*4*p*(1-p));f.uRope=r<KN.N?1:0;f.facing=d;}
+  if(r>=KN.N+LF.LAND){f.uRope=0;f.u2=0;f.ucOn=0;f.state='jump';f.vy=0;f.vx=d*0.02;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;f.uFollow=1;dust(f.x,8);}
 }
 function luEnd(f,o){f.uFollow=1;f.uRope=0;f.u2=0;f.ucOn=0;f.state='jump';f.vy=0.18;f.vx=-f.udir*0.04;f.jumps=1;f.flip=0;f.pass=false;f.ut=0;
   if(o.state==='ultd'){o.state='airhit';o.vy=-0.3;}o.pass=false;}
@@ -179,5 +192,5 @@ function luEnd(f,o){f.uFollow=1;f.uRope=0;f.u2=0;f.ucOn=0;f.state='jump';f.vy=0.
 // which sprite frame The Lash shows during the cinematic
 function lashUltFrame(f){const t=f.ut||0,u=f.u2||0;
   if(u)return u<LF.BOUNCE?['jacob_jump',3]:u<LF.BOUNCE+8?['jacob_jump',0]:u<LF.FLEX?[('jacob_idle'),Math.floor(u/7)%SPR.jacob_idle.length]
-    :u<LF.WIND?['jacob_win',2]:u<LF.PUNCH?['jacob_heavy',1]:u<LF.PUNCH+26?['jacob_heavy',3]:u<LF.SWAP?['jacob_heavy',4]:u<LF.SWING+LF.SWING_LEN?['jacob_jump',2]:['jacob_jump',3];
+    :u<LF.WIND?['jacob_win',2]:u<LF.PUNCH?['jacob_heavy',1]:u<LF.PUNCH+LF.CHASE?['jacob_heavy',3]:u<LF.END-6?['jacob_jump',2]:['jacob_jump',3];
   return t<=14?['jacob_heavy',2]:t<=26?['jacob_heavy',3]:t<=42?['jacob_heavy',4]:t<=62?['jacob_heavy',1]:t<=72?['jacob_heavy',3]:t<=96?['jacob_jump',2]:['jacob_jump',3];}

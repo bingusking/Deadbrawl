@@ -55,16 +55,23 @@ const EMB=[];
     if(e.y<-10||e.l<=0){EMB.splice(i,1);continue;}x.globalAlpha=Math.min(1,e.l*1.5)*0.85;x.fillStyle=e.r>2?'#ffb347':'#ff5a2a';x.fillRect(e.x,e.y,e.r,e.r);}
   x.globalAlpha=1;})();
 setTimeout(()=>$('#menu').classList.remove('intro'),1800); // the opening slam only plays once
-function show(id){$$('.screen').forEach(s=>s.classList.toggle('on',s.id===id));}
-function toSelect(){cReset();G.mode='select';closeOvl();show('csel');$('#hud').classList.remove('on');canvas.style.visibility='hidden';$('#cmode').textContent=G.training?'TRAINING':'VS CPU';$('#cdiffrow').style.display=G.training?'none':'';$('#dlabel').textContent=G.diff;}
-function toMenu(){if(CIDS.includes(G.p1char)&&MF.front!==G.p1char){MF.front=G.p1char;mfBuild();}netClose();$('[data-a=rematch]').style.display='';$('#rnext').style.display='none';$('#cintro').classList.remove('on');G.mode='menu';G.paused=false;closeOvl();show('menu');$('#hud').classList.remove('on');canvas.style.visibility='hidden';}
+// switch screens; anim slides the old screen out and the new one in: left/right (characters), down/up (fight setup)
+const SLIDES={left:['sOutL','sInR'],right:['sOutR','sInL'],down:['sOutD','sInT'],up:['sOutU','sInB']};
+function show(id,anim){
+  const nxt=id?document.getElementById(id):null,cur=[...$$('.screen.on')].find(s=>s!==nxt);
+  $$('.screen').forEach(s=>{s.classList.remove('leaving',...Object.values(SLIDES).flat());s.classList.toggle('on',s===nxt);});
+  if(!anim||!cur||!nxt)return;
+  const [o,i]=SLIDES[anim];cur.classList.add('leaving',o);nxt.classList.add(i);
+  clearTimeout(show.t);show.t=setTimeout(()=>{cur.classList.remove('leaving',o);nxt.classList.remove(i);},650);}
+function toSelect(){cReset();G.mode='select';closeOvl();show('csel','down');$('#hud').classList.remove('on');canvas.style.visibility='hidden';$('#cmode').textContent=G.training?'TRAINING':'VS CPU';$('#cdiffrow').style.display=G.training?'none':'';$('#dlabel').textContent=G.diff;}
+function toMenu(){const pm=G.mode;if(CIDS.includes(G.p1char)&&MF.front!==G.p1char){MF.front=G.p1char;mfBuild();}netClose();$('[data-a=rematch]').style.display='';$('#rnext').style.display='none';$('#cintro').classList.remove('on');G.mode='menu';G.paused=false;closeOvl();show('menu',pm==='viewer'?'right':(pm==='select'||pm==='onl')?'up':null);$('#hud').classList.remove('on');canvas.style.visibility='hidden';}
 function toFight(){G.mode='fight';G.paused=false;closeOvl();show('');$('#hud').classList.add('on');canvas.style.visibility='visible';if(G.training)G.p2char='vish';charIntro();startMatch();updCam(true);}
 function charIntro(){const c=$('#cintro'),A=c.querySelector('.a'),B=c.querySelector('.b');c.classList.add('on');
   [[A,G.p1char,G.online?(G.online.role==='host'?'YOU':'P1'):'P1'],[B,G.p2char,G.online?(G.online.role==='guest'?'YOU':'P2'):'CPU']].forEach(([e,id,lab])=>{e.querySelector('.art').style.backgroundImage='url('+HUDIMG[id==='vish'?'intro':'intro_'+id]+')';e.querySelector('.nm').innerHTML='<small>'+lab+'</small>'+CHARS[id].name;});
   for(const e of[A,B]){e.classList.remove('go');e.style.animationDelay='';}void c.offsetWidth;
   A.classList.add('go');G.introHold=88;
   if(!G.training){B.style.animationDelay='1.4s';B.classList.add('go');G.introHold=172;}}
-function toViewer(){G.mode='viewer';show('viewer');$('#hud').classList.remove('on');canvas.style.visibility='hidden';cvShow(CIDS.includes(G.p1char)?G.p1char:'vish');}
+function toViewer(){G.mode='viewer';show('viewer','left');$('#hud').classList.remove('on');canvas.style.visibility='hidden';cvShow(CIDS.includes(G.p1char)?G.p1char:'vish');}
 let ovl=null;
 function openOvl(id){ovl=id;$$('.ovl').forEach(o=>o.classList.toggle('on',o.id===id));setSel($$('#'+id+' .mbtn'),0);}
 function closeOvl(){ovl=null;$$('.ovl').forEach(o=>o.classList.remove('on'));}

@@ -50,22 +50,59 @@ function buildStage(){
 }
 buildStage();
 
-/* ---------- arenas: the 3D colosseum, plus painted backdrops the fight can be knocked into ---------- */
+/* ---------- arenas: the 3D colosseum plus the Blender-built arenas the fight can be knocked into ----------
+   Each arena is a THREE.Group. During an ultimate's knock-off the next arena is placed beside the current one
+   (arenaPlace), the fight travels across, then everything shifts back so the new arena sits at x=0 (arenaRecenter). */
+const ARENA_GAP=72; // distance between arena centres during a transition
+const colo=new THREE.Group();scene.add(colo);
+for(const o of[...arena0,floorMesh]){scene.remove(o);colo.add(o);}
+floorMesh.scale.x=80/120; // keep the colosseum floor clear of the arena next door
 const ARENAS=[
-  {name:'THE COLOSSEUM'},
-  {name:'THE RING',img:'assets/bg_jacob.webp',floor:0x9a6250,fog:0x3a1a1c},
-  {name:'BACK ALLEY',img:'assets/bg_rift.webp',floor:0x6a587a,fog:0x24142e},
-  {name:'THE SALOON',img:'assets/bg_vish.webp',floor:0xa87050,fog:0x3a2014}];
-let arenaIdx=0;const ARENA_TEX={};
+  {name:'THE COLOSSEUM',grp:colo},
+  {name:'THE RING',glb:'assets/arena_ring.glb',img:'assets/bg_jacob.webp',beam:0x2a2214,fog:0x1e0c10,near:22,far:75,bg:0x120608},
+  {name:'BACK ALLEY',glb:'assets/arena_alley.glb',img:'assets/bg_rift.webp',beam:0x22162c,fog:0x1c1026,near:22,far:80,bg:0x140a1c},
+  {name:'THE SALOON',glb:'assets/arena_saloon.glb',img:'assets/bg_vish.webp',beam:0x2a1a0c,fog:0x24120a,near:24,far:70,bg:0x180c06}];
+const ARENA0={fog:scene.fog.color.getHex(),near:scene.fog.near,far:scene.fog.far};
+let arenaIdx=0,arenaNext=-1;
+// painted fallback, only shown if an arena's .glb hasn't loaded
+const ARENA_TEX={};
 const backdrop=new THREE.Mesh(new THREE.PlaneGeometry(32,18),new THREE.MeshBasicMaterial({fog:false,depthWrite:false}));
 backdrop.position.set(0,3.4,-10);backdrop.renderOrder=-1;backdrop.visible=false;scene.add(backdrop);
-const ARENA0={fog:scene.fog.color.getHex(),near:scene.fog.near,far:scene.fog.far,floor:floorMesh.material.color.getHex()};
-function setArena(i){
-  arenaIdx=i%ARENAS.length;const A=ARENAS[arenaIdx],painted=!!A.img;
-  for(const o of arena0)o.visible=!painted;embers.visible=true;backdrop.visible=painted;
-  if(painted){if(!ARENA_TEX[A.img]){const t=new THREE.TextureLoader().load(A.img);t.encoding=THREE.sRGBEncoding;ARENA_TEX[A.img]=t;}
-    backdrop.material.map=ARENA_TEX[A.img];backdrop.material.needsUpdate=true;}
-  floorMesh.material.color.setHex(painted?A.floor:ARENA0.floor);
-  G.camSnap=1;scene.fog.color.setHex(painted?A.fog:ARENA0.fog);scene.fog.near=painted?24:ARENA0.near;scene.fog.far=painted?60:ARENA0.far;}
+// Blender exports our colours as normalised ints in a second colour set; unpack them (dec: darken the palette to sit under the game's lights like the colosseum)
+function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=!at.normalized?1:A instanceof Uint16Array?65535:A instanceof Uint8Array?255:1,f=c=>(c/=D,dec?Math.pow(c,2.2):c);
+  for(let i=0;i<n;i++){o[i*3]=f(at.getX(i));o[i*3+1]=f(at.getY(i));o[i*3+2]=f(at.getZ(i));}return new THREE.BufferAttribute(o,3);}
+(function loadArenas(){
+  if(!THREE.GLTFLoader)return;const L=new THREE.GLTFLoader();
+  ARENAS.forEach((A,i)=>{if(!A.glb)return;
+    L.load(A.glb,gl=>{const g=new THREE.Group();
+      const ms=[];gl.scene.traverse(o=>{if(o.isMesh)ms.push(o);});
+      ms.forEach(o=>{const n=o.name||'',geo=o.geometry;if(geo.attributes.color_1){geo.setAttribute('color',arenaCol(geo.attributes.color_1,!n.startsWith('GLOW')));geo.deleteAttribute('color_1');}/* Blender exports a blank COLOR_0, then ours */let m;
+        if(n.startsWith('GLOW'))m=new THREE.MeshBasicMaterial({vertexColors:true,fog:false});
+        else if(n.startsWith('BEAM')){geo.deleteAttribute('color');m=new THREE.MeshBasicMaterial({color:A.beam||0x201810,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false,fog:false});} // light shafts
+        else{m=new THREE.MeshToonMaterial({vertexColors:true,gradientMap:gmap});o.add(new THREE.Mesh(prep(geo),outlineMat));}
+        o.material=m;});
+      g.add(gl.scene);g.visible=false;scene.add(g);A.grp=g;
+      if(arenaIdx===i)setArena(i);else if(arenaNext===i)arenaPlace(i,A.px||0);
+    },undefined,()=>{});});
+})();
+function arenaLook(A){ // fog + background for an arena
+  scene.fog.color.setHex(A.fog??ARENA0.fog);scene.fog.near=A.near??ARENA0.near;scene.fog.far=A.far??ARENA0.far;
+  scene.background=A.bg!==undefined?new THREE.Color(A.bg):null;}
+function setArena(i){ // show one arena at the centre, everything else hidden
+  arenaIdx=((i%ARENAS.length)+ARENAS.length)%ARENAS.length;arenaNext=-1;const A=ARENAS[arenaIdx];
+  ARENAS.forEach(B=>{if(B.grp){B.grp.visible=B===A;B.grp.position.x=0;}});
+  const fall=!A.grp&&A.img;backdrop.visible=!!fall;backdrop.position.x=0;
+  if(fall){if(!ARENA_TEX[A.img]){const t=new THREE.TextureLoader().load(A.img);t.encoding=THREE.sRGBEncoding;ARENA_TEX[A.img]=t;}backdrop.material.map=ARENA_TEX[A.img];backdrop.material.needsUpdate=true;}
+  arenaLook(A);G.camSnap=1;}
+function arenaPlace(i,x){ // put the next arena beside this one, ready for the fight to travel into it
+  arenaNext=((i%ARENAS.length)+ARENAS.length)%ARENAS.length;const A=ARENAS[arenaNext];A.px=x;
+  if(A.grp){A.grp.position.x=x;A.grp.visible=true;}}
+function arenaRecenter(x){ // the fight has arrived: shift the world back by x so the new arena is at the centre
+  if(arenaNext<0)return;const old=ARENAS[arenaIdx],A=ARENAS[arenaNext];
+  if(old.grp&&old!==A){old.grp.visible=false;old.grp.position.x=0;}
+  arenaIdx=arenaNext;arenaNext=-1;if(A.grp)A.grp.position.x=0;
+  const fall=!A.grp&&A.img;backdrop.visible=!!fall;
+  if(fall){if(!ARENA_TEX[A.img]){const t=new THREE.TextureLoader().load(A.img);t.encoding=THREE.sRGBEncoding;ARENA_TEX[A.img]=t;}backdrop.material.map=ARENA_TEX[A.img];backdrop.material.needsUpdate=true;}
+  arenaLook(A);camPos.x-=x;camLook.x-=x;cam.position.x-=x;}
 // full-screen slash wipe that hides the arena swap
 function arenaWipe(){const w=document.getElementById('wipe');w.classList.remove('go');void w.offsetWidth;w.classList.add('go');}

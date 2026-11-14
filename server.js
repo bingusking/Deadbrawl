@@ -10,7 +10,7 @@ const CHARS = ['vish', 'rift', 'jacob'];
 const zlib = require('zlib');
 
 // static files: index.html, js/ and assets/ are loaded into memory (gzipped) at startup
-const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json' };
+const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.webp': 'image/webp', '.png': 'image/png', '.jpg': 'image/jpeg', '.json': 'application/json', '.glb': 'model/gltf-binary' };
 const files = new Map();
 function load(rel) {
   const full = path.join(__dirname, rel);
@@ -18,7 +18,7 @@ function load(rel) {
   const type = TYPES[path.extname(rel)];
   if (!type) return;
   const body = fs.readFileSync(full);
-  const zipped = /^(text|application)/.test(type) ? zlib.gzipSync(body, { level: 9 }) : null;
+  const zipped = /^(text|application|model)/.test(type) ? zlib.gzipSync(body, { level: 9 }) : null;
   files.set('/' + rel, { body, zipped, type });
 }
 for (const rel of ['index.html', 'js', 'assets']) if (fs.existsSync(path.join(__dirname, rel))) load(rel);

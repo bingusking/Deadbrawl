@@ -15,7 +15,7 @@ const BIND_LBL={
     ['melee','Melee · hold to charge · air: launcher'],['parry','Parry'],['dodge','Dodge roll'],['ult','Ultimate (aims at mouse)'],['taunt','Taunt']],
   vish:[['a1','Throwing Knife (aims at mouse)'],['a2','Dash'],['a3','Slide (hold)'],['a4','Spike Kick'],['shot','Shotgun (aims at mouse)']],
   rift:[['a1','Big Slash'],['a2','Blink'],['a3','Grab'],['a4','Lunge']],
-  jacob:[['a1','Grapple Hook'],['a2','Slam'],['a3','Uppercut'],['a4','Kick Off (aims at mouse)']]};
+  jacob:[['a1','Grapple Hook'],['a2','Slam'],['a3','Uppercut'],['a4','Kick Off']]};
 const BIND_TABS=[['general','GENERAL'],['vish','VISH'],['rift','RIFT'],['jacob','THE LASH']];
 const BINDS=JSON.parse(JSON.stringify(BIND_DEF));
 try{const s=JSON.parse(localStorage.getItem('deadbrawl.binds')||'{}');for(const g in BINDS)Object.assign(BINDS[g],s[g]||{});}catch(e){}

@@ -1,0 +1,406 @@
+"""Build Deadbrawl's knock-into arenas in Blender and export them as .glb.
+
+    python3 tools/arenas/build_arenas.py          (uses the bpy module = headless Blender)
+
+Coordinates (Blender): X = along the fight line, Y = depth (+ is away from the camera), Z = up.
+Fighters stand on Z=0 along Y=0 between X=-8.2 and 8.2; the camera sits around Y=-10, Z=2.
+glTF converts this to the game's Y-up space (game z = -Y).
+
+Everything is plain boxes/cylinders with per-vertex colours, merged into a few meshes:
+  SOLID  -> toon shaded with outlines in the game (like the colosseum)
+  GLOW   -> unlit, full brightness (lamps, neon, lit windows, fire)
+  BEAM   -> unlit, additive and see-through (spotlight shafts)
+Colours are written as the exact display colour (the game renders in linear space with hex colours).
+"""
+import bpy, bmesh, math, random, os, sys
+from mathutils import Matrix, Vector
+
+OUT = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', 'assets')
+
+def hexc(h, j=0.0):
+    r, g, b = ((h >> 16) & 255) / 255, ((h >> 8) & 255) / 255, (h & 255) / 255
+    if j:
+        k = 1 + (random.random() - 0.5) * 2 * j
+        r, g, b = min(1, r * k), min(1, g * k), min(1, b * k)
+    return (r, g, b, 1.0)
+
+class Scene:
+    def __init__(self):
+        self.bm = {k: bmesh.new() for k in ('SOLID', 'GLOW', 'BEAM')}
+        self.col = {k: v.loops.layers.float_color.new('Col') for k, v in self.bm.items()}
+
+    def _paint(self, kind, res, col, top=None):
+        """colour exactly the faces of the shape just created (res = the bmesh op result)"""
+        lay = self.col[kind]
+        faces = {f for v in res['verts'] for f in v.link_faces}
+        for f in faces:
+            for l in f.loops:
+                c = col
+                if top is not None and l.vert.co.z > top[0]:
+                    c = top[1]
+                l[lay] = c
+
+    def box(self, c, x0, x1, y0, y1, z0, z1, kind='SOLID', j=0.04, rz=0.0, top=None):
+        bm = self.bm[kind]
+        cx, cy, cz = (x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2
+        M = Matrix.Translation((cx, cy, cz)) @ Matrix.Rotation(rz, 4, 'Z') @ Matrix.Diagonal((x1 - x0, y1 - y0, z1 - z0, 1))
+        res = bmesh.ops.create_cube(bm, size=1.0, matrix=M)
+        self._paint(kind, res, hexc(c, j), (cz + (z1 - z0) / 2 - 1e-4, hexc(top, j)) if top else None)
+
+    def obox(self, c, cx, cy, cz, sx, sy, sz, rot=(0, 0, 0), kind='SOLID', j=0.04):
+        """box by centre/size with an arbitrary rotation (radians, XYZ)"""
+        bm = self.bm[kind]
+        R = Matrix.Rotation(rot[2], 4, 'Z') @ Matrix.Rotation(rot[1], 4, 'Y') @ Matrix.Rotation(rot[0], 4, 'X')
+        M = Matrix.Translation((cx, cy, cz)) @ R @ Matrix.Diagonal((sx, sy, sz, 1))
+        res = bmesh.ops.create_cube(bm, size=1.0, matrix=M)
+        self._paint(kind, res, hexc(c, j))
+
+    def cyl(self, c, x, y, z0, z1, r0, r1=None, seg=10, kind='SOLID', j=0.03):
+        """vertical cylinder / cone from z0 to z1"""
+        bm = self.bm[kind]
+        h = z1 - z0
+        res = bmesh.ops.create_cone(bm, cap_ends=True, segments=seg, radius1=r0, radius2=r0 if r1 is None else r1, depth=h,
+                              matrix=Matrix.Translation((x, y, z0 + h / 2)))
+        self._paint(kind, res, hexc(c, j))
+
+    def rod(self, c, a, b, r, seg=6, kind='SOLID', j=0.02):
+        """cylinder between two points"""
+        bm = self.bm[kind]
+        a, b = Vector(a), Vector(b); d = b - a; L = d.length
+        q = Vector((0, 0, 1)).rotation_difference(d.normalized())
+        M = Matrix.Translation((a + b) / 2) @ q.to_matrix().to_4x4()
+        res = bmesh.ops.create_cone(bm, cap_ends=True, segments=seg, radius1=r, radius2=r, depth=L, matrix=M)
+        self._paint(kind, res, hexc(c, j))
+
+    def quad(self, cols, p00, p10, p11, p01, kind='SOLID'):
+        """single quad with a colour per corner (for gradients like skies)"""
+        bm = self.bm[kind]; lay = self.col[kind]
+        vs = [bm.verts.new(p) for p in (p00, p10, p11, p01)]
+        f = bm.faces.new(vs)
+        for l, c in zip(f.loops, cols):
+            l[lay] = hexc(c)
+
+    def export(self, name):
+        for o in list(bpy.data.objects):
+            bpy.data.objects.remove(o, do_unlink=True)
+        for kind, bm in self.bm.items():
+            if not bm.faces:
+                continue
+            me = bpy.data.meshes.new(kind)
+            bm.to_mesh(me); bm.free()
+            mat = bpy.data.materials.new(kind)
+            me.materials.append(mat)
+            ob = bpy.data.objects.new(kind, me)
+            bpy.context.scene.collection.objects.link(ob)
+            me.color_attributes.active_color = me.color_attributes['Col']
+        path = os.path.abspath(os.path.join(OUT, name))
+        bpy.ops.export_scene.gltf(filepath=path, export_format='GLB', export_vertex_color='ACTIVE',
+                                  export_normals=True, export_texcoords=False, export_materials='EXPORT', export_yup=True)
+        print('wrote', path, os.path.getsize(path))
+
+# ------------------------------------------------------------------ THE RING
+def build_ring():
+    random.seed(7); S = Scene()
+    # arena floor, below the raised ring
+    S.box(0x22121a, -34, 34, -16, 44, -1.4, -1.2, j=0)
+    for i in range(-3, 4):  # aisles of red carpet toward the ring
+        S.box(0x5a141c, i * 9 - 1.2, i * 9 + 1.2, 5, 30, -1.2, -1.19, j=0.02)
+    # ring platform: canvas top brighter in the middle (spotlight pool), red skirt, gold trim
+    N = 12
+    for ix in range(N):
+        for iy in range(5):
+            x0 = -10.8 + 21.6 * ix / N; x1 = -10.8 + 21.6 * (ix + 1) / N
+            y0 = -4.2 + 7.6 * iy / 5; y1 = -4.2 + 7.6 * (iy + 1) / 5
+            dx = ((x0 + x1) / 2) / 10.8; dy = ((y0 + y1) / 2 + 0.4) / 3.8
+            k = max(0, 1 - (dx * dx + dy * dy) * 0.55)
+            c = int(0x6a + 0x30 * k) << 16 | int(0x5a + 0x26 * k) << 8 | int(0x48 + 0x1c * k)
+            S.box(c, x0, x1, y0, y1, -0.05, 0.0, j=0.0)
+    S.box(0x8a1820, -10.8, 10.8, -4.2, 3.4, -1.2, -0.05, j=0.01)
+    S.box(0xc8962e, -10.85, 10.85, -4.25, 3.45, -0.32, -0.12, j=0.0)
+    S.cyl(0x6a1418, 0, -0.4, 0.0, 0.012, 2.6, seg=32, j=0)   # centre logo
+    S.cyl(0xc8962e, 0, -0.4, 0.012, 0.02, 2.0, seg=32, j=0)
+    S.cyl(0x8a1820, 0, -0.4, 0.02, 0.025, 1.5, seg=32, j=0)
+    # posts, pads, ropes (no ropes on the camera side so they never cover the fighters)
+    posts = [(-10.6, -4.0), (10.6, -4.0), (-10.6, 3.2), (10.6, 3.2)]
+    for i, (x, y) in enumerate(posts):
+        S.cyl(0x2e2228, x, y, -1.2, 2.0, 0.17, seg=10)
+        S.box(0xb02028 if i % 3 == 0 else 0x2a3a8a, x - 0.25, x + 0.25, y - 0.25, y + 0.25, 0.3, 1.75, j=0.02)
+    for k, z in enumerate((0.55, 1.05, 1.55)):
+        rc = 0xd8d0c0 if k == 1 else 0xb01c26
+        S.rod(rc, (-10.6, 3.2, z), (10.6, 3.2, z), 0.055)
+        for sx in (-10.6, 10.6):
+            S.rod(rc, (sx, -4.0, z), (sx, 3.2, z), 0.055)
+    # ring steps and stools in the corners
+    for sx in (-1, 1):
+        for st in range(3):
+            S.box(0x3a2a2e, sx * 11.0 - 0.6, sx * 11.0 + 0.6, 3.6 + st * 0.5, 4.1 + st * 0.5, -1.2, -0.3 - st * 0.3)
+        S.cyl(0x3a2a2e, sx * 12.2, -3.6, -1.2, -0.6, 0.35, seg=10)
+    # barrier with glowing ad boards
+    S.box(0x3a1a20, -30, 30, 6.4, 6.8, -1.2, 0.1, top=0xc8962e)
+    for i in range(-6, 6):
+        S.box(0xff9a3a if i % 2 else 0xd8323a, i * 5 + 0.3, i * 5 + 4.7, 6.35, 6.4, -1.0, -0.15, kind='GLOW', j=0.05)
+    # tiered stands full of crowd silhouettes, behind and to the sides
+    for k in range(9):
+        y0 = 7.5 + k * 1.7; zt = -1.2 + 0.7 + k * 0.95
+        S.box(0x2a161c, -32, 32, y0, y0 + 1.7, -1.2, zt, j=0.02)
+        x = -31.0
+        while x < 31:
+            x += 0.55 + random.random() * 0.35
+            if random.random() < 0.12:
+                continue
+            sh = random.choice([0x4a2a30, 0x5a3036, 0x3a2430, 0x6a3a2e, 0x7a2a2a, 0x8a5a3a, 0x3a3044])
+            hgt = 0.75 + random.random() * 0.2
+            S.box(sh, x - 0.2, x + 0.2, y0 + 0.5, y0 + 0.9, zt, zt + hgt, j=0.1)
+            S.box(0x6a4a3a, x - 0.13, x + 0.13, y0 + 0.55, y0 + 0.85, zt + hgt, zt + hgt + 0.3, j=0.12)
+            if random.random() < 0.05:   # camera flashes / phone screens in the crowd
+                S.box(0xfff0c0, x - 0.06, x + 0.06, y0 + 0.45, y0 + 0.5, zt + hgt + 0.1, zt + hgt + 0.22, kind='GLOW', j=0)
+    for sx in (-1, 1):  # side stands
+        for k in range(7):
+            x0 = sx * (17 + k * 1.7); zt = -1.2 + 0.7 + k * 0.95
+            S.box(0x2a161c, min(x0, x0 + sx * 1.7), max(x0, x0 + sx * 1.7), -14, 7.5, -1.2, zt)
+            y = -14.0
+            while y < 7:
+                y += 0.6 + random.random() * 0.4
+                if random.random() < 0.15:
+                    continue
+                xc = x0 + sx * 0.85
+                sh = random.choice([0x4a2a30, 0x5a3036, 0x3a2430, 0x6a3a2e, 0x7a2a2a])
+                S.box(sh, xc - 0.2, xc + 0.2, y - 0.2, y + 0.2, zt, zt + 0.8, j=0.1)
+                S.box(0x6a4a3a, xc - 0.13, xc + 0.13, y - 0.13, y + 0.13, zt + 0.8, zt + 1.1, j=0.12)
+    # back wall + hanging banners
+    S.box(0x1a0c10, -40, 40, 24, 25, -1.2, 22, j=0)
+    for i in range(-5, 6):
+        S.box(0x8a1820 if i % 2 else 0xb08a3a, i * 6 - 1, i * 6 + 1, 23.8, 24, 10, 17, j=0.03)
+    # lighting rig over the ring: truss, lamps, light shafts
+    tz = 8.6
+    for (a, b) in [((-11, -4.4), (11, -4.4)), ((-11, 3.6), (11, 3.6)), ((-11, -4.4), (-11, 3.6)), ((11, -4.4), (11, 3.6))]:
+        S.rod(0x3a3036, (a[0], a[1], tz), (b[0], b[1], tz), 0.16, seg=6)
+        S.rod(0x3a3036, (a[0], a[1], tz + 0.7), (b[0], b[1], tz + 0.7), 0.12, seg=6)
+    for x in (-7.5, -2.5, 2.5, 7.5):
+        for y in (-4.4, 3.6):
+            S.cyl(0x2a2226, x, y, tz - 0.7, tz, 0.35, 0.25, seg=10)
+            S.cyl(0xffe2a0, x, y, tz - 0.75, tz - 0.68, 0.32, seg=12, kind='GLOW', j=0)
+            S.cyl(0x40301a, x, y * 0.4, 0.0, tz - 0.75, 2.2, 0.32, seg=16, kind='BEAM', j=0)
+    for x in (-9, 9):  # cables up into the dark
+        S.rod(0x221a1e, (x, 0, tz + 0.7), (x * 0.6, 2, 26), 0.05)
+    # scoreboard
+    S.box(0x1a1216, -4, 4, 9.5, 10.2, 10.5, 14.2, j=0)
+    S.box(0xff6a2a, -3.6, 3.6, 9.45, 9.5, 10.9, 13.8, kind='GLOW', j=0)
+    S.box(0x2a0a0a, -3.2, -0.3, 9.4, 9.45, 11.4, 13.3, kind='GLOW', j=0)
+    S.box(0x2a0a0a, 0.3, 3.2, 9.4, 9.45, 11.4, 13.3, kind='GLOW', j=0)
+    S.export('arena_ring.glb')
+
+# ------------------------------------------------------------------ BACK ALLEY
+def build_alley():
+    random.seed(11); S = Scene()
+    for ix in range(-17, 17):  # asphalt, slightly patchy
+        for iy in range(-8, 16):
+            S.box(random.choice([0x2a2430, 0x2e2834, 0x26202c, 0x30283a]), ix * 2, ix * 2 + 2, iy * 2, iy * 2 + 2, -0.3, 0.0, j=0.03)
+    for (x, y, r) in [(-5, -1.5, 1.4), (3.5, 1.5, 1.0), (9, -2.5, 1.6), (-12, 2, 1.2), (14, 0.5, 0.9)]:  # puddles catching the neon
+        S.cyl(0x5a3a7a, x, y, 0.0, 0.01, r, seg=20, j=0.05)
+        S.cyl(0x8a4aa0, x + 0.2, y, 0.01, 0.015, r * 0.5, seg=16, j=0.05)
+    # building facades across the back, with lit / dark windows
+    x = -34.0
+    while x < 34:
+        w = 6 + random.random() * 5; h = 9 + random.random() * 13; y0 = 8 + random.random() * 2
+        if -4 < x + w / 2 < 4:     # leave a gap down the middle: the street continues
+            x += w; continue
+        col = random.choice([0x4a2a2e, 0x3e2630, 0x3a2a40, 0x52302c])
+        S.box(col, x, x + w, y0, y0 + 7, 0, h, j=0.03)
+        S.box(0x2a1c24, x - 0.1, x + w + 0.1, y0 - 0.15, y0 + 0.2, h - 0.5, h, j=0)   # roof ledge
+        for fz in range(1, int(h / 2.6)):
+            for fx in range(int(w / 1.8)):
+                wx = x + 0.7 + fx * 1.8; wz = 1.2 + fz * 2.6
+                if wx + 0.9 > x + w:
+                    continue
+                if random.random() < 0.3:
+                    c = random.choice([0xff3aa0, 0xffa050, 0xb060ff, 0xffd080])
+                    S.box(c, wx, wx + 0.9, y0 - 0.06, y0, wz, wz + 1.3, kind='GLOW', j=0.08)
+                else:
+                    S.box(0x1a1420, wx, wx + 0.9, y0 - 0.06, y0, wz, wz + 1.3, j=0.05)
+        if random.random() < 0.6:  # fire escape
+            fx0 = x + 1; fx1 = x + min(w - 1, 4.5)
+            for fz in (3.6, 6.2, 8.8):
+                if fz > h - 1:
+                    break
+                S.box(0x2a2228, fx0, fx1, y0 - 1.3, y0, fz, fz + 0.1, j=0)
+                S.rod(0x2a2228, (fx0, y0 - 1.3, fz + 0.9), (fx1, y0 - 1.3, fz + 0.9), 0.04)
+                for bx in range(int((fx1 - fx0) / 0.5) + 1):
+                    S.rod(0x2a2228, (fx0 + bx * 0.5, y0 - 1.3, fz), (fx0 + bx * 0.5, y0 - 1.3, fz + 0.9), 0.025)
+                S.obox(0x2a2228, (fx0 + fx1) / 2, y0 - 0.7, fz - 1.3, 0.8, 0.9, 0.08, rot=(0, 0.75, 0))
+        if random.random() < 0.5:  # drain pipe
+            px = x + w - 0.4
+            S.cyl(0x3a3036, px, y0 - 0.2, 0, h, 0.12, seg=8)
+        x += w
+    # the street continuing through the gap, lit at the far end
+    S.box(0x26202c, -4, 4, 8, 40, -0.3, 0.0, j=0.02)
+    for sx in (-1, 1):
+        for k in range(4):
+            yy = 16 + k * 6
+            S.box(random.choice([0x3a2a40, 0x4a2a2e]), sx * 4, sx * 9, yy, yy + 5, 0, 10 + random.random() * 10, j=0.04)
+            for fz in range(1, 6):
+                if random.random() < 0.4:
+                    S.box(random.choice([0xff3aa0, 0xb060ff, 0xffa050]), sx * 4 - sx * 0.05, sx * 4, yy + 1, yy + 2.2, fz * 2, fz * 2 + 1.2, kind='GLOW')
+    S.quad([0x8a2a6a, 0x8a2a6a, 0x1a0a24, 0x1a0a24], (-40, 46, -1), (40, 46, -1), (40, 46, 40), (-40, 46, 40), kind='GLOW')
+    # side walls receding toward the camera
+    for sx in (-1, 1):
+        S.box(0x3a2430, sx * 19, sx * 26, -16, 8, 0, 16, j=0.03)
+        for k in range(3):
+            wy = -1 + k * 3.4
+            lit = random.random() < 0.35
+            S.box(random.choice([0xff3aa0, 0xffa050]) if lit else 0x1a1420, sx * 19 - sx * 0.06, sx * 19, wy, wy + 1.2, 3, 4.6, kind='GLOW' if lit else 'SOLID')
+    # chain-link fence across the street gap
+    for xx in (-4, -1.3, 1.3, 4):
+        S.cyl(0x3a3640, xx, 9, 0, 3.4, 0.07, seg=6)
+    S.rod(0x3a3640, (-4, 9, 3.4), (4, 9, 3.4), 0.05)
+    for k in range(17):
+        a = -4 + k * 0.5
+        S.rod(0x4a4652, (a, 9, 0), (min(4, a + 3.4), 9, min(3.4, (4 - a))), 0.012, seg=4)
+        S.rod(0x4a4652, (a, 9, 0), (max(-4, a - 3.4), 9, min(3.4, a + 4)), 0.012, seg=4)
+    # dumpster, trash, boxes
+    S.box(0x24342c, -14, -10.8, 5, 6.6, 0.2, 1.7, top=0x1c2a24)
+    for wx in (-13.6, -11.2):
+        S.cyl(0x111111, wx, 5.2, 0, 0.25, 0.2, seg=8)
+    for (tx, ty) in [(-9.4, 6.2), (-8.6, 6.8), (13, 6.4)]:
+        S.cyl(0x4a4a52, tx, ty, 0, 1.0, 0.4, 0.45, seg=12)
+        S.cyl(0x5a5a62, tx, ty, 1.0, 1.08, 0.48, seg=12)
+    for (bx, by, bz) in [(15, 5.5, 0), (15.6, 6.4, 0), (15.2, 5.9, 0.8)]:
+        S.box(0x6a4a30, bx - 0.4, bx + 0.4, by - 0.4, by + 0.4, bz, bz + 0.8, j=0.08)
+    # burning barrel
+    S.cyl(0x6a3420, 10.5, 5.2, 0, 1.25, 0.5, seg=12)
+    S.cyl(0x4a2416, 10.5, 5.2, 0.4, 0.5, 0.52, seg=12)
+    S.cyl(0xff7a2a, 10.5, 5.2, 1.2, 2.3, 0.42, 0.05, seg=8, kind='GLOW', j=0)
+    S.cyl(0xffc04a, 10.4, 5.1, 1.2, 1.9, 0.26, 0.03, seg=8, kind='GLOW', j=0)
+    S.cyl(0x40180a, 10.5, 5.2, 0.0, 3.6, 1.6, 0.4, seg=16, kind='BEAM', j=0)   # warm glow around the fire
+    # neon signs
+    def neon(c, pts, y):
+        for a, b in zip(pts, pts[1:]):
+            S.rod(c, (a[0], y, a[1]), (b[0], y, b[1]), 0.07, seg=6, kind='GLOW')
+    neon(0xff3aa0, [(-9, 6.5), (-5, 6.5), (-5, 9.0), (-9, 9.0), (-9, 6.5)], 7.85)
+    neon(0xff7ad0, [(-8.4, 7.1), (-7.6, 8.4), (-6.8, 7.1), (-6.0, 8.4), (-5.6, 7.4)], 7.85)
+    neon(0xa060ff, [(6, 5), (6, 10), (7.2, 10), (7.2, 5), (6, 5)], 7.85)
+    for k in range(4):
+        neon(0xc890ff, [(6.25, 5.6 + k * 1.15), (6.95, 5.6 + k * 1.15)], 7.85)
+    # street lamps
+    for lx in (-6.5, 4.5):
+        S.cyl(0x2a2830, lx, 5, 0, 5.4, 0.08, seg=8)
+        S.rod(0x2a2830, (lx, 5, 5.4), (lx + 0.9, 4.6, 5.6), 0.06)
+        S.cyl(0xffd8a0, lx + 0.9, 4.6, 5.2, 5.5, 0.22, seg=10, kind='GLOW', j=0)
+        S.cyl(0x2a1c30, lx + 0.9, 4.6, 0.0, 5.2, 1.8, 0.2, seg=14, kind='BEAM', j=0)
+    # wires strung between the buildings
+    for (xa, xb, zz) in [(-20, 0, 13), (-6, 18, 12), (2, 22, 15)]:
+        n = 8; prev = None
+        for k in range(n + 1):
+            t = k / n; px = xa + (xb - xa) * t; pz = zz - math.sin(t * math.pi) * 1.2
+            if prev:
+                S.rod(0x141018, prev, (px, 8.2, pz), 0.025, seg=4)
+            prev = (px, 8.2, pz)
+    S.export('arena_alley.glb')
+
+# ------------------------------------------------------------------ THE SALOON
+def build_saloon():
+    random.seed(23); S = Scene()
+    # floorboards, warmer under the lamps
+    y = -16.0
+    while y < 13:
+        x = -34.0
+        while x < 34:
+            L = 3 + random.random() * 4
+            d = min(abs(x + L / 2 - (-6)), abs(x + L / 2), abs(x + L / 2 - 6))
+            k = max(0, 1 - d / 9) * max(0, 1 - abs(y - 1) / 12)
+            base = random.choice([0x5e361f, 0x6a3e24, 0x74442a, 0x583220])
+            r = min(255, ((base >> 16) & 255) + int(40 * k)); g = min(255, ((base >> 8) & 255) + int(24 * k)); b = (base & 255) + int(8 * k)
+            S.box(r << 16 | g << 8 | b, x, x + L - 0.04, y, y + 0.86, -0.3, 0.0, j=0.03)
+            x += L
+        y += 0.9
+    # back wall: dark wainscot, plank panelling, picture rail
+    S.box(0x3a2014, -34, 34, 11, 12, 0, 1.6, j=0)
+    xx = -34.0
+    while xx < 34:
+        S.box(random.choice([0x4a2a1a, 0x52301c, 0x46261a]), xx, xx + 0.75, 11.05, 12, 1.6, 12, j=0.03)
+        xx += 0.75
+    S.box(0x2a160e, -34, 34, 10.9, 11.0, 1.55, 1.75, j=0)
+    # bar counter with brass rail and stools
+    S.box(0x5a3018, -11, 5, 6.0, 7.6, 0, 1.15, j=0.02)
+    S.box(0x7a4428, -11.2, 5.2, 5.85, 7.7, 1.15, 1.3, j=0.0)
+    for k in range(8):
+        S.box(0x4a2814, -10.6 + k * 2, -9.2 + k * 2, 5.95, 6.0, 0.2, 0.95, j=0.02)
+    S.rod(0xd8a03a, (-11, 5.6, 0.25), (5, 5.6, 0.25), 0.05)
+    for k in range(6):
+        sx = -9.5 + k * 2.6
+        S.cyl(0x3a2014, sx, 4.9, 0, 0.75, 0.06, seg=6)
+        S.cyl(0x7a2a1e, sx, 4.9, 0.75, 0.88, 0.32, seg=12)
+    # back bar: shelves of bottles, mirror with a gold frame
+    S.box(0x3a2014, -11, 5, 10.2, 11.0, 0, 1.4, j=0)
+    S.box(0xc8902a, -6.2, 0.2, 10.85, 10.95, 2.0, 5.8, j=0)
+    S.box(0x2a3440, -5.9, -0.1, 10.8, 10.85, 2.3, 5.5, j=0.02)
+    for k in range(3):  # streaks of reflected lamp light in the mirror
+        S.obox(0x8a6a4a, -4.6 + k * 1.6, 10.79, 3.9, 0.12, 0.01, 2.2, rot=(0, 0.5, 0), kind='GLOW', j=0.05)
+    for sx0, sx1 in ((-11, -6.6), (0.6, 5)):
+        for sz in (2.2, 3.4, 4.6):
+            S.box(0x4a2814, sx0, sx1, 10.4, 11.0, sz, sz + 0.08, j=0)
+            bx = sx0 + 0.2
+            while bx < sx1 - 0.2:
+                c = random.choice([0x2a5a2a, 0x7a4a14, 0x5a2a14, 0x8a6a2a, 0x2a3a5a])
+                hh = 0.5 + random.random() * 0.35
+                glow = random.random() < 0.18
+                S.cyl(0xffb050 if glow else c, bx, 10.7, sz + 0.08, sz + 0.08 + hh, 0.1, seg=8, kind='GLOW' if glow else 'SOLID')
+                S.cyl(c, bx, 10.7, sz + 0.08 + hh, sz + 0.28 + hh, 0.04, seg=6)
+                bx += 0.26 + random.random() * 0.12
+    # balcony above the bar with balusters
+    S.box(0x4a2814, -16, 16, 8.8, 11, 6.2, 6.6, j=0.02)
+    S.box(0x5a3018, -16, 16, 8.75, 8.9, 7.7, 7.85, j=0)
+    xx = -16.0
+    while xx <= 16:
+        S.cyl(0x5a3018, xx, 8.82, 6.6, 7.7, 0.06, seg=6); xx += 0.55
+    for px in (-16, -8, 8, 16):
+        S.box(0x3a2014, px - 0.25, px + 0.25, 8.6, 9.1, 0, 6.2, j=0)
+    # ceiling beams and ceiling
+    S.box(0x24120a, -34, 34, -16, 12, 11.8, 12.2, j=0)
+    for k in range(-5, 6):
+        S.box(0x3a2014, -34, 34, k * 2.4 - 0.25, k * 2.4 + 0.25, 11.2, 11.8, j=0.03)
+    # hanging oil lamps
+    for lx in (-6, 0, 6):
+        S.rod(0x1a120e, (lx, 1.5, 11.2), (lx, 1.5, 7.6), 0.03)
+        S.cyl(0x3a2a1a, lx, 1.5, 7.2, 7.6, 0.5, 0.15, seg=10)
+        S.cyl(0xffc060, lx, 1.5, 6.8, 7.25, 0.2, seg=10, kind='GLOW', j=0)
+        S.cyl(0x2a1608, lx, 1.5, 0.0, 6.8, 2.6, 0.2, seg=16, kind='BEAM', j=0)
+    # wall sconces, wanted posters, a sunset window each side
+    for wx in (-14, -2, 10, 20):
+        S.box(0xc8902a, wx - 0.1, wx + 0.1, 10.7, 10.95, 3.6, 4.0)
+        S.cyl(0xffb050, wx, 10.75, 4.0, 4.4, 0.12, seg=8, kind='GLOW', j=0)
+    for (wx, wz) in [(-20, 3.4), (-18.4, 3.0), (8.6, 8.8), (12.5, 9.2), (14.0, 8.9)]:
+        S.box(0xc8b080, wx - 0.55, wx + 0.55, 10.9, 10.95, wz, wz + 1.4, j=0.06)
+        S.box(0x4a3020, wx - 0.35, wx + 0.35, 10.86, 10.9, wz + 0.4, wz + 1.1, j=0.05)
+    for sx in (-1, 1):
+        S.box(0x4a2a1a, sx * 22, sx * 23, -16, 12, 0, 12, j=0.02)
+        S.box(0xff9a4a, sx * 22 - sx * 0.05, sx * 22, -6, -2, 3, 6.5, kind='GLOW', j=0)
+        S.box(0x2a160e, sx * 22 - sx * 0.1, sx * 22, -4.05, -3.95, 3, 6.5, j=0)
+        S.box(0x2a160e, sx * 22 - sx * 0.1, sx * 22, -6, -2, 4.7, 4.8, j=0)
+    # tables and chairs at the sides, a piano, barrels
+    for (tx, ty) in [(-14, 3.0), (-17.5, -1.0), (13.5, 2.5), (17.5, -1.5)]:
+        S.cyl(0x3a2014, tx, ty, 0, 0.8, 0.12, seg=8)
+        S.cyl(0x6a3a20, tx, ty, 0.8, 0.9, 1.0, seg=16)
+        S.cyl(0xd8c8a0, tx + 0.2, ty, 0.9, 1.15, 0.07, seg=6)
+        for a in range(3):
+            ang = a * 2.1 + 0.4; cx = tx + math.cos(ang) * 1.4; cy = ty + math.sin(ang) * 1.4
+            S.box(0x4a2814, cx - 0.3, cx + 0.3, cy - 0.3, cy + 0.3, 0.5, 0.58)
+            S.box(0x4a2814, cx - 0.3, cx + 0.3, cy + 0.22, cy + 0.3, 0.58, 1.3)
+            for (lx, ly) in ((-0.25, -0.25), (0.25, -0.25), (-0.25, 0.25), (0.25, 0.25)):
+                S.cyl(0x3a2014, cx + lx, cy + ly, 0, 0.5, 0.04, seg=4)
+    S.box(0x2a1410, 8, 11.6, 8.4, 10.2, 0.3, 2.6, j=0.0)
+    S.box(0xe8e0d0, 8.1, 11.5, 8.25, 8.4, 1.3, 1.45, j=0)
+    for k in range(18):
+        S.box(0x111111, 8.2 + k * 0.19, 8.28 + k * 0.19, 8.24, 8.3, 1.4, 1.46, j=0)
+    for lx in (8.3, 11.3):
+        S.box(0x2a1410, lx - 0.1, lx + 0.1, 8.5, 8.7, 0, 0.3)
+    for (bx, by, bz) in [(-20, 7, 0), (-18.6, 7.4, 0), (-19.3, 7.2, 1.3), (19, 7, 0)]:
+        S.cyl(0x6a3a1c, bx, by, bz, bz + 1.3, 0.55, 0.6, seg=12)
+        S.cyl(0x3a3036, bx, by, bz + 0.25, bz + 0.33, 0.58, seg=12, j=0)
+        S.cyl(0x3a3036, bx, by, bz + 0.97, bz + 1.05, 0.58, seg=12, j=0)
+    S.export('arena_saloon.glb')
+
+if __name__ == '__main__':
+    which = sys.argv[1:] or ['ring', 'alley', 'saloon']
+    for w in which:
+        {'ring': build_ring, 'alley': build_alley, 'saloon': build_saloon}[w]()

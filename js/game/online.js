@@ -8,7 +8,7 @@ function netClose(){if(NET.ws){netSend({t:'leave'});const w=NET.ws;NET.ws=null;t
 function onSt(t){$('#onst').textContent=t;}
 function onCards(){$$('#ongrid .ccard').forEach(c=>{c.style.backgroundImage='url('+HUDIMG['face_'+c.dataset.c]+')';c.className='ccard off';});}
 function goOnline(){
-  netClose();closeOvl();G.mode='onl';show('onl');$('#hud').classList.remove('on');canvas.style.visibility='hidden';onCards();onSt('CONNECTING…');$('#onhint').textContent='ESC TO CANCEL';
+  netClose();closeOvl();G.mode='onl';show('onl','down');$('#hud').classList.remove('on');canvas.style.visibility='hidden';onCards();onSt('CONNECTING…');$('#onhint').textContent='ESC TO CANCEL';
   let ws;try{ws=new WebSocket((location.protocol==='https:'?'wss://':'ws://')+location.host);}catch(e){onSt('ONLINE ONLY WORKS ON THE DEADBRAWL WEBSITE');return;}
   NET.ws=ws;
   ws.onopen=()=>netSend({t:'queue'});
@@ -55,7 +55,7 @@ function netWrap(name,fn){ORIG[name]=fn;return function(...a){if(G.online&&G.onl
 spark=netWrap('spark',spark);trail=netWrap('trail',trail);dust=netWrap('dust',dust);flash=netWrap('flash',flash);splash=netWrap('splash',splash);
 callout=netWrap('callout',callout);showCombo=netWrap('showCombo',showCombo);cutin=netWrap('cutin',cutin);shotgunFx=netWrap('shotgunFx',shotgunFx);shotFx=netWrap('shotFx',shotFx);
 afterimage=netWrap('afterimage',afterimage);burstKnife=netWrap('burstKnife',burstKnife);muzzleFlash=netWrap('muzzleFlash',muzzleFlash);stars=netWrap('stars',stars);endMatch=netWrap('endMatch',endMatch);
-setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);
+setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);arenaPlace=netWrap('arenaPlace',arenaPlace);arenaRecenter=netWrap('arenaRecenter',arenaRecenter);
 for(const k in sfx){const fn=sfx[k];ORIG['sfx.'+k]=fn;sfx[k]=function(...a){if(G.online&&G.online.role==='host')G.netEv.push(['sfx.'+k,a]);return fn.apply(this,a);};}
 function netSer(f){const o={};for(const k in f){if(k==='_face')continue;const v=f[k],t=typeof v;if(t==='number')o[k]=Math.round(v*1000)/1000;else if(t==='string'||t==='boolean')o[k]=v;}o.cd=f.cd;return o;}
 function netSnap(){

@@ -74,7 +74,7 @@ function drawSprite(f){
   const fr=SPR[anim][idx],tex=TEX[dummy||rift?0:f.idx][anim][idx],m=f.spr;
   m.material.color.setHex(rift&&!own?0xc09cff:0xffffff);
   if(!tex.image){m.visible=false;return;}
-  m.visible=!(f.invuln>0&&f.state==='wakeup'&&G.time%4<2);
+  m.visible=!f.hide&&!(f.invuln>0&&f.state==='wakeup'&&G.time%4<2);
   if(m.material.map!==tex){m.material.map=tex;m.material.needsUpdate=true;}
   const K=fr.k||SPRK,w=fr.w*K,h=fr.h*K,fc=f.facing*(fr.flip?-1:1);
   m.scale.set(w*fc,h,1);

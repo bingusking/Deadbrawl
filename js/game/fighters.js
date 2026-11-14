@@ -20,7 +20,7 @@ function press(f,b){f.buf[b]=BUF;}
 // unit direction from (f.x, f.y+oy) toward the mouse (if it was aimed just now), otherwise toward the opponent
 function aimDir(f,o,oy=1.2){const aimed=f.uAimT!==undefined&&G.time-f.uAimT<40&&isFinite(f.uAX)&&isFinite(f.uAY);
   const dx=(aimed?f.uAX:o.x)-f.x,dy=(aimed?f.uAY:o.y+1.0)-(f.y+oy),L=Math.hypot(dx,dy);return L<0.3?[f.facing,0]:[dx/L,dy/L];}
-const AIM_MOVES=new Set(['knife','burst','rult','jkick']);
+const AIM_MOVES=new Set(['knife','burst','rult']);
 function take(f,b){if(f.buf[b]>0){f.buf[b]=0;return true;}return false;}
 const projectiles=[];
 let p1,p2;
@@ -355,6 +355,6 @@ function pushbox(){
     if(Math.abs(a.x)>STAGE){a.x=Math.sign(a.x)*STAGE;b.x=a.x+s*0.64;}
     if(Math.abs(b.x)>STAGE){b.x=Math.sign(b.x)*STAGE;a.x=b.x-s*0.64;}
   }
-  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult');if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
-  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult')f.x=clamp(f.x,-STAGE,STAGE); // ultimates can carry fighters off screen
+  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult'||f.state==='rult'||f.ucOn);if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
+  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult'&&f.state!=='rult')f.x=clamp(f.x,-STAGE,STAGE); // ultimates can carry fighters off screen
 }

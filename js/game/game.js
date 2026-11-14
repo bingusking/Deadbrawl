@@ -78,17 +78,17 @@ function updHud(force){
 const camPos=new THREE.Vector3(0,1.7,9),camLook=new THREE.Vector3(0,1.2,0);
 function updCam(snap){
   const mid=(p1.x+p2.x)/2,d=Math.abs(p1.x-p2.x),hy=Math.max(p1.y,p2.y);
-  const tx=clamp(mid,-5,5),tz=6.4+d*0.42,ty=1.75+hy*0.35;
+  const tx=clamp(mid,-4.6,4.6),tz=7.7+d*0.45,ty=1.95+hy*0.35; // wider shot so you can see more of the stage
   const lo=Math.min(p1.y,p2.y)*0.5;
   const want=new THREE.Vector3(tx,ty+lo,tz),look=new THREE.Vector3(tx,1.15+hy*0.3+lo,0);
   for(const f of[p1,p2])if(f.uFollow&&!f.air()&&!(f===p1?p2:p1).air())f.uFollow=0;
   {const U=[p1,p2].find(f=>f.state==='rult'||f.state==='jult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
-   if(U&&U.ucOn){want.set(U.ucx,U.ucy+0.6,8.6);look.set(U.ucx,U.ucy,0);G.ultCam=30;}
+   if(U&&U.ucOn){const L=G.me||p1;want.set(L.x,Math.max(1.9,L.y*0.6+1.9),10.2);look.set(L.x,L.y*0.55+1.2,0);G.ultCam=30;G.camFollow=1;} // knocked into the next arena: ride along with your fighter
    else if(U){const top=Math.max(U.y,V.y)+2.3,bot=Math.min(U.y,V.y),cy=(top+bot)/2;want.set(clamp((U.x+V.x)/2,-5,5),cy+0.2,6.6+(top-bot)*1.15);look.set(want.x,cy,0);G.ultCam=30;}else if(G.ultCam>0)G.ultCam--;}
   if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.z-=k*2.2;want.y-=k*0.6;} // intro: start close, pull back, centred between both fighters
   if(G.phase==='ko'&&G.pt<130&&G.koBy){const w=G.koBy===p1?p2:p1;want.set(w.x*0.6+tx*0.4,1.6,6.5);look.set(w.x*0.6+tx*0.4,0.8,0);}
   if(G.camSnap){G.camSnap=0;snap=true;} // arena change: cut straight to the new shot
-  if(snap){camPos.copy(want);camLook.copy(look);}else{const r=G.ultCam?0.16:0.08;camPos.lerp(want,r);camLook.lerp(look,r*1.25);}
+  if(snap){camPos.copy(want);camLook.copy(look);}else{const r=G.camFollow?0.24:G.ultCam?0.16:0.08;G.camFollow=0;camPos.lerp(want,r);camLook.lerp(look,r*1.25);}
   cam.position.copy(camPos);
   if(G.shake>0.002){cam.position.x+=(rnd()-0.5)*G.shake*SET.shake;cam.position.y+=(rnd()-0.5)*G.shake*SET.shake;G.shake*=0.85;}else G.shake=0;
   cam.lookAt(camLook);

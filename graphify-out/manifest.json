@@ -6,9 +6,9 @@
     "semantic_hash": ""
   },
   "js/game/animation.js": {
-    "mtime": 1794468361.4331963,
-    "seen": 1794469219.903134,
-    "ast_hash": "a5fe6cb416e6073f10581c1d0452d88c",
+    "mtime": 1794653719.2467425,
+    "seen": 1794654005.7181878,
+    "ast_hash": "dff530dfaaf6de0505975d75c7cd41b4",
     "semantic_hash": ""
   },
   "js/game/audio.js": {
@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "js/game/fighters.js": {
-    "mtime": 1794650843.9643745,
-    "seen": 1794651143.7788649,
-    "ast_hash": "849d1ba53f6dba78c22abb6e6ebf0120",
+    "mtime": 1794653719.2470167,
+    "seen": 1794654005.7182002,
+    "ast_hash": "3ed2048ed33846f2c78329a9075006a2",
     "semantic_hash": ""
   },
   "js/game/fx.js": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794650765.429098,
-    "seen": 1794651143.778867,
-    "ast_hash": "3fe1714f033496980bcd237acf4ff152",
+    "mtime": 1794653719.2473192,
+    "seen": 1794654005.7182052,
+    "ast_hash": "45b4b1d6451e7018663d3e0dba9ea11c",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
@@ -48,33 +48,33 @@
     "semantic_hash": ""
   },
   "js/game/menus.js": {
-    "mtime": 1794651536.8030782,
-    "seen": 1794651628.2286441,
-    "ast_hash": "f3c2d69c325e358f7de85c610c94ede6",
+    "mtime": 1794652751.269565,
+    "seen": 1794654005.7182093,
+    "ast_hash": "95339dcf5d566b24bb6eeb89aaf9e51d",
     "semantic_hash": ""
   },
   "js/game/moves.js": {
-    "mtime": 1794650827.399701,
-    "seen": 1794651143.7788706,
-    "ast_hash": "a99d95f1e4e8c179862eca29a5a0176d",
+    "mtime": 1794652692.040877,
+    "seen": 1794654005.7182107,
+    "ast_hash": "dc6c75dbd51399ee0d1d5b2d42f44c58",
     "semantic_hash": ""
   },
   "js/game/online.js": {
-    "mtime": 1794650765.4292467,
-    "seen": 1794651143.7788715,
-    "ast_hash": "479625c36d34022c65ed375f35b2e79f",
+    "mtime": 1794653719.2474973,
+    "seen": 1794654005.7182126,
+    "ast_hash": "aeb5e6c13576adfe2511547eab3ff254",
     "semantic_hash": ""
   },
   "js/game/sprites.js": {
-    "mtime": 1794649754.7012303,
-    "seen": 1794650061.1284847,
-    "ast_hash": "cdaca4a5961e0a72cf805f735bad1e18",
+    "mtime": 1794653719.246552,
+    "seen": 1794654005.7182138,
+    "ast_hash": "369910c8b5c44ac2efa42e982191973d",
     "semantic_hash": ""
   },
   "js/game/stage.js": {
-    "mtime": 1794646651.2389317,
-    "seen": 1794647304.4069862,
-    "ast_hash": "a322274918f66f97308073a05d0f9606",
+    "mtime": 1794653490.3112438,
+    "seen": 1794654005.7182157,
+    "ast_hash": "9779c7d0b3fb5f9daff92acde619e219",
     "semantic_hash": ""
   },
   "js/game/viewer.js": {
@@ -96,21 +96,21 @@
     "semantic_hash": ""
   },
   "server.js": {
-    "mtime": 1794468486.0127833,
-    "seen": 1794469219.9031765,
-    "ast_hash": "8924e1e80aa3b13efa9b63b286e2631a",
+    "mtime": 1794653128.6626785,
+    "seen": 1794654005.7182236,
+    "ast_hash": "0364a9cf2ecc0dac2e3eeaa8205792af",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794651142.2200456,
-    "seen": 1794651143.7788832,
-    "ast_hash": "2679a7922b7bf9ce3d4d779fc6fb62bb",
+    "mtime": 1794654004.117672,
+    "seen": 1794654005.7182345,
+    "ast_hash": "aad70cb758c9507afc5a52140c58f01b",
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794651536.8021345,
-    "seen": 1794651628.2286608,
-    "ast_hash": "b25c1aa044d83005d275cb8966b47978",
+    "mtime": 1794653137.3080828,
+    "seen": 1794654005.7182357,
+    "ast_hash": "f14a8a42163754e1d878fd366cb46f2d",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
@@ -144,15 +144,21 @@
     "semantic_hash": ""
   },
   "js/game/ult.js": {
-    "mtime": 1794650827.3998876,
-    "seen": 1794651143.7788744,
-    "ast_hash": "291f62cef0993d9f76ba8dca01007f33",
+    "mtime": 1794653719.2442822,
+    "seen": 1794654005.718217,
+    "ast_hash": "3876e14dbf0ff4de4cc1ddde6fc5f24f",
     "semantic_hash": ""
   },
   "js/game/binds.js": {
-    "mtime": 1794651536.7345393,
-    "seen": 1794651628.2286348,
-    "ast_hash": "fc2dcc554eb9d3dba9ee210b62868266",
+    "mtime": 1794652692.0416238,
+    "seen": 1794654005.7181957,
+    "ast_hash": "09bc2db476572779e1eec3eb7ac73e9a",
+    "semantic_hash": ""
+  },
+  "tools/arenas/build_arenas.py": {
+    "mtime": 1794653612.2956185,
+    "seen": 1794654005.7182255,
+    "ast_hash": "04ddcc24b49a3a19334ff956db4522f8",
     "semantic_hash": ""
   },
   "package-lock.json": {
