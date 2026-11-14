@@ -128,6 +128,7 @@ function stepFighter(f,o){
   f.t++;
   if(f.state==='rult'){riftUltTick(f,o);return;} // the ultimates drive both fighters' positions
   if(f.state==='jult'){lashUltTick(f,o);return;}
+  if(f.state==='jfire'){lashFireTick(f,o);return;}
   if(f.state==='ultd'){f.vx=f.vy=0;return;}
   const wasAir=f.air();
   const fwd=()=>f.facing>0?f.inp.r:f.inp.l, back=()=>f.facing>0?f.inp.l:f.inp.r;

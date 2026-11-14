@@ -24,7 +24,7 @@ function netLost(msg){
 }
 function netMsg(d){
   if(d[0]==='~'){const o=JSON.parse(d.slice(1));
-    if(o.s)G.snap=o;else if(o.i)G.remIn=o.i;else if(o.p&&G.online&&G.online.role==='host'&&G.phase==='fight')press(p2,o.p);
+    if(o.s)G.snap=o;else if(o.i)G.remIn=o.i;else if(o.p&&G.online&&G.online.role==='host'&&G.phase==='fight'){if(o.a){p2.uAX=o.a[0];p2.uAY=o.a[1];p2.uAimT=G.time;}press(p2,o.p);}
     return;}
   const m=JSON.parse(d);
   switch(m.t){
@@ -46,7 +46,7 @@ function startOnline(m){
   updCam(true);
 }
 $$('#ongrid .ccard').forEach(c=>c.addEventListener('click',()=>{if(!NET.matched||NET.locked||c.classList.contains('taken'))return;sfx.sel();netSend({t:'lock',c:c.dataset.c});}));
-function pressMe(b){if(G.online&&G.online.role==='guest')netGame({p:b});else press(p1,b);}
+function pressMe(b,a){if(G.online&&G.online.role==='guest')netGame(a?{p:b,a}:{p:b});else{if(a){const f=G.me||p1;f.uAX=a[0];f.uAY=a[1];f.uAimT=G.time;}press(G.me||p1,b);}}
 // host: record visual/sound events so the guest can replay them
 const ORIG={};
 function netEnc(v){return v instanceof Fighter?{__f:v.idx}:v;}

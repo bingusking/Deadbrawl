@@ -104,7 +104,7 @@ function jacobRope(f,o){
   if(!f.rope){f.rope=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xd8d2c4,fog:false}));f.rope.renderOrder=4;scene.add(f.rope);}
   const pr=projectiles.find(p=>p.owner===f&&p.hook);let tx,ty;
   if(pr){tx=pr.x;ty=pr.y;}else if(f.hookOn>0||f.pulling||(f.state==='jult'&&f.uRope)){tx=o.x;ty=o.y+1.1;}
-  else if(f.state==='attack'&&f.mname==='jult'&&f.mt>=6){const L=Math.min(LU.RANGE,(f.mt-5)*1.1);tx=f.x+f.facing*(0.45+L);ty=f.y+1.25;} // ult grapple flying out
+  else if(f.state==='jfire'&&f.hTipX!==undefined&&f.ht>LU.WIND){tx=f.hTipX;ty=f.hTipY;} // ult grapple in flight
   if(tx===undefined)f.rope.visible=false;
   else{const sx=f.x+f.facing*0.45,sy=f.y+1.25,dx=tx-sx,dy=ty-sy,L=Math.hypot(dx,dy)||0.01;
     f.rope.visible=true;f.rope.position.set(sx+dx/2,sy+dy/2,0.12);f.rope.rotation.z=Math.atan2(dy,dx);f.rope.scale.set(L,0.05,1);}
@@ -159,13 +159,13 @@ function jacobFrame(f){
     case 'parry':return [T,2];
     case 'guard':case 'block':return [T,0];
     case 'jult':return lashUltFrame(f);
+    case 'jfire':return ['jacob_heavy',(f.ht||0)<=LU.WIND?1:3];
     case 'hitstun':case 'stun':case 'ultd':return ['jacob_hit',0];
     case 'airhit':return ['jacob_hit',0,'tumble'];
     case 'kd':case 'ko':return ['jacob_hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0;
       if(f.mname==='heavy')return ['jacob_heavy',k<=s?2:k<=s+m.active+6?3:4];
       if(f.mname==='light')return ['jacob_jab',k<=s?0:k<=s+m.active+2?1:0];
-      if(f.mname==='jult')return ['jacob_heavy',k<=s?1:3];
       if(f.mname==='jslam')return k<=s?[T,3]:[R,3];
       if(f.mname==='jupper')return [T,k<=s?1:3];
       if(f.mname==='zip')return [R,3];

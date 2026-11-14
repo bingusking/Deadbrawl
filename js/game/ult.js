@@ -15,7 +15,7 @@ MOVES.rult={base:'stance',startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[
 function tryUlt(f){
   if(!(f.buf.ult>0))return false;f.buf.ult=0;
   if(!ULTS[f.char]||f.tension<ULT_COST)return false;
-  f.tension=0;startMove(f,f.char==='rift'?'rult':'jult');
+  f.tension=0;if(f.char==='rift')startMove(f,'rult');else lashFire(f,f===p1?p2:p1);
   cutin(f);G.freeze=40;sfx.super();return true;}
 
 function riftUltStart(a,d){
@@ -65,13 +65,35 @@ function riftUltFrame(f){const t=Math.max(0,(f.ut||1)-1);
    2. hook them again and drag them back down to him, punch them up again
    3. ride the rope up with them, get above them
    4. body slam: drop together and crush them into the floor */
-const LU={RANGE:6,HOOK:10,P1:45,P2:45,SLAM:110,UP1:4.2,UP2:5.0};
+const LU={HOOK:10,P1:45,P2:45,SLAM:110,UP1:4.2,UP2:5.0,SPEED:1.4,WIND:9};
 ULTS.jacob={name:'HOOK, LINE & SINKER'};
-MOVES.jult={base:'stance',startup:10,active:7,recovery:26,dmg:1,reach:[0,LU.RANGE],y:[-1,4],grab:1,
-  react:(a,d)=>lashUltStart(a,d)};
+
+// R as The Lash: turn toward the aim point (mouse, or the opponent for the CPU) and fire the grapple.
+// The hook flies until it hits the opponent or leaves the arena: no range limit. Unblockable; a dodge passes through it.
+function lashFire(f,o){
+  const aimed=f.uAimT!==undefined&&G.time-f.uAimT<30;
+  let ax=aimed?f.uAX:o.x,ay=aimed?f.uAY:o.y+1;
+  f.facing=Math.sign(ax-f.x)||f.facing;
+  const sx=f.x+f.facing*0.45,sy=f.y+1.25,L=Math.hypot(ax-sx,ay-sy)||1;
+  f.state='jfire';f.ht=0;f.hback=0;f.hdx=(ax-sx)/L;f.hdy=(ay-sy)/L;f.hTipX=sx;f.hTipY=sy;f.vx=0;f.atkId++;}
+function lashFireTick(f,o){
+  f.ht++;f.vx*=0.6;if(f.air()){f.vy-=GRAV*0.5;f.y=Math.max(0,f.y+f.vy);}
+  const sx=f.x+f.facing*0.45,sy=f.y+1.25;
+  if(f.ht<=LU.WIND){f.hTipX=sx;f.hTipY=sy;return;}               // wind-up
+  if(f.hback){                                                     // missed: reel the hook back in
+    f.hTipX+=(sx-f.hTipX)*0.35;f.hTipY+=(sy-f.hTipY)*0.35;
+    if(Math.hypot(f.hTipX-sx,f.hTipY-sy)<0.3||f.ht>LU.WIND+120){f.state='idle';f.hTipX=undefined;}
+    return;}
+  if(f.ht===LU.WIND+1)sfx.whoosh();
+  for(let i=0;i<4;i++){                                            // fly (sub-steps so it can't skip past them)
+    f.hTipX+=f.hdx*LU.SPEED/4;f.hTipY+=f.hdy*LU.SPEED/4;
+    if(o.invuln<=0&&o.state!=='ko'&&Math.abs(f.hTipX-o.x)<0.45&&f.hTipY>=o.y-0.1&&f.hTipY<=o.y+1.9){
+      f.facing=Math.sign(o.x-f.x)||f.facing;f.hTipX=undefined;lashUltStart(f,o);return;}
+    if(Math.abs(f.hTipX)>STAGE+4||f.hTipY>16||f.hTipY<0){f.hback=1;sfx.block();return;}
+  }}
 
 function lashUltStart(a,d){
-  a.state='jult';a.move=null;a.ut=0;a.udir=a.facing;a.ux0=a.x;a.uy0=a.y;a.uRope=1;
+  a.facing=Math.sign(d.x-a.x)||a.facing;a.state='jult';a.move=null;a.ut=0;a.udir=a.facing;a.ux0=a.x;a.uy0=a.y;a.uRope=1;
   d.state='ultd';d.vx=d.vy=0;a.pass=d.pass=true;ultHit(a,d,LU.HOOK,d.x,d.y+1.1,false);}
 
 function lashUltTick(f,o){

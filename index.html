@@ -16,6 +16,7 @@ button{font-family:inherit}
 #viewer{pointer-events:auto;overflow:hidden}
 .cvbg{position:absolute;inset:0;background:radial-gradient(ellipse 34% 60% at 25% 62%,#7a141c99,#0000 70%),linear-gradient(90deg,#0008,#000c 55%,#000e),var(--cvbg,url(assets/arena_bg.webp)) center/cover;transition:background .3s}
 .cvroster{position:absolute;left:4vw;top:4vh;display:flex;gap:10px;align-items:flex-end;z-index:3}
+canvas{cursor:crosshair}
 .cvroster .rp{width:84px;height:92px;background:#141016 50% 100%/cover no-repeat;border:3px solid #3a2e34;clip-path:polygon(10% 0,100% 0,90% 100%,0 100%);cursor:pointer;position:relative;filter:grayscale(.7) brightness(.7);transition:filter .15s,transform .15s}
 .cvroster .rp.on{border-color:#d8232f;filter:none;transform:translateY(-6px)}
 .cvroster .rp:hover{filter:none}

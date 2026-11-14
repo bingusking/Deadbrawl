@@ -1,17 +1,17 @@
-# Graph Report - deadbrawl  (2026-11-13)
+# Graph Report - deadbrawl  (2026-11-14)
 
 ## Corpus Check
-- 24 files · ~7,993 words
+- 24 files · ~8,115 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 275 nodes · 409 edges · 19 communities (16 shown, 3 thin omitted)
+- 279 nodes · 415 edges · 19 communities (16 shown, 3 thin omitted)
 - Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `fb084139`
+- Built from commit: `a090db92`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -42,8 +42,8 @@
 4. `buildRig()` - 9 edges
 5. `services` - 8 edges
 6. `goOnline()` - 7 edges
-7. `cvShow()` - 6 edges
-8. `netLost()` - 6 edges
+7. `netLost()` - 6 edges
+8. `cvShow()` - 6 edges
 9. `startMove()` - 5 edges
 10. `tryAbility()` - 5 edges
 
@@ -81,8 +81,8 @@ Cohesion: 0.11
 Nodes (14): BOOT, CHARS, files, fs, http, load(), path, send() (+6 more)
 
 ### Community 5 - "menus.js"
-Cohesion: 0.15
-Nodes (26): act(), applySet(), cChoose(), charIntro(), CIDS, closeOvl(), cNav(), cReset() (+18 more)
+Cohesion: 0.14
+Nodes (27): act(), applySet(), cChoose(), charIntro(), CIDS, closeOvl(), cNav(), cReset() (+19 more)
 
 ### Community 6 - "moves.js"
 Cohesion: 0.08
@@ -93,8 +93,8 @@ Cohesion: 0.18
 Nodes (11): dependencies, ws@^8.18.0, description, engines, node, main, name, scripts (+3 more)
 
 ### Community 8 - "ult.js"
-Cohesion: 0.18
-Nodes (11): blinkTo(), lashUltStart(), lashUltTick(), LU, luEnd(), riftUltTick(), RU, ruEnd() (+3 more)
+Cohesion: 0.17
+Nodes (14): blinkTo(), lashFire(), lashFireTick(), lashUltStart(), lashUltTick(), LU, luEnd(), riftUltTick() (+6 more)
 
 ### Community 9 - "services"
 Cohesion: 0.22

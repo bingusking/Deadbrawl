@@ -118,7 +118,7 @@ addEventListener('keydown',e=>{
     if(e.repeat||G.phase!=='fight')return;
     const dk={KeyW:'kU',ArrowUp:'kU',KeyS:'kD',ArrowDown:'kD',KeyA:'kL',ArrowLeft:'kL',KeyD:'kR',ArrowRight:'kR',KeyT:'taunt'}[e.code];if(dk)pressMe(dk);
     const m={KeyR:'ult',KeyQ:'melee',KeyF:'parry',Digit1:'a1',Digit2:'a2',Digit3:'a3',Digit4:'a4',ShiftLeft:'dodge',ShiftRight:'dodge',KeyW:'jump',ArrowUp:'jump',Space:'jump',Numpad1:'a1',Numpad2:'a2',Numpad3:'a3',Numpad4:'a4'}[e.code];
-    if(m==='melee'&&(keys.KeyS||keys.ArrowDown))pressMe('slam');else if(m)pressMe(m);
+    if(m==='melee'&&(keys.KeyS||keys.ArrowDown))pressMe('slam');else if(m==='ult')pressMe(m,mouseWorld());else if(m)pressMe(m);
   }
 });
 addEventListener('keyup',e=>{keys[e.code]=false;});
@@ -128,3 +128,10 @@ $('#dlabel').addEventListener('click',()=>{G.diff=DIFFS[(DIFFS.indexOf(G.diff)+1
 applySet();mfBuild();
 $('#mute').addEventListener('click',toggleMute);
 document.addEventListener('pointerdown',()=>ac(),{once:true});
+
+/* mouse aim (The Lash's ultimate fires toward the cursor): cursor position -> point on the fight plane (z=0) */
+const MOUSE={nx:null,ny:null};
+addEventListener('mousemove',e=>{MOUSE.nx=e.clientX/innerWidth*2-1;MOUSE.ny=-(e.clientY/innerHeight)*2+1;});
+function mouseWorld(){if(MOUSE.nx===null)return null;cam.updateMatrixWorld();
+  const v=new THREE.Vector3(MOUSE.nx,MOUSE.ny,0.5).unproject(cam).sub(cam.position).normalize(),t=-cam.position.z/v.z;
+  return [Math.round((cam.position.x+v.x*t)*100)/100,Math.round((cam.position.y+v.y*t)*100)/100];}
