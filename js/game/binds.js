@@ -79,3 +79,23 @@ function hudKeys(){const ch=myChar(),k=(id,a)=>{const el=document.querySelector(
   const s=document.querySelector('#ab-s .k');k('q','melee');k('f','parry');k('1','a1');k('2','a2');k('3','a3');k('4','a4');k('s','dodge');k('r','ult');k('m','shot');if(s&&s.textContent==='SHIFT')s.textContent='⇧';}
 bindRender();
 $('#bReset').addEventListener('click',e=>{e.stopPropagation();bindReset();});
+
+/* ---- browser shortcuts vs the game ----
+   1. During a fight, stop Ctrl/Alt/Cmd shortcuts and the browser's use of game keys (Ctrl+D bookmark, Space scroll...).
+      Ctrl+W/T/N can't be stopped this way; only fullscreen keyboard lock (3) captures them.
+   2. Leaving mid-match asks first.
+   3. Fullscreen (F11 or the menu button) locks the keyboard in Chrome/Edge, so every key reaches the game.
+      Hold Esc to leave fullscreen. */
+addEventListener('keydown',e=>{
+  if(e.code==='F11'){e.preventDefault();toggleFullscreen();return;}
+  if(G.mode==='fight'&&(e.ctrlKey||e.metaKey||e.altKey||e.code==='Tab'||actionsFor(e.code).length))e.preventDefault();},true);
+addEventListener('keyup',e=>{if(G.mode==='fight'&&(e.code.startsWith('Alt')||e.code.startsWith('Control')))e.preventDefault();},true);
+addEventListener('beforeunload',e=>{if((G.mode==='fight'&&G.phase!=='done')||G.online){e.preventDefault();e.returnValue='';}});
+function fsOn(){return !!document.fullscreenElement;}
+function fsLabel(){$$('.fsLbl').forEach(el=>el.textContent=fsOn()?'ON':'OFF');}
+async function toggleFullscreen(){
+  try{if(fsOn())await document.exitFullscreen();
+    else{await document.documentElement.requestFullscreen({navigationUI:'hide'});if(navigator.keyboard&&navigator.keyboard.lock)await navigator.keyboard.lock();}}
+  catch(e){}fsLabel();}
+document.addEventListener('fullscreenchange',()=>{if(!fsOn()&&navigator.keyboard&&navigator.keyboard.unlock)navigator.keyboard.unlock();fsLabel();});
+fsLabel();

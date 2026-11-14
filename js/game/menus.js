@@ -83,6 +83,7 @@ function act(a){
     case 'set':applySet();openOvl('settings');break;
     case 'snd':SET.sound=SET.sound?0:1;applySet();saveSet();break;
     case 'vol':SET.vol=[1,0.75,0.5,0.25][([1,0.75,0.5,0.25].indexOf(SET.vol)+1)%4];applySet();saveSet();break;
+    case 'fs':toggleFullscreen();break;
     case 'shk':SET.shake=SET.shake?0:1;applySet();saveSet();break;
     case 'sback':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));closeOvl();setSel($$('#menu .mbtn'),4);break;
     case 'ctrl':$('#ctrlPanel').classList.toggle('on');$('#settings').classList.toggle('side',$('#ctrlPanel').classList.contains('on'));break;
