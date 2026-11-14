@@ -17,11 +17,16 @@ const SLIDE={MIN:0.03,STOP:0.015,DEC:0.005,DECV:0.01,MAX:0.46,BURST:0.17,LAND:0.
 /* Vish: SHOTGUN (left click / E) fires toward the mouse. 3 shells; damage falls off with distance. */
 const SHOT={RANGE:4.6,MAXD:120,MIND:25,CD:16,RELOAD_DELAY:40,RELOAD:70,SPREAD:0.18};
 function press(f,b){f.buf[b]=BUF;}
+// unit direction from (f.x, f.y+oy) toward the mouse (if it was aimed just now), otherwise toward the opponent
+function aimDir(f,o,oy=1.2){const aimed=f.uAimT!==undefined&&G.time-f.uAimT<40&&isFinite(f.uAX)&&isFinite(f.uAY);
+  const dx=(aimed?f.uAX:o.x)-f.x,dy=(aimed?f.uAY:o.y+1.0)-(f.y+oy),L=Math.hypot(dx,dy);return L<0.3?[f.facing,0]:[dx/L,dy/L];}
+const AIM_MOVES=new Set(['knife','burst','rult','jkick']);
 function take(f,b){if(f.buf[b]>0){f.buf[b]=0;return true;}return false;}
 const projectiles=[];
 let p1,p2;
 function startMove(f,name){
   const m=MOVES[name];f.state='attack';f.move=m;f.mname=name;f.mt=0;f.hasHit=false;f.lastRes='';f.atkId++;f.airMove=f.air();
+  if(AIM_MOVES.has(name)){[f.adx,f.ady]=aimDir(f,f===p1?p2:p1);if(name!=='burst'&&Math.abs(f.adx)>0.05)f.facing=Math.sign(f.adx);} // lock in the aim as the move starts
   if(name==='dash'){f.cd.dash=CD.dash;f.pass=true;}
   if(name==='shotgun')f.cd.shotgun=CD.shotgun;
   if(name==='kick')f.cd.kick=CD.kick;
@@ -40,7 +45,7 @@ function tryAbility(f){
   if(tryUlt(f))return true;
   const V=f.char==='vish';if(f.char==='rift'&&tryRift(f))return true;if(f.char==='jacob'&&tryJacob(f))return true;
   if(V&&f.buf.a1>0&&f.knives>0){f.buf.a1=0;const o=f===p1?p2:p1,d=(o.x-f.x)*f.facing;
-    if(d>0&&d<1.7&&Math.abs(o.y-f.y)<1.4&&o.state!=='ko')return startMove(f,'burst'); // point-blank: throw every stored knife
+    if(Math.abs(d)<1.7&&Math.abs(o.y-f.y)<1.4&&o.state!=='ko')return startMove(f,'burst'); // point-blank: throw every stored knife
     return startMove(f,'knife');}
   if(V&&f.buf.a2>0&&f.cd.dash<=0){f.buf.a2=0;return startMove(f,'dash');}
   if(V&&f.buf.a4>0&&f.cd.kick<=0){f.buf.a4=0;return startMove(f,'kick');}
@@ -141,7 +146,7 @@ function stepFighter(f,o){
   if(['idle','walkf','walkb','guard','jump','land','slide'].includes(f.state))f.comboTaken=0;
   if(f.char==='vish')tryShot(f,o);
   // always face the enemy, except mid-dash and mid-roll
-  if(!(G.time-(f.heldT||-9)<=1)&&!(f.state==='attack'&&(f.mname==='dash'||f.mname==='jkick'||f.mname==='lunge'))&&f.state!=='dodge'&&f.state!=='slide'&&!(f.shotT>0)&&f.state!=='ghold'&&f.state!=='hold'&&!['kd','ko','intro','victory'].includes(f.state)&&Math.abs(o.x-f.x)>0.08)f.facing=o.x>=f.x?1:-1;
+  if(!(G.time-(f.heldT||-9)<=1)&&!(f.state==='attack'&&(f.mname==='dash'||f.mname==='jkick'||f.mname==='lunge'||f.mname==='rult'||f.mname==='knife'))&&f.state!=='dodge'&&f.state!=='slide'&&!(f.shotT>0)&&f.state!=='ghold'&&f.state!=='hold'&&!['kd','ko','intro','victory'].includes(f.state)&&Math.abs(o.x-f.x)>0.08)f.facing=o.x>=f.x?1:-1;
   switch(f.state){
     case 'idle':case 'walkf':case 'walkb':case 'guard':{f.jumps=0;f.airUsed=false;f.lightChain=0;
       if(tryAbility(f)||tryMelee(f))break;
@@ -203,7 +208,7 @@ function stepFighter(f,o){
   if(f.state==='attack'&&f.mname==='zip'&&f.mt<=27&&!f.hasHit){f.vy=clamp((o.y-f.y)*0.3,-0.3,0.3)+GRAV;if(f.y<=0&&f.vy<=GRAV)f.vy=0;}
   else if(f.state==='attack'&&f.mname==='jslam'){if(f.mt>f.move.startup)f.vy=-0.45;}
   else if(f.state==='attack'&&f.airMove&&f.mname==='slam'){if(f.mt<=f.move.startup)f.vy=Math.max(f.vy,0)*0.5;else f.vy=-0.38;}
-  else if(f.state==='attack'&&f.airMove&&f.mname!=='air'&&f.mt<=f.move.startup+f.move.active)f.vy=0; // abilities hover briefly in the air
+  else if(f.state==='attack'&&f.airMove&&f.mname!=='air'&&!f.move.aim&&f.mt<=f.move.startup+f.move.active)f.vy=0; // abilities hover briefly in the air
   // physics
   if(f.air())f.vy-=GRAV;
   f.x+=f.vx;f.y+=f.vy;
@@ -243,9 +248,11 @@ function stepFighter(f,o){
 }
 function runMove(f,o){
   const m=f.move;f.mt++;
-  if(m.vx&&f.mt<=m.startup+m.active)f.vx=f.facing*m.vx*(f.mt>m.startup?1:0.3);
-  if(f.char==='vish'&&f.mname==='dash'&&f.inp.s&&f.mt===m.startup+m.active&&!f.air()){f.move=null;f.state='slide';f.mt=0;f.vx=f.facing*m.vx;dust(f.x,8);return;} // dash-slide: keep the dash speed
+  if(m.vx&&f.mt<=m.startup+m.active){const k=f.mt>m.startup?1:0.3;
+    if(m.aim){f.vx=f.adx*m.vx*k;f.vy=f.ady*m.vx*k;if(f.y<=0&&f.vy<0)f.vy=0;} // dash toward where you aimed
+    else f.vx=f.facing*m.vx*k;}
   else if(!f.air())f.vx*=0.55;
+  if(f.char==='vish'&&f.mname==='dash'&&f.inp.s&&f.mt===m.startup+m.active&&!f.air()){f.move=null;f.state='slide';f.mt=0;f.vx=f.facing*m.vx;dust(f.x,8);return;} // dash-slide: keep the dash speed
   if(f.mt===Math.max(1,m.startup-3)&&(m.trail||m.melee))sfx.whoosh();
   if(m.trail&&f.mt===m.startup+1)trail(f,f.mname==='dash'||(m.heavy&&f.chargeLvl>0.5));
   if(m.proj&&f.mt===m.startup)spawnKnife(f);
@@ -258,7 +265,7 @@ function runMove(f,o){
       const h=overlap(f,o,{reach:[-0.2,2.0],y:[-0.2,2.2]});
       if(h)applyHit(f,o,{dmg:35*n,hitstun:18+4*n,push:0.035,impact:1,shake:0.1+0.04*n},h.x,h.y);
       if(h)callout(f,n+'× KNIVES','#ffcc33');}
-    if(f.mt===m.startup+2){f.move=null;f.state='jump';f.vy=0.17;f.vx=-f.facing*0.12;f.jumps=1;f.airUsed=false;f.flip=0;dust(f.x,6);sfx.jump();return;}
+    if(f.mt===m.startup+2){f.move=null;f.state='jump';f.vx=-f.adx*0.2;f.vy=f.air()?-f.ady*0.24:Math.max(0.07,-f.ady*0.24);/* pushed away from where you aimed */f.jumps=1;f.airUsed=false;f.flip=0;dust(f.x,6);sfx.jump();return;}
   }
   if(f.mname==='shotgun'&&f.mt===m.startup)shotgunFx(f);
   if(f.mname==='dash'&&f.mt>m.startup&&f.mt%2===0)afterimage(f);
@@ -276,8 +283,9 @@ function spawnKnife(f){
   const fr=SPR.knifeproj[0];
   const g=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({map:TEX[f.idx].knifeproj[0],transparent:true,depthWrite:false,fog:false}));
   g.renderOrder=5;g.scale.set(fr.w*SPRK*1.1*f.facing,fr.h*SPRK*1.1,1);
-  const p={x:f.x+f.facing*0.9,y:f.y+1.25,vx:f.facing*0.33,owner:f,mesh:g,life:52,noSpin:1};
-  g.position.set(p.x,p.y,0.2);scene.add(g);projectiles.push(p);sfx.whoosh();
+  const dx=f.adx??f.facing,dy=f.ady??0;
+  const p={x:f.x+dx*0.9,y:f.y+1.25+dy*0.9,vx:dx*0.33,vy:dy*0.33,owner:f,mesh:g,life:52,noSpin:1};
+  g.rotation.z=(Math.sign(dx)||1)*Math.atan2(dy,Math.abs(dx));g.position.set(p.x,p.y,0.2);scene.add(g);projectiles.push(p);sfx.whoosh();
 }
 function burstKnife(f,o,i){
   const fr=SPR.knifeproj[0];
@@ -330,8 +338,8 @@ function afterimage(f){const sp=f.spr;if(!sp.material.map)return;
 function stars(f){for(let i=0;i<3;i++){const m=new THREE.Mesh(sparkGeo,new THREE.MeshBasicMaterial({color:0xffdd55,transparent:true,blending:THREE.AdditiveBlending,depthWrite:false}));
   const a0=i*2.1;m.scale.set(0.09,0.09,1);addFx(m,16,(mm,k)=>{const a=a0+G.time*0.15;mm.position.set(f.x+Math.cos(a)*0.3,f.y+2.05+Math.sin(a)*0.06,0.3+Math.sin(a)*0.3);mm.material.opacity=k;});}}
 function updProj(){
-  for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.x+=p.vx;p.life--;p.mesh.position.set(p.x,p.y,0.2);if(!p.noSpin)p.mesh.rotation.z-=0.55*Math.sign(p.vx);
-    const o=p.owner===p1?p2:p1;let dead=p.life<=0||Math.abs(p.x)>STAGE+3;
+  for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.x+=p.vx;p.y+=p.vy||0;p.life--;p.mesh.position.set(p.x,p.y,0.2);if(!p.noSpin)p.mesh.rotation.z-=0.55*Math.sign(p.vx);
+    const o=p.owner===p1?p2:p1;let dead=p.life<=0||Math.abs(p.x)>STAGE+3||p.y<0.05||p.y>16;if(p.y<0.05)dust(p.x,3);
     for(const q of projectiles)if(q!==p&&q.owner!==p.owner&&Math.abs(q.x-p.x)<0.4){dead=true;q.life=0;spark(p.x,p.y,0xffffff,14,0.12);sfx.block();}
     if(!dead&&Math.abs(p.x-o.x)<0.42&&p.y>o.y&&p.y<o.y+1.8&&o.invuln<=0&&o.state!=='ko'){
       if(p.hook){p.owner.hookOn=60;o.hp=Math.max(1,o.hp-15);o.lastHitT=G.time;spark(p.x,p.y,0xffffff,8,0.1);sfx.block();}

@@ -3,7 +3,7 @@
 const G={mode:'menu',diff:'NORMAL',paused:false,time:0,phase:'intro',pt:0,round:1,wins:[0,0],timer:99*60,hitstop:0,freeze:0,shake:0,koBy:null,p1char:'vish',p2char:'vish'};
 const CHARS={vish:{name:'VISH',ab:['KNIFE','RUSH','SLIDE','KICK'],desc:'1 Throwing knife · 2 Dash · 3 Slide (hold) · 4 Spike kick · Click Shotgun'},jacob:{name:'THE LASH',ab:['HOOK','SLAM','UPPER','KICK'],desc:'1 Grapple hook: then 1 again zip in, W launch above, S pull them · 2 Slam · 3 Uppercut · 4 Kick off · T taunt'},rift:{name:'RIFT',ab:['SLASH','BLINK','GRAB','LUNGE'],desc:'1 Big slash · 2 Teleport behind (2nd use pushes) · 3 Grab and hold, then S slam, A/D throw, W toss up · 4 Lunge grab'}};
 const keys={};
-function readPlayer(){p1.inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ,s:+!!(keys.Digit3||keys.Numpad3)};if(G.phase!=='fight'){p1.inp={l:0,r:0,u:0,d:0,q:0};p1.buf={};}}
+function readPlayer(){p1.inp=readHeld();if(G.phase!=='fight'){p1.inp={l:0,r:0,u:0,d:0,q:0};p1.buf={};}}
 function callout(f,txt,col){const el=$('#call'+(f.idx+1));el.innerHTML='<b style="color:'+col+'">'+txt+'</b>';el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),900);}
 function splash(html,dur=1.2){const s=$('#splash');s.innerHTML=html;s.classList.remove('show');void s.offsetWidth;s.style.setProperty('--d',dur+'s');s.classList.add('show');}
 function flash(a){const f=$('#flash');f.style.transition='none';f.style.opacity=a;void f.offsetWidth;f.style.transition='opacity .35s';f.style.opacity=0;}
@@ -14,7 +14,7 @@ function showCombo(a,n,dmg){if(n===undefined)n=a.combo;if(n<2)return;const el=$(
   el.classList.toggle('hot',n>=5);el.classList.toggle('fire',n>=9);el.classList.add('on');el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1400);}
 function KO(a,d){if(G.training){d.hp=1;return;}if(G.phase!=='fight')return;G.phase='ko';G.pt=0;G.koBy=a;G.wins[a.idx]++;d.state='airhit';sfx.ko();flash(0.6);splash('K.O.<span class="u"></span>',2.2);G.hitstop=20;}
-function hudSetup(){const me=G.me||p1;$('#ab-m').style.display=me.char==='vish'?'':'none';CHARS[me.char].ab.forEach((n,i)=>$('#ab-'+(i+1)+' .n').textContent=n);$('#ab-1 .pips').style.display=me.char==='rift'?'none':'';$('#ab-2').classList.remove('charging');}
+function hudSetup(){const me=G.me||p1;hudKeys();$('#ab-m').style.display=me.char==='vish'?'':'none';CHARS[me.char].ab.forEach((n,i)=>$('#ab-'+(i+1)+' .n').textContent=n);$('#ab-1 .pips').style.display=me.char==='rift'?'none':'';$('#ab-2').classList.remove('charging');}
 function startMatch(){setArena(0);p1.char=G.p1char;p2.char=G.p2char;hudSetup();G.wins=[0,0];G.round=1;p1.tension=p2.tension=0;startRound();}
 function startRound(){
   $('#cutin').classList.remove('on');

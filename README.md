@@ -26,6 +26,7 @@ Then open http://localhost:3000. Open it in two tabs and pick **Online** in both
 | `js/game/game.js` | Rounds, match flow, camera, main tick |
 | `js/game/online.js` | Online sync (host streams state, guest sends inputs) |
 | `js/game/menus.js` | Menus, character select, input handling |
+| `js/game/binds.js` | Rebindable keys (General + per-fighter tabs), mouse buttons, HUD key labels |
 | `js/game/audio.js`, `stage.js`, `fx.js`, `viewer.js`, `loop.js` | Sound, arena, effects, character viewer, frame loop |
 | `js/data/` | Sprite frames and HUD portraits (generated, large) |
 | `js/lib/three.min.js` | Three.js r128 |

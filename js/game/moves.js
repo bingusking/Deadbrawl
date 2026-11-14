@@ -65,7 +65,7 @@ Object.assign(MOVES,{
   zip:{base:'stance',impact:1,startup:1,active:26,recovery:20,dmg:70,vx:0.42,reach:[-0.1,1.0],y:[-0.6,2.2],shake:0.16,react:(a,d,dir)=>{d.state=d.air()?'airhit':'hitstun';d.stun=24;d.vx=dir*0.14;if(d.air())d.vy=0.1;a.vx=0;a.vy=0;a.mt=27;}},
   jslam:{base:'stance',impact:1,startup:10,active:60,recovery:8,dmg:80,reach:[-1.1,1.1],y:[-0.9,1.2],soft:1,launch:0.17,kb:0.02,shake:0.2},
   jupper:{base:'stance',impact:1,startup:9,active:5,recovery:22,dmg:90,reach:[0,1.35],y:[0,2.5],kd:1,launch:0.27,kb:0.13,shake:0.2},
-  jkick:{base:'stance',impact:1,startup:5,active:10,recovery:14,vx:0.24,dmg:50,reach:[0,1.35],y:[-0.2,2.0],shake:0.12,react:(a,d,dir)=>{d.state='hitstun';d.stun=14;d.vx=dir*0.4;a.move=null;a.state='jump';a.vy=0.13;a.vx=-dir*0.22;a.jumps=Math.max(a.jumps,1);a.flip=0;}}
+  jkick:{base:'stance',aim:1,impact:1,startup:5,active:10,recovery:14,vx:0.24,dmg:50,reach:[0,1.35],y:[-0.2,2.0],shake:0.12,react:(a,d,dir)=>{d.state='hitstun';d.stun=14;d.vx=dir*0.4;a.move=null;a.state='jump';a.vy=0.13;a.vx=-dir*0.22;a.jumps=Math.max(a.jumps,1);a.flip=0;}}
 });
 const JHOOK_REGEN=240;
 function tryJacob(f){

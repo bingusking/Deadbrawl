@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-14)
 
 ## Corpus Check
-- 24 files · ~8,839 words
+- 25 files · ~9,219 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 295 nodes · 444 edges · 20 communities (17 shown, 3 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 26 edges (avg confidence: 0.86)
+- 316 nodes · 479 edges · 21 communities (18 shown, 3 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 26 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `20af0ee0`
+- Built from commit: `62de602d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -31,6 +31,7 @@
 - animation.js
 - audio.js
 - ai.js
+- binds.js
 - viewer.js
 - loop.js
 - stage.js
@@ -42,24 +43,24 @@
 3. `stepFighter()` - 10 edges
 4. `buildRig()` - 9 edges
 5. `services` - 8 edges
-6. `goOnline()` - 7 edges
-7. `applyHit()` - 6 edges
-8. `netLost()` - 6 edges
-9. `cvShow()` - 6 edges
-10. `riftUltTick()` - 6 edges
+6. `bindRender()` - 7 edges
+7. `goOnline()` - 7 edges
+8. `startMove()` - 6 edges
+9. `applyHit()` - 6 edges
+10. `netLost()` - 6 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/sprites.js
-- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/sprites.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (20 total, 3 thin omitted)
+## Communities (21 total, 3 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -74,8 +75,8 @@ Cohesion: 0.12
 Nodes (28): addFx(), dust(), dustGeo, fx, muzzleFlash(), spark(), sparkGeo, trail() (+20 more)
 
 ### Community 3 - "fighters.js"
-Cohesion: 0.16
-Nodes (22): afterimage(), applyHit(), burstKnife(), canBlock(), overlap(), projectiles, runMove(), SHOT (+14 more)
+Cohesion: 0.15
+Nodes (24): afterimage(), AIM_MOVES, aimDir(), applyHit(), burstKnife(), canBlock(), overlap(), projectiles (+16 more)
 
 ### Community 4 - "server.js"
 Cohesion: 0.11
@@ -117,6 +118,10 @@ Nodes (4): ac(), noise(), sfx, tone()
 Cohesion: 0.67
 Nodes (3): aiCore(), aiThink(), DIFF
 
+### Community 15 - "binds.js"
+Cohesion: 0.18
+Nodes (18): actionsFor(), AIMED, BIND_ALT, BIND_DEF, BIND_LBL, BIND_TABS, bindOf(), bindRender() (+10 more)
+
 ### Community 16 - "viewer.js"
 Cohesion: 0.26
 Nodes (9): CVDATA, cvInit(), CVMETA, cvName(), cvNav(), cvPlace(), cvShow(), cvStep() (+1 more)
@@ -136,7 +141,7 @@ Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `splash()` connect `game.js` to `online.js`?**
@@ -147,5 +152,5 @@ _Questions this graph is uniquely positioned to answer:_
   _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
-- **Should `server.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._
+- **Should `fighters.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.14814814814814814 - nodes in this community are weakly interconnected._

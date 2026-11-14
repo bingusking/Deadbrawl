@@ -79,13 +79,13 @@ function act(a){
     case 'train':G.training=true;toSelect();break;
     case 'fight':toFight();break;
     case 'diff':{const i=(DIFFS.indexOf(G.diff)+1)%3;G.diff=DIFFS[i];$('#dlabel').textContent=G.diff;break;}
-    case 'char':$('#ctrlPanel').classList.remove('on');toViewer();break;
+    case 'char':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));toViewer();break;
     case 'set':applySet();openOvl('settings');break;
     case 'snd':SET.sound=SET.sound?0:1;applySet();saveSet();break;
     case 'vol':SET.vol=[1,0.75,0.5,0.25][([1,0.75,0.5,0.25].indexOf(SET.vol)+1)%4];applySet();saveSet();break;
     case 'shk':SET.shake=SET.shake?0:1;applySet();saveSet();break;
-    case 'sback':$('#ctrlPanel').classList.remove('on');closeOvl();setSel($$('#menu .mbtn'),4);break;
-    case 'ctrl':$('#ctrlPanel').classList.toggle('on');break;
+    case 'sback':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));closeOvl();setSel($$('#menu .mbtn'),4);break;
+    case 'ctrl':$('#ctrlPanel').classList.toggle('on');$('#settings').classList.toggle('side',$('#ctrlPanel').classList.contains('on'));break;
     case 'resume':G.paused=false;closeOvl();break;
     case 'restart':if(G.online){closeOvl();break;}G.paused=false;closeOvl();startMatch();break;
     case 'rematch':closeOvl();startMatch();break;
@@ -104,8 +104,8 @@ addEventListener('keydown',e=>{
     else if(e.code==='KeyS'||e.code==='ArrowDown'){setSel(list,(i+1)%list.length);sfx.sel();}
     else if((e.code==='Enter'||e.code==='KeyJ'||e.code==='Space')&&!e.repeat){act(list[Math.max(0,i)].dataset.a);}
     else if(e.code==='Escape'&&ovl==='pause'){act('resume');}
-    else if(e.code==='Escape'&&ovl==='settings'){if($('#ctrlPanel').classList.contains('on'))$('#ctrlPanel').classList.remove('on');else act('sback');}
-    else if(e.code==='Escape'&&G.mode==='menu'){$('#ctrlPanel').classList.remove('on');}
+    else if(e.code==='Escape'&&ovl==='settings'){if($('#ctrlPanel').classList.contains('on'))($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));else act('sback');}
+    else if(e.code==='Escape'&&G.mode==='menu'){($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));}
     return;
   }
   if(G.mode==='onl'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();toMenu();}return;}
@@ -116,10 +116,7 @@ addEventListener('keydown',e=>{
     if(e.code==='Escape'){if(G.phase!=='done'){if(!G.online)G.paused=true;openOvl('pause');}return;}
     keys[e.code]=true;
     if(e.repeat||G.phase!=='fight')return;
-    const dk={KeyW:'kU',ArrowUp:'kU',KeyS:'kD',ArrowDown:'kD',KeyA:'kL',ArrowLeft:'kL',KeyD:'kR',ArrowRight:'kR',KeyT:'taunt'}[e.code];if(dk)pressMe(dk);
-    const m={KeyR:'ult',KeyQ:'melee',KeyF:'parry',Digit1:'a1',Digit2:'a2',Digit3:'a3',Digit4:'a4',ShiftLeft:'dodge',ShiftRight:'dodge',KeyW:'jump',ArrowUp:'jump',Space:'jump',Numpad1:'a1',Numpad2:'a2',Numpad3:'a3',Numpad4:'a4'}[e.code];
-    if(e.code==='KeyE')pressMe('shot',mouseWorld());
-    if(m==='melee'&&(keys.KeyS||keys.ArrowDown))pressMe('slam');else if(m==='ult')pressMe(m,mouseWorld());else if(m)pressMe(m);
+    fightPress(e.code); // keybinds.js maps the key to actions for your fighter
   }
 });
 addEventListener('keyup',e=>{keys[e.code]=false;});
@@ -132,7 +129,6 @@ document.addEventListener('pointerdown',()=>ac(),{once:true});
 
 /* mouse aim (The Lash's ultimate fires toward the cursor): cursor position -> point on the fight plane (z=0) */
 const MOUSE={nx:null,ny:null};
-addEventListener('mousedown',e=>{if(e.button===0&&G.mode==='fight'&&G.phase==='fight'&&!G.paused&&e.target.tagName==='CANVAS')pressMe('shot',mouseWorld());}); // Vish's shotgun
 addEventListener('mousemove',e=>{MOUSE.nx=e.clientX/innerWidth*2-1;MOUSE.ny=-(e.clientY/innerHeight)*2+1;});
 function mouseWorld(){if(MOUSE.nx===null)return null;cam.updateMatrixWorld();
   const v=new THREE.Vector3(MOUSE.nx,MOUSE.ny,0.5).unproject(cam).sub(cam.position).normalize(),t=-cam.position.z/v.z;

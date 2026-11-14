@@ -79,7 +79,7 @@ function guestTick(){
     if(g.arena!==undefined&&g.arena!==arenaIdx)ORIG.setArena(g.arena); // in case the arena-change event was in a skipped snapshot
   }else G.time++;
   if(!(G.introHold>0))$('#cintro').classList.remove('on');
-  const inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ,s:+!!(keys.Digit3||keys.Numpad3)};
+  const inp=readHeld();
   const js=JSON.stringify(inp);if(js!==G.lastIn){G.lastIn=js;netGame({i:inp});}
   const ep=embers.geometry.attributes.position;for(let i=0;i<ep.count;i++){let y=ep.getY(i)+0.012;if(y>14)y=0;ep.setY(i,y);}ep.needsUpdate=true;
   updFx();animFighter(p1,p2);animFighter(p2,p1);

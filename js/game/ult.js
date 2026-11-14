@@ -9,7 +9,7 @@ const ULTS={rift:{name:'PHANTOM RUSH'}}; // fighters without an entry show ULT a
    rising in a zig-zag (N hits), then blink above them and slam them into the floor. */
 // N hits, L frames each; HIT_FREEZE / SLAM_FREEZE = impact freeze frames; SWAY = how far each punch knocks them sideways (zig-zag is 2x SWAY wide)
 const RU={N:5,L:13,DMG:28,SLAM:70,KICK:30,HIT_FREEZE:10,SLAM_FREEZE:20,RISE:0.72,SWAY:2.25};
-MOVES.rult={base:'stance',startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[0,0.75],y:[0,2.0],grab:1,shake:0.15,
+MOVES.rult={base:'stance',aim:1,startup:10,active:14,recovery:24,vx:0.34,dmg:1,reach:[0,0.75],y:[0,2.0],grab:1,shake:0.15,
   react:(a,d)=>riftUltStart(a,d)};
 
 function tryUlt(f){

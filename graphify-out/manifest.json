@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "js/game/fighters.js": {
-    "mtime": 1794649867.5857635,
-    "seen": 1794650061.128475,
-    "ast_hash": "b13bf32a66899000fcb9ee77008b57a5",
+    "mtime": 1794650843.9643745,
+    "seen": 1794651143.7788649,
+    "ast_hash": "849d1ba53f6dba78c22abb6e6ebf0120",
     "semantic_hash": ""
   },
   "js/game/fx.js": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794649951.4492433,
-    "seen": 1794650061.128478,
-    "ast_hash": "00654a48418b6c745325c07f49a47172",
+    "mtime": 1794650765.429098,
+    "seen": 1794651143.778867,
+    "ast_hash": "3fe1714f033496980bcd237acf4ff152",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
@@ -48,21 +48,21 @@
     "semantic_hash": ""
   },
   "js/game/menus.js": {
-    "mtime": 1794649754.7009027,
-    "seen": 1794650061.1284802,
-    "ast_hash": "ee240b2c4e7a3a54f587c651f01e3674",
+    "mtime": 1794651005.6621315,
+    "seen": 1794651143.7788692,
+    "ast_hash": "52fd78a801c12e83abdd04b916b5e34e",
     "semantic_hash": ""
   },
   "js/game/moves.js": {
-    "mtime": 1794646905.4265785,
-    "seen": 1794647304.4069824,
-    "ast_hash": "dc6c75dbd51399ee0d1d5b2d42f44c58",
+    "mtime": 1794650827.399701,
+    "seen": 1794651143.7788706,
+    "ast_hash": "a99d95f1e4e8c179862eca29a5a0176d",
     "semantic_hash": ""
   },
   "js/game/online.js": {
-    "mtime": 1794649754.6998792,
-    "seen": 1794650061.1284833,
-    "ast_hash": "aa1b925b9c72ff4b58200ab817be244b",
+    "mtime": 1794650765.4292467,
+    "seen": 1794651143.7788715,
+    "ast_hash": "479625c36d34022c65ed375f35b2e79f",
     "semantic_hash": ""
   },
   "js/game/sprites.js": {
@@ -102,15 +102,15 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794552815.4727886,
-    "seen": 1794552818.8487387,
-    "ast_hash": "7b9ad55df90ba0fe03ae1c4758bd6c8b",
+    "mtime": 1794651142.2200456,
+    "seen": 1794651143.7788832,
+    "ast_hash": "2679a7922b7bf9ce3d4d779fc6fb62bb",
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794649925.3575127,
-    "seen": 1794650061.128498,
-    "ast_hash": "dd2f9e1bd0be8f46426bca7851a41fb9",
+    "mtime": 1794651044.0641897,
+    "seen": 1794651143.7788842,
+    "ast_hash": "18c23e710829b3b1d648ac4e3e0d983f",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
@@ -144,9 +144,15 @@
     "semantic_hash": ""
   },
   "js/game/ult.js": {
-    "mtime": 1794648380.7196095,
-    "seen": 1794648522.248707,
-    "ast_hash": "45f58908996f94dade9a7ae33c3461c7",
+    "mtime": 1794650827.3998876,
+    "seen": 1794651143.7788744,
+    "ast_hash": "291f62cef0993d9f76ba8dca01007f33",
+    "semantic_hash": ""
+  },
+  "js/game/binds.js": {
+    "mtime": 1794650765.4293969,
+    "seen": 1794651143.7788615,
+    "ast_hash": "3d5feddc4672917ae4f9b4976faa9850",
     "semantic_hash": ""
   },
   "package-lock.json": {
