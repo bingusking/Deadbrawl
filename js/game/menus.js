@@ -118,6 +118,7 @@ addEventListener('keydown',e=>{
     if(e.repeat||G.phase!=='fight')return;
     const dk={KeyW:'kU',ArrowUp:'kU',KeyS:'kD',ArrowDown:'kD',KeyA:'kL',ArrowLeft:'kL',KeyD:'kR',ArrowRight:'kR',KeyT:'taunt'}[e.code];if(dk)pressMe(dk);
     const m={KeyR:'ult',KeyQ:'melee',KeyF:'parry',Digit1:'a1',Digit2:'a2',Digit3:'a3',Digit4:'a4',ShiftLeft:'dodge',ShiftRight:'dodge',KeyW:'jump',ArrowUp:'jump',Space:'jump',Numpad1:'a1',Numpad2:'a2',Numpad3:'a3',Numpad4:'a4'}[e.code];
+    if(e.code==='KeyE')pressMe('shot',mouseWorld());
     if(m==='melee'&&(keys.KeyS||keys.ArrowDown))pressMe('slam');else if(m==='ult')pressMe(m,mouseWorld());else if(m)pressMe(m);
   }
 });
@@ -131,6 +132,7 @@ document.addEventListener('pointerdown',()=>ac(),{once:true});
 
 /* mouse aim (The Lash's ultimate fires toward the cursor): cursor position -> point on the fight plane (z=0) */
 const MOUSE={nx:null,ny:null};
+addEventListener('mousedown',e=>{if(e.button===0&&G.mode==='fight'&&G.phase==='fight'&&!G.paused&&e.target.tagName==='CANVAS')pressMe('shot',mouseWorld());}); // Vish's shotgun
 addEventListener('mousemove',e=>{MOUSE.nx=e.clientX/innerWidth*2-1;MOUSE.ny=-(e.clientY/innerHeight)*2+1;});
 function mouseWorld(){if(MOUSE.nx===null)return null;cam.updateMatrixWorld();
   const v=new THREE.Vector3(MOUSE.nx,MOUSE.ny,0.5).unproject(cam).sub(cam.position).normalize(),t=-cam.position.z/v.z;

@@ -53,7 +53,7 @@ function netEnc(v){return v instanceof Fighter?{__f:v.idx}:v;}
 function netDec(v){return v&&typeof v==='object'&&v.__f!==undefined?[p1,p2][v.__f]:v;}
 function netWrap(name,fn){ORIG[name]=fn;return function(...a){if(G.online&&G.online.role==='host')G.netEv.push([name,a.map(netEnc)]);return fn.apply(this,a);};}
 spark=netWrap('spark',spark);trail=netWrap('trail',trail);dust=netWrap('dust',dust);flash=netWrap('flash',flash);splash=netWrap('splash',splash);
-callout=netWrap('callout',callout);showCombo=netWrap('showCombo',showCombo);cutin=netWrap('cutin',cutin);shotgunFx=netWrap('shotgunFx',shotgunFx);
+callout=netWrap('callout',callout);showCombo=netWrap('showCombo',showCombo);cutin=netWrap('cutin',cutin);shotgunFx=netWrap('shotgunFx',shotgunFx);shotFx=netWrap('shotFx',shotFx);
 afterimage=netWrap('afterimage',afterimage);burstKnife=netWrap('burstKnife',burstKnife);muzzleFlash=netWrap('muzzleFlash',muzzleFlash);stars=netWrap('stars',stars);endMatch=netWrap('endMatch',endMatch);
 setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);
 for(const k in sfx){const fn=sfx[k];ORIG['sfx.'+k]=fn;sfx[k]=function(...a){if(G.online&&G.online.role==='host')G.netEv.push(['sfx.'+k,a]);return fn.apply(this,a);};}
@@ -79,7 +79,7 @@ function guestTick(){
     if(g.arena!==undefined&&g.arena!==arenaIdx)ORIG.setArena(g.arena); // in case the arena-change event was in a skipped snapshot
   }else G.time++;
   if(!(G.introHold>0))$('#cintro').classList.remove('on');
-  const inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ};
+  const inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ,s:+!!(keys.Digit3||keys.Numpad3)};
   const js=JSON.stringify(inp);if(js!==G.lastIn){G.lastIn=js;netGame({i:inp});}
   const ep=embers.geometry.attributes.position;for(let i=0;i<ep.count;i++){let y=ep.getY(i)+0.012;if(y>14)y=0;ep.setY(i,y);}ep.needsUpdate=true;
   updFx();animFighter(p1,p2);animFighter(p2,p1);

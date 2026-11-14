@@ -40,7 +40,7 @@ function aiCore(b,p){
   if(b.state==='attack'&&b.lastRes==='hit'&&A.cfor!==b.atkId){A.cfor=b.atkId;
     if(rnd()<D.combo){const nm=b.mname;
       if(nm==='light'&&b.lightChain<2)press(b,'melee');
-      else if(nm==='light'){if(b.cd.shotgun<=0)press(b,'a3');else if(b.cd.dash<=0)press(b,'a2');}
+      else if(nm==='light'){if(b.ammo>0)press(b,'shot');else if(b.cd.dash<=0)press(b,'a2');}
       else if(nm==='air'&&b.cd.kick<=0)A.kickWait=14;
       else if(nm==='knife'&&dist<2.2){press(b,'jump');A.airAtk=true;}}}
   if(A.kickWait>0&&--A.kickWait===0)press(b,'a4');
@@ -66,14 +66,14 @@ function aiCore(b,p){
     if(r<0.18*D.aggr){press(b,'jump');A.plan=10;A.dir=tw;A.airAtk=true;A.dj=rnd()<0.3;}
     else if(r<0.3&&b.cd.dash<=0)press(b,'a2');
     else if(r<0.4&&b.knives>0)press(b,'a1');
-    else if(r<0.5&&dist<2.3&&b.cd.shotgun<=0)press(b,'a3');
+    else if(r<0.5&&dist<2.3&&b.ammo>0)press(b,'shot');
     else if(r<0.58&&b.cd.dodge<=0){hold(tw);press(b,'dodge');}
     else{A.plan=10+(rnd()*10|0);A.dir=tw;}
   }else{
     if(rnd()<D.block*0.45){A.blockT=20+(rnd()*30|0);return;} // up close: sometimes just hold back and wait (guarding ahead of time)
     if(r<0.34*D.aggr)press(b,'melee');
     else if(r<0.48){press(b,'melee');A.holdQ=20+(rnd()*45|0);}
-    else if(r<0.6&&b.cd.shotgun<=0)press(b,'a3');
+    else if(r<0.6&&b.ammo>0)press(b,'shot');
     else if(r<0.64&&b.knives>=2)press(b,'a1');
     else if(r<0.66&&b.cd.kick<=0)press(b,'a4');
     else if(r<0.76&&b.cd.dodge<=0){hold(-tw);press(b,'dodge');}

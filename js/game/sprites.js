@@ -21,6 +21,7 @@ function makeSpriteMesh(order){
 }
 function spriteFrame(f){
   const t=G.time,st=f.st||0;
+  if(f.shotT>0&&['idle','walkf','walkb','guard','jump','slide','land'].includes(f.state))return ['shotgun',f.shotT>7?2:3,'aim']; // fired toward the mouse
   switch(f.state){
     case 'intro':case 'idle':return ['idle',Math.floor(t/7+f.idx*3)%SPR.idle.length];
     case 'victory':return ['vish_win',Math.min(4,Math.floor(st/12))]; // plays once, holds the last pose
@@ -31,6 +32,7 @@ function spriteFrame(f){
       if(st<6&&f.vy>0.12)return [J,1];
       return [J,f.vy>0.05?2:f.vy>-0.07?3:4];}
     case 'land':return ['vish_jump2',0];
+    case 'slide':return ['dash',5];
     case 'wakeup':return st<7?['vish_jump2',0]:['idle',0];
     case 'dodge':return [f.dodgeDir===f.facing?'roll':'dodgeb',1+Math.min(4,Math.floor(f.mt/5))];
     case 'charge':return ['vish_heavy2',0];
@@ -79,6 +81,7 @@ function drawSprite(f){
   let rot=0,px=f.x+(fr.w/2-fr.ax)*K*fc,py=f.y+(fr.ay-fr.h/2)*K;
   if(mode==='down'){rot=fc*Math.PI/2*0.96;px=f.x-fc*h*0.15;py=f.y+w*0.5-0.08;}
   else if(mode==='tumble'){rot=fc*clamp(0.5-f.vy*4,-0.2,1.3);py=f.y+h*0.5;}
+  else if(mode==='aim')rot=fc*f.shotA*0.75; // tilt the gun toward where the shot went
   else if(mode==='flip'){rot=-fc*Math.PI*2*(1-f.flip/24);py=f.y+h*0.5;px=f.x;}
   else if(f.state==='stun'&&!(G.time-(f.heldT||-9)<=1))rot=Math.sin(G.time*0.15)*0.06;
   m.rotation.z=rot;m.position.set(px,py,0.05+f.idx*0.01);
