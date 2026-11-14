@@ -139,6 +139,7 @@ function stepFighter(f,o){
   f.t++;
   if(f.state==='rult'){riftUltTick(f,o);return;} // the ultimates drive both fighters' positions
   if(f.state==='jult'){lashUltTick(f,o);return;}
+  if(f.state==='vult'){vishUltTick(f,o);return;}
   if(f.state==='jfire'){lashFireTick(f,o);return;}
   if(f.state==='ultd'){f.vx=f.vy=0;return;}
   const wasAir=f.air();
@@ -176,7 +177,7 @@ function stepFighter(f,o){
       if(tryAbility(f)||tryMelee(f))break;
       if(take(f,'jump')){f.state='jump';f.vy=JUMPV;f.jumps=1;f.flip=0;sfx.jump();dust(f.x,6);break;} // slide-jump keeps the momentum
       const s=Math.sign(f.vx),v=Math.abs(f.vx);
-      if(!f.inp.s||v<SLIDE.STOP||(Math.abs(f.x)>=STAGE-0.01&&Math.sign(f.x)===s)){f.state='idle';f.vx*=0.5;break;}
+      if(!f.inp.s||v<SLIDE.STOP||((s>0&&f.x>=BR-0.01)||(s<0&&f.x<=BL+0.01))){f.state='idle';f.vx*=0.5;break;}
       f.vx=s*Math.max(0,v-(SLIDE.DEC+SLIDE.DECV*v));
       if(G.time%3===0)dust(f.x-s*0.3,v>0.2?2:1);
       break;}
@@ -244,7 +245,12 @@ function stepFighter(f,o){
   }
   if(f.state==='airhit'){f.airT=(f.airT||0)+1;if(f.airT>300&&f.vy>-0.05)f.vy=-0.1;}else f.airT=0;
   if(f.invuln>40&&f.state!=='dodge')f.invuln=0;
-  f.x=clamp(f.x,-STAGE,STAGE);
+  // The Ring: get knocked into the ropes and you bounce back off them
+  if(ARENAS[arenaIdx].ropes&&(f.x<BL||f.x>BR)&&(f.state==='airhit'||f.state==='hitstun')&&Math.abs(f.vx)>0.06){
+    const s=Math.sign(f.x);f.x=s>0?BR:BL;f.vx=-s*Math.max(0.17,Math.abs(f.vx)*1.1);
+    if(f.state==='hitstun'){f.state='airhit';f.y=Math.max(f.y,0.02);f.vy=0.1;}else f.vy=Math.max(f.vy,0.12);
+    spark(f.x+s*0.5,f.y+1.1,0xfff0d0,10,0.1,0.12);sfx.block();G.shake=Math.max(G.shake,0.1);callout(f,'ROPES!','#e8e0d0');}
+  f.x=clamp(f.x,BL,BR);
 }
 function runMove(f,o){
   const m=f.move;f.mt++;
@@ -339,7 +345,7 @@ function stars(f){for(let i=0;i<3;i++){const m=new THREE.Mesh(sparkGeo,new THREE
   const a0=i*2.1;m.scale.set(0.09,0.09,1);addFx(m,16,(mm,k)=>{const a=a0+G.time*0.15;mm.position.set(f.x+Math.cos(a)*0.3,f.y+2.05+Math.sin(a)*0.06,0.3+Math.sin(a)*0.3);mm.material.opacity=k;});}}
 function updProj(){
   for(let i=projectiles.length-1;i>=0;i--){const p=projectiles[i];p.x+=p.vx;p.y+=p.vy||0;p.life--;p.mesh.position.set(p.x,p.y,0.2);if(!p.noSpin)p.mesh.rotation.z-=0.55*Math.sign(p.vx);
-    const o=p.owner===p1?p2:p1;let dead=p.life<=0||Math.abs(p.x)>STAGE+3||p.y<0.05||p.y>16;if(p.y<0.05)dust(p.x,3);
+    const o=p.owner===p1?p2:p1;let dead=p.life<=0||p.x<BL-3||p.x>BR+3||p.y<0.05||p.y>16;if(p.y<0.05)dust(p.x,3);
     for(const q of projectiles)if(q!==p&&q.owner!==p.owner&&Math.abs(q.x-p.x)<0.4){dead=true;q.life=0;spark(p.x,p.y,0xffffff,14,0.12);sfx.block();}
     if(!dead&&Math.abs(p.x-o.x)<0.42&&p.y>o.y&&p.y<o.y+1.8&&o.invuln<=0&&o.state!=='ko'){
       if(p.hook){p.owner.hookOn=60;o.hp=Math.max(1,o.hp-15);o.lastHitT=G.time;spark(p.x,p.y,0xffffff,8,0.1);sfx.block();}
@@ -352,9 +358,9 @@ function pushbox(){
   const a=p1,b=p2,dx=b.x-a.x;
   if(!a.pass&&!b.pass&&Math.abs(dx)<0.64&&Math.abs(a.y-b.y)<1.5&&!['kd','ko'].includes(a.state)&&!['kd','ko'].includes(b.state)){
     const s=dx!==0?Math.sign(dx):a.facing,o=(0.64-Math.abs(dx))/2;a.x-=s*o;b.x+=s*o;
-    if(Math.abs(a.x)>STAGE){a.x=Math.sign(a.x)*STAGE;b.x=a.x+s*0.64;}
-    if(Math.abs(b.x)>STAGE){b.x=Math.sign(b.x)*STAGE;a.x=b.x-s*0.64;}
+    if(a.x<BL||a.x>BR){a.x=clamp(a.x,BL,BR);b.x=a.x+s*0.64;}
+    if(b.x<BL||b.x>BR){b.x=clamp(b.x,BL,BR);a.x=b.x-s*0.64;}
   }
-  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult'||f.state==='rult'||f.ucOn);if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
-  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult'&&f.state!=='rult')f.x=clamp(f.x,-STAGE,STAGE); // ultimates can carry fighters off screen
+  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult'||f.state==='rult'||f.state==='vult'||f.ucOn);if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
+  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult'&&f.state!=='rult'&&f.state!=='vult')f.x=clamp(f.x,BL,BR); // ultimates can carry fighters off screen
 }

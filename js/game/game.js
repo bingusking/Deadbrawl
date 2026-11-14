@@ -31,7 +31,7 @@ function phaseLogic(){
   if(G.phase==='intro'){
     if(G.pt===95){splash('FIGHT!<span class="u"></span>',0.9);sfx.ok();for(const f of[p1,p2])f.state='idle';G.phase='fight';}
   }else if(G.phase==='fight'){
-    if(G.training&&!['rult','attack'].includes(p1.state))p1.tension=100; // training: ULT always ready
+    if(G.training&&!['rult','vult','attack'].includes(p1.state))p1.tension=100; // training: ULT always ready
     if(G.training){for(const f of[p1,p2])if(G.time-(f.lastHitT||-999)>110&&f.hp<MAXHP&&!['airhit','kd','hitstun','stun'].includes(f.state)){f.hp=MAXHP;f.trailHp=MAXHP;}}
     else if(G.freeze<=0&&G.hitstop<=0)G.timer--;
     if(G.timer<=0){G.timer=0;G.phase='ko';G.pt=0;const w=p1.hp===p2.hp?null:(p1.hp>p2.hp?p1:p2);G.koBy=w;if(w)G.wins[w.idx]++;splash('TIME!<span class="u"></span>',2);}
@@ -57,6 +57,7 @@ function updHud(force){
   }
   $('#timer').textContent=G.training?'∞':Math.ceil(G.timer/60);
   for(const g of[p1,p2]){const want=G.training&&g.idx===1?'pf_dummy':'pf_'+g.char+'_'+(g.state==='victory'?'won':g.hp<MAXHP*0.3?'low':'default');if(g._face!==want){g._face=want;$('#pt'+(g.idx+1)).style.backgroundImage='url('+HUDIMG[want]+')';}}
+  vultPromptUpd();
   const f=G.me||p1,set=(id,cd,max)=>{const el=$('#ab-'+id);el.querySelector('i').style.height=(cd>0?cd/max*100:0)+'%';el.querySelector('b').textContent=cd>0?Math.ceil(cd/60):'';el.classList.toggle('ready',cd<=0);};
   set('f',f.cd.parry,CD.parry);set('2',f.cd.dash,CD.dash);set('3',0,1);$('#ab-3').classList.toggle('charging',f.char==='vish'&&f.state==='slide');set('4',f.cd.kick,CD.kick);set('s',f.cd.dodge,CD.dodge);
   const k=$('#ab-1');k.querySelectorAll('.pips u').forEach((u,i)=>u.classList.toggle('on',i<f.knives));
@@ -77,18 +78,21 @@ function updHud(force){
 /* =============== CAMERA =============== */
 const camPos=new THREE.Vector3(0,1.7,9),camLook=new THREE.Vector3(0,1.2,0);
 function updCam(snap){
+  {const A=ARENAS[arenaIdx]; // The Saloon: walk out through the doors onto Main Street (and back)
+   if(A.door!==undefined&&G.phase==='fight'&&arenaNext<0&&!(G.online&&G.online.role==='guest')){const z=(p1.x+p2.x)/2>A.door?1:0;
+     if(G.zone===undefined)G.zone=z;else if(z!==G.zone){G.zone=z;splash('<b>'+(z?'MAIN STREET':A.name)+'</b>',1.2);sfx.whoosh();}}}
   const mid=(p1.x+p2.x)/2,d=Math.abs(p1.x-p2.x),hy=Math.max(p1.y,p2.y);
-  const tx=clamp(mid,-4.6,4.6),tz=7.7+d*0.45,ty=1.95+hy*0.35; // wider shot so you can see more of the stage
+  const tx=clamp(mid,BL+3.6,BR-3.6),tz=7.7+d*0.45,ty=1.95+hy*0.35; // wider shot so you can see more of the stage
   const lo=Math.min(p1.y,p2.y)*0.5;
   const want=new THREE.Vector3(tx,ty+lo,tz),look=new THREE.Vector3(tx,1.15+hy*0.3+lo,0);
   for(const f of[p1,p2])if(f.uFollow&&!f.air()&&!(f===p1?p2:p1).air())f.uFollow=0;
-  {const U=[p1,p2].find(f=>f.state==='rult'||f.state==='jult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
+  {const U=[p1,p2].find(f=>f.state==='rult'||f.state==='jult'||f.state==='vult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
    if(U&&U.ucOn){const L=G.me||p1;want.set(L.x,Math.max(1.9,L.y*0.6+1.9),10.2);look.set(L.x,L.y*0.55+1.2,0);G.ultCam=30;G.camFollow=1;} // knocked into the next arena: ride along with your fighter
-   else if(U){const top=Math.max(U.y,V.y)+2.3,bot=Math.min(U.y,V.y),cy=(top+bot)/2;want.set(clamp((U.x+V.x)/2,-5,5),cy+0.2,6.6+(top-bot)*1.15);look.set(want.x,cy,0);G.ultCam=30;}else if(G.ultCam>0)G.ultCam--;}
+   else if(U){const top=Math.max(U.y,V.y)+2.3,bot=Math.min(U.y,V.y),cy=(top+bot)/2;want.set(clamp((U.x+V.x)/2,BL+3.2,BR-3.2),cy+0.2,6.6+(top-bot)*1.15);look.set(want.x,cy,0);G.ultCam=30;}else if(G.ultCam>0)G.ultCam--;}
   if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.z-=k*2.2;want.y-=k*0.6;} // intro: start close, pull back, centred between both fighters
   if(G.phase==='ko'&&G.pt<130&&G.koBy){const w=G.koBy===p1?p2:p1;want.set(w.x*0.6+tx*0.4,1.6,6.5);look.set(w.x*0.6+tx*0.4,0.8,0);}
   if(G.camSnap){G.camSnap=0;snap=true;} // arena change: cut straight to the new shot
-  if(snap){camPos.copy(want);camLook.copy(look);}else{const r=G.camFollow?0.24:G.ultCam?0.16:0.08;G.camFollow=0;camPos.lerp(want,r);camLook.lerp(look,r*1.25);}
+  if(snap){camPos.copy(want);camLook.copy(look);}else{const r=G.camFollow?0.34:G.ultCam?0.16:0.08;G.camFollow=0;camPos.lerp(want,r);camLook.lerp(look,r*1.25);}
   cam.position.copy(camPos);
   if(G.shake>0.002){cam.position.x+=(rnd()-0.5)*G.shake*SET.shake;cam.position.y+=(rnd()-0.5)*G.shake*SET.shake;G.shake*=0.85;}else G.shake=0;
   cam.lookAt(camLook);

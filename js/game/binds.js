@@ -12,7 +12,7 @@ const BIND_ALT={left:['ArrowLeft'],right:['ArrowRight'],jump:['ArrowUp','Space']
 // labels shown in the controls panel
 const BIND_LBL={
   general:[['left','Move left'],['right','Move right'],['jump','Jump · again to double jump'],['down','Down (S + air melee = slam)'],
-    ['melee','Melee · hold to charge · air: launcher'],['parry','Parry'],['dodge','Dodge roll'],['ult','Ultimate (aims at mouse)'],['taunt','Taunt']],
+    ['melee','Melee · hold to charge · air: launcher'],['parry','Parry'],['dodge','Dodge roll'],['ult','Ultimate'],['taunt','Taunt']],
   vish:[['a1','Throwing Knife (aims at mouse)'],['a2','Dash'],['a3','Slide (hold)'],['a4','Spike Kick'],['shot','Shotgun (aims at mouse)']],
   rift:[['a1','Big Slash'],['a2','Blink'],['a3','Grab'],['a4','Lunge']],
   jacob:[['a1','Grapple Hook'],['a2','Slam'],['a3','Uppercut'],['a4','Kick Off']]};

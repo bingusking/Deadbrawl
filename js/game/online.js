@@ -24,7 +24,7 @@ function netLost(msg){
 }
 function netMsg(d){
   if(d[0]==='~'){const o=JSON.parse(d.slice(1));
-    if(o.s)G.snap=o;else if(o.i)G.remIn=o.i;else if(o.p&&G.online&&G.online.role==='host'&&G.phase==='fight'){if(o.a){p2.uAX=o.a[0];p2.uAY=o.a[1];p2.uAimT=G.time;}press(p2,o.p);}
+    if(o.s){if(G.snap&&G.snap!==G.lastSnap&&G.snap.ev)o.ev=G.snap.ev.concat(o.ev||[]);G.snap=o;} /* keep the effects of snapshots we never got to draw */ else if(o.i)G.remIn=o.i;else if(o.p&&G.online&&G.online.role==='host'&&G.phase==='fight'){if(o.a){p2.uAX=o.a[0];p2.uAY=o.a[1];p2.uAimT=G.time;}press(p2,o.p);}
     return;}
   const m=JSON.parse(d);
   switch(m.t){
@@ -55,7 +55,7 @@ function netWrap(name,fn){ORIG[name]=fn;return function(...a){if(G.online&&G.onl
 spark=netWrap('spark',spark);trail=netWrap('trail',trail);dust=netWrap('dust',dust);flash=netWrap('flash',flash);splash=netWrap('splash',splash);
 callout=netWrap('callout',callout);showCombo=netWrap('showCombo',showCombo);cutin=netWrap('cutin',cutin);shotgunFx=netWrap('shotgunFx',shotgunFx);shotFx=netWrap('shotFx',shotFx);
 afterimage=netWrap('afterimage',afterimage);burstKnife=netWrap('burstKnife',burstKnife);muzzleFlash=netWrap('muzzleFlash',muzzleFlash);stars=netWrap('stars',stars);endMatch=netWrap('endMatch',endMatch);
-setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);arenaPlace=netWrap('arenaPlace',arenaPlace);arenaRecenter=netWrap('arenaRecenter',arenaRecenter);
+setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);impactFrame=netWrap('impactFrame',impactFrame);arenaPlace=netWrap('arenaPlace',arenaPlace);arenaRecenter=netWrap('arenaRecenter',arenaRecenter);
 for(const k in sfx){const fn=sfx[k];ORIG['sfx.'+k]=fn;sfx[k]=function(...a){if(G.online&&G.online.role==='host')G.netEv.push(['sfx.'+k,a]);return fn.apply(this,a);};}
 function netSer(f){const o={};for(const k in f){if(k==='_face')continue;const v=f[k],t=typeof v;if(t==='number')o[k]=Math.round(v*1000)/1000;else if(t==='string'||t==='boolean')o[k]=v;}o.cd=f.cd;return o;}
 function netSnap(){

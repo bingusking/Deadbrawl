@@ -1,6 +1,7 @@
 'use strict';
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const clamp=(v,a,b)=>v<a?a:v>b?b:v, rnd=Math.random;
+let BL=-8.2,BR=8.2; // left/right limits of the current arena's fight area (set per arena in stage.js)
 
 /* =============== RENDERER / SCENES =============== */
 const canvas=$('#c');

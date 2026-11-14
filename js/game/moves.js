@@ -32,13 +32,13 @@ function grabReact(a,d){d.state='stun';d.stun=80;d.vx=0;d.vy=0;a.state='ghold';a
 function holdThroat(f,o,stay){ // held up by the throat: enemy's neck sits at Rift's raised fist
   o.facing=-f.facing;o.heldT=G.time;
   const ndx=(o.neckRx||0)*o.facing,ndy=o.neckDy!==undefined?o.neckDy:1.55;
-  f.pass=o.pass=true;if(stay)f.x=clamp(o.x-f.facing*0.2+ndx,-STAGE,STAGE);else o.x=clamp(f.x+f.facing*0.2-ndx,-STAGE,STAGE);o.y=Math.max(0,f.y+2.12-ndy);o.vy=GRAV;o.vx=0;
+  f.pass=o.pass=true;if(stay)f.x=clamp(o.x-f.facing*0.2+ndx,BL,BR);else o.x=clamp(f.x+f.facing*0.2-ndx,BL,BR);o.y=Math.max(0,f.y+2.12-ndy);o.vy=GRAV;o.vx=0;
 }
 function doThrow(a,d,mode){
   d.state='airhit';d.soft=false;d.spiked=false;d.slammed=false;let extra=0;
-  if(mode==='down'){a.slamT=G.time;d.x=clamp(a.x-a.facing*0.9,-STAGE,STAGE);d.y=0.9;d.vy=-0.5;d.vx=0;d.slammed=true;extra=30;callout(a,'SLAM!','#c9a0ff');}
+  if(mode==='down'){a.slamT=G.time;d.x=clamp(a.x-a.facing*0.9,BL,BR);d.y=0.9;d.vy=-0.5;d.vx=0;d.slammed=true;extra=30;callout(a,'SLAM!','#c9a0ff');}
   else if(mode==='up'){a.upT=G.time;d.x=a.x+a.facing*0.2;d.y=1.2;d.vy=0.3;d.vx=0;callout(a,'TOSS!','#c9a0ff');}
-  else{const sd=mode==='R'?1:mode==='L'?-1:a.facing;if(sd!==a.facing)a.throwBackT=G.time;else a.throwFwdT=G.time;d.x=clamp(a.x+sd*0.75,-STAGE,STAGE);d.y=Math.max(d.y,0.6);d.vy=0.13;d.vx=sd*0.3;extra=10;callout(a,'THROW!','#c9a0ff');}
+  else{const sd=mode==='R'?1:mode==='L'?-1:a.facing;if(sd!==a.facing)a.throwBackT=G.time;else a.throwFwdT=G.time;d.x=clamp(a.x+sd*0.75,BL,BR);d.y=Math.max(d.y,0.6);d.vy=0.13;d.vx=sd*0.3;extra=10;callout(a,'THROW!','#c9a0ff');}
   a.pass=false;d.pass=false;if(mode!=='down'&&mode!=='up')d.y=Math.max(d.y,0.6);
   d.hp=Math.max(G.training?1:0,d.hp-extra);d.lastHitT=G.time;a.grabDir=null;a.buf.jump=0;a.state='land';a.stun=(a.throwBackT===G.time||a.throwFwdT===G.time||a.slamT===G.time||a.upT===G.time)?18:14;
   G.hitstop=15;G.shake=Math.max(G.shake,0.18);flash(0.12);if(mode!=='down')sfx.heavy();spark(d.x,d.y+1,0xc9a0ff,16,0.16);
@@ -48,7 +48,7 @@ function lungeReact(a,d){d.state='stun';d.stun=40;d.vx=0;a.state='hold';a.mt=0;a
 function doTeleport(f,o){
   afterimage(f);spark(f.x,f.y+1,0xb48cff,10,0.12,0.1);
   const side=Math.sign(o.x-f.x)||f.facing;let nx=o.x+side*0.8;
-  if(Math.abs(nx)>STAGE)nx=o.x-side*0.8;
+  if(nx<BL||nx>BR)nx=o.x-side*0.8;
   f.x=nx;f.vx=0;f.y=o.y;if(o.y>0.05){f.vy=Math.max(o.vy,0.04);f.airMove=true;f.jumps=Math.max(f.jumps,1);}else{f.y=0;f.vy=0;f.airMove=false;}
   f.facing=Math.sign(o.x-f.x)||-side;spark(f.x,f.y+1,0xb48cff,10,0.12,0.1);sfx.whoosh();
   if(f.tpPush&&o.invuln<=0&&o.state!=='ko'&&Math.abs(o.y-f.y)<1.8)applyHit(f,o,{dmg:15,hitstun:14,push:0.45,stop:4},o.x,o.y+1);

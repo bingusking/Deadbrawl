@@ -31,6 +31,7 @@ function spriteFrame(f){
       if(f.flip>0)return [J,3,'flip'];
       if(st<6&&f.vy>0.12)return [J,1];
       return [J,f.vy>0.05?2:f.vy>-0.07?3:4];}
+    case 'vult':return vishUltFrame(f);
     case 'land':return ['vish_jump2',0];
     case 'slide':return ['dash',5];
     case 'wakeup':return st<7?['vish_jump2',0]:['idle',0];
@@ -50,7 +51,7 @@ function spriteFrame(f){
         case 'air':return k<=s?['vish_jump2',2]:['vish_airup',0];
         case 'rslash':return k<=s?['heavy',3]:['light',3];
         case 'tele':return ['dash',1];
-        case 'grab':return ['knife',k<=s?3:4];
+        case 'grab':case 'vult':return ['knife',k<=s?3:4];
         case 'lunge':return ['dash',k<=s?1:3];
         case 'burst':return ['knife',k<3?2:3];
         case 'knife':return ['knife',k<4?1:k<=s?2:k<=s+4?3:k<=s+9?4:5];

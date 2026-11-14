@@ -15,6 +15,7 @@ function aiThink(b,p){
     if(b.buf.a4>0&&dist>4.5){b.buf.a4=0;b.buf.a2=8;}
     if(b.tpWin>0&&b.tpWin<100&&rnd()<0.02)b.buf.a2=8;
     if(b.tension>=ULT_COST&&dist<2.4&&!b.air()&&rnd()<0.04)press(b,'ult');}
+  if(b.char==='vish'&&b.tension>=ULT_COST&&dist<1.6&&!b.air()&&rnd()<0.05)press(b,'ult');
 }
 function aiCore(b,p){
   const A=b.ai,D=DIFF[G.diff];b.inp={l:0,r:0,u:0,d:0,q:0};

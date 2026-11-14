@@ -53,15 +53,15 @@ buildStage();
 /* ---------- arenas: the 3D colosseum plus the Blender-built arenas the fight can be knocked into ----------
    Each arena is a THREE.Group. During an ultimate's knock-off the next arena is placed beside the current one
    (arenaPlace), the fight travels across, then everything shifts back so the new arena sits at x=0 (arenaRecenter). */
-const ARENA_GAP=72; // distance between arena centres during a transition
+const ARENA_GAP=130; // distance between arena centres during a transition
 const colo=new THREE.Group();scene.add(colo);
 for(const o of[...arena0,floorMesh]){scene.remove(o);colo.add(o);}
 floorMesh.scale.x=80/120; // keep the colosseum floor clear of the arena next door
 const ARENAS=[
-  {name:'THE COLOSSEUM',grp:colo,glb:'assets/arena_colosseum.glb'},
-  {name:'THE RING',glb:'assets/arena_ring.glb',img:'assets/bg_jacob.webp',beam:0x2a2214,fog:0x1e0c10,near:22,far:75,bg:0x120608},
-  {name:'BACK ALLEY',glb:'assets/arena_alley.glb',img:'assets/bg_rift.webp',beam:0x22162c,fog:0x1c1026,near:22,far:80,bg:0x140a1c},
-  {name:'THE SALOON',glb:'assets/arena_saloon.glb',img:'assets/bg_vish.webp',beam:0x2a1a0c,fog:0x24120a,near:24,far:70,bg:0x180c06}];
+  {name:'THE COLOSSEUM',grp:colo,glb:'assets/arena_colosseum.glb',l:-11.8,r:11.8},
+  {name:'THE RING',l:-9.9,r:9.9,ropes:1,glb:'assets/arena_ring.glb',img:'assets/bg_jacob.webp',beam:0x2a2214,fog:0x1e0c10,near:22,far:75,bg:0x120608},
+  {name:'BACK ALLEY',l:-11.4,r:12.0,glb:'assets/arena_alley.glb',img:'assets/bg_rift.webp',beam:0x22162c,fog:0x1c1026,near:22,far:80,bg:0x140a1c},
+  {name:'THE SALOON',l:-10.8,r:30.5,door:12,glb:'assets/arena_saloon.glb',img:'assets/bg_vish.webp',beam:0x2a1a0c,fog:0x24120a,near:24,far:70,bg:0x180c06}];
 const ARENA0={fog:scene.fog.color.getHex(),near:scene.fog.near,far:scene.fog.far};
 let arenaIdx=0,arenaNext=-1;
 // painted fallback, only shown if an arena's .glb hasn't loaded
@@ -90,7 +90,8 @@ function arenaCol(at,dec){const n=at.count,o=new Float32Array(n*3),A=at.array,D=
       if(arenaIdx===i)setArena(i);else if(arenaNext===i)arenaPlace(i,A.px||0);
     },()=>{});};document.head.appendChild(sc);});
 })();
-function arenaLook(A){ // fog + background for an arena
+function arenaLook(A){ // fog + background + fight limits for an arena
+  BL=A.l??-8.2;BR=A.r??8.2;G.zone=undefined;
   scene.fog.color.setHex(A.fog??ARENA0.fog);scene.fog.near=A.near??ARENA0.near;scene.fog.far=A.far??ARENA0.far;
   scene.background=A.bg!==undefined?new THREE.Color(A.bg):null;}
 function setArena(i){ // show one arena at the centre, everything else hidden
