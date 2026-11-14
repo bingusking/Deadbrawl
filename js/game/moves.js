@@ -103,7 +103,8 @@ function jacobTick(f,o){
 function jacobRope(f,o){
   if(!f.rope){f.rope=new THREE.Mesh(new THREE.PlaneGeometry(1,1),new THREE.MeshBasicMaterial({color:0xd8d2c4,fog:false}));f.rope.renderOrder=4;scene.add(f.rope);}
   const pr=projectiles.find(p=>p.owner===f&&p.hook);let tx,ty;
-  if(pr){tx=pr.x;ty=pr.y;}else if(f.hookOn>0||f.pulling||(f.state==='jult'&&f.uRope)){tx=o.x;ty=o.y+1.1;}
+  if(pr){tx=pr.x;ty=pr.y;}else if(f.state==='jult'&&f.uRope===2){tx=f.sAX;ty=f.sAY;} // swinging in from a point above
+  else if(f.hookOn>0||f.pulling||(f.state==='jult'&&f.uRope)){tx=o.x;ty=o.y+1.1;}
   else if(f.state==='jfire'&&f.hTipX!==undefined&&f.ht>LU.WIND){tx=f.hTipX;ty=f.hTipY;} // ult grapple in flight
   if(tx===undefined)f.rope.visible=false;
   else{const sx=f.x+f.facing*0.45,sy=f.y+1.25,dx=tx-sx,dy=ty-sy,L=Math.hypot(dx,dy)||0.01;
@@ -126,7 +127,8 @@ function riftFrame(f){
     case 'parry':return [H,0];
     case 'guard':case 'block':return ['rift_block',f.state==='block'?1:0];
     case 'rult':return riftUltFrame(f);
-    case 'hitstun':case 'stun':case 'ultd':return ['rift_hit',0];
+    case 'ultd':return f.uPose==='down'?['rift_hit',0,'down']:f.uPose==='fly'?['rift_hit',0,'tumble']:['rift_hit',0];
+    case 'hitstun':case 'stun':return ['rift_hit',0];
     case 'airhit':return ['rift_hit',0,'tumble'];
     case 'kd':case 'ko':return ['rift_hit',0,'down'];
     case 'attack':{const m=f.move,s=m?m.startup:0,a=m?m.active:0,k=f.mt;
@@ -160,7 +162,8 @@ function jacobFrame(f){
     case 'guard':case 'block':return [T,0];
     case 'jult':return lashUltFrame(f);
     case 'jfire':return ['jacob_heavy',(f.ht||0)<=LU.WIND?1:3];
-    case 'hitstun':case 'stun':case 'ultd':return ['jacob_hit',0];
+    case 'ultd':return f.uPose==='down'?['jacob_hit',0,'down']:f.uPose==='fly'?['jacob_hit',0,'tumble']:['jacob_hit',0];
+    case 'hitstun':case 'stun':return ['jacob_hit',0];
     case 'airhit':return ['jacob_hit',0,'tumble'];
     case 'kd':case 'ko':return ['jacob_hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0;

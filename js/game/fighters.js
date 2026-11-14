@@ -297,6 +297,6 @@ function pushbox(){
     if(Math.abs(a.x)>STAGE){a.x=Math.sign(a.x)*STAGE;b.x=a.x+s*0.64;}
     if(Math.abs(b.x)>STAGE){b.x=Math.sign(b.x)*STAGE;a.x=b.x-s*0.64;}
   }
-  const MAXSEP=11;if(Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
-  for(const f of[a,b])f.x=clamp(f.x,-STAGE,STAGE);
+  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult');if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
+  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult')f.x=clamp(f.x,-STAGE,STAGE); // ultimates can carry fighters off screen
 }

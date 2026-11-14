@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-14)
 
 ## Corpus Check
-- 24 files · ~8,115 words
+- 24 files · ~8,454 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 279 nodes · 415 edges · 19 communities (16 shown, 3 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 23 edges (avg confidence: 0.86)
+- 287 nodes · 427 edges · 19 communities (17 shown, 2 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 25 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `a090db92`
+- Built from commit: `7aea9bc3`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -58,7 +58,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (19 total, 3 thin omitted)
+## Communities (19 total, 2 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -93,8 +93,8 @@ Cohesion: 0.18
 Nodes (11): dependencies, ws@^8.18.0, description, engines, node, main, name, scripts (+3 more)
 
 ### Community 8 - "ult.js"
-Cohesion: 0.17
-Nodes (14): blinkTo(), lashFire(), lashFireTick(), lashUltStart(), lashUltTick(), LU, luEnd(), riftUltTick() (+6 more)
+Cohesion: 0.16
+Nodes (16): blinkTo(), lashFinisher(), lashFire(), lashFireTick(), lashUltStart(), lashUltTick(), LF, LU (+8 more)
 
 ### Community 9 - "services"
 Cohesion: 0.22
@@ -120,26 +120,30 @@ Nodes (3): aiCore(), aiThink(), DIFF
 Cohesion: 0.26
 Nodes (9): CVDATA, cvInit(), CVMETA, cvName(), cvNav(), cvPlace(), cvShow(), cvStep() (+1 more)
 
+### Community 18 - "stage.js"
+Cohesion: 0.25
+Nodes (8): arena0, ARENA_TEX, ARENAS, arenaWipe(), backdrop, buildStage(), setArena(), skyMat()
+
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
 ## Knowledge Gaps
-- **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **2 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+  _High betweenness centrality (0.009) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `burstKnife()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `game.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
 - **Why does `shotgunFx()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.007) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Should `server.js` be split into smaller, more focused modules?**

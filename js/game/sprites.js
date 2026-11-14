@@ -37,7 +37,8 @@ function spriteFrame(f){
     case 'parry':return ['parry',f.mt<3?1:f.mt<5?2:f.mt<7?3:f.mt<=PARRY_WIN?4:5];
     case 'hold':case 'ghold':return ['knife',3];
     case 'guard':case 'block':return ['parry',1];
-    case 'hitstun':case 'stun':case 'ultd':return ['hit',0];
+    case 'ultd':return f.uPose==='down'?['hit',0,'down']:f.uPose==='fly'?['hit',0,'tumble']:['hit',0];
+    case 'hitstun':case 'stun':return ['hit',0];
     case 'airhit':return ['hit',0,'tumble'];
     case 'kd':case 'ko':return ['hit',0,'down'];
     case 'attack':{const m=f.move,k=f.mt,s=m?m.startup:0,a=m?m.active:0;

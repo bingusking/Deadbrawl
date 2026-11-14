@@ -42,7 +42,7 @@ function startOnline(m){
   G.mode='fight';G.paused=false;closeOvl();show('');$('#hud').classList.add('on');canvas.style.visibility='visible';
   $('[data-a=rematch]').style.display='none';$('#rnext').style.display='';
   charIntro();
-  if(NET.role==='host')startMatch();else{p1.char=m.host;p2.char=m.guest;hudSetup();for(const f of[p1,p2])f.reset(f.idx?2.2:-2.2);G.phase='intro';}
+  if(NET.role==='host')startMatch();else{setArena(0);p1.char=m.host;p2.char=m.guest;hudSetup();for(const f of[p1,p2])f.reset(f.idx?2.2:-2.2);G.phase='intro';}
   updCam(true);
 }
 $$('#ongrid .ccard').forEach(c=>c.addEventListener('click',()=>{if(!NET.matched||NET.locked||c.classList.contains('taken'))return;sfx.sel();netSend({t:'lock',c:c.dataset.c});}));
@@ -55,11 +55,12 @@ function netWrap(name,fn){ORIG[name]=fn;return function(...a){if(G.online&&G.onl
 spark=netWrap('spark',spark);trail=netWrap('trail',trail);dust=netWrap('dust',dust);flash=netWrap('flash',flash);splash=netWrap('splash',splash);
 callout=netWrap('callout',callout);showCombo=netWrap('showCombo',showCombo);cutin=netWrap('cutin',cutin);shotgunFx=netWrap('shotgunFx',shotgunFx);
 afterimage=netWrap('afterimage',afterimage);burstKnife=netWrap('burstKnife',burstKnife);muzzleFlash=netWrap('muzzleFlash',muzzleFlash);stars=netWrap('stars',stars);endMatch=netWrap('endMatch',endMatch);
+setArena=netWrap('setArena',setArena);arenaWipe=netWrap('arenaWipe',arenaWipe);
 for(const k in sfx){const fn=sfx[k];ORIG['sfx.'+k]=fn;sfx[k]=function(...a){if(G.online&&G.online.role==='host')G.netEv.push(['sfx.'+k,a]);return fn.apply(this,a);};}
 function netSer(f){const o={};for(const k in f){if(k==='_face')continue;const v=f[k],t=typeof v;if(t==='number')o[k]=Math.round(v*1000)/1000;else if(t==='string'||t==='boolean')o[k]=v;}o.cd=f.cd;return o;}
 function netSnap(){
   for(const p of projectiles)if(!p.id)p.id=++PID;
-  netGame({s:1,g:{time:G.time,timer:G.timer,phase:G.phase,pt:G.pt,wins:G.wins,round:G.round,introHold:G.introHold||0,freeze:G.freeze,hitstop:G.hitstop,shake:G.shake},
+  netGame({s:1,g:{time:G.time,timer:G.timer,phase:G.phase,pt:G.pt,wins:G.wins,round:G.round,introHold:G.introHold||0,freeze:G.freeze,hitstop:G.hitstop,shake:G.shake,arena:arenaIdx},
     f:[netSer(p1),netSer(p2)],pr:projectiles.map(p=>({id:p.id,x:Math.round(p.x*1000)/1000,y:Math.round(p.y*1000)/1000,vx:p.vx,o:p.owner.idx})),ev:G.netEv});
   G.netEv=[];
 }
@@ -75,6 +76,7 @@ function guestTick(){
     [p1,p2].forEach((f,i)=>{const s=S.f[i];for(const k in s){if(k==='cd')Object.assign(f.cd,s[k]);else f[k]=s[k];}f.move=f.state==='attack'&&MOVES[f.mname]||null;});
     guestProj(S.pr);
     for(const[n,a]of S.ev){try{ORIG[n](...a.map(netDec));}catch(e){}}
+    if(g.arena!==undefined&&g.arena!==arenaIdx)ORIG.setArena(g.arena); // in case the arena-change event was in a skipped snapshot
   }else G.time++;
   if(!(G.introHold>0))$('#cintro').classList.remove('on');
   const inp={l:+!!(keys.KeyA||keys.ArrowLeft),r:+!!(keys.KeyD||keys.ArrowRight),u:+!!(keys.KeyW||keys.ArrowUp),d:+!!(keys.KeyS||keys.ArrowDown),q:+!!keys.KeyQ};
