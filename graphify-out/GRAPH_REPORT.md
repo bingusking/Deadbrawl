@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-14)
 
 ## Corpus Check
-- 26 files · ~13,377 words
+- 26 files · ~14,920 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 356 nodes · 547 edges · 20 communities (18 shown, 2 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 31 edges (avg confidence: 0.86)
+- 361 nodes · 557 edges · 20 communities (18 shown, 2 thin omitted)
+- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 32 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `eb41cdc0`
+- Built from commit: `0efa5da7`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -37,16 +37,16 @@
 - Deadbrawl: notes for Claude
 
 ## God Nodes (most connected - your core abstractions)
-1. `Scene` - 12 edges
+1. `Scene` - 13 edges
 2. `runMove()` - 11 edges
 3. `act()` - 11 edges
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
-6. `services` - 8 edges
-7. `hexc()` - 7 edges
-8. `bindRender()` - 7 edges
-9. `goOnline()` - 7 edges
-10. `cvShow()` - 6 edges
+6. `build_colosseum()` - 8 edges
+7. `services` - 8 edges
+8. `hexc()` - 7 edges
+9. `bindRender()` - 7 edges
+10. `goOnline()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
@@ -126,8 +126,8 @@ Cohesion: 0.18
 Nodes (12): arena0, ARENA_TEX, arenaLook(), arenaPlace(), arenaRecenter(), ARENAS, arenaWipe(), backdrop (+4 more)
 
 ### Community 19 - "build_arenas.py"
-Cohesion: 0.12
-Nodes (6): build_alley(), build_ring(), build_saloon(), hexc(), pack(), Scene
+Cohesion: 0.10
+Nodes (10): build_alley(), build_colosseum(), arcade(), bays(), P(), build_ring(), build_saloon(), hexc() (+2 more)
 
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
@@ -144,11 +144,11 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `shotFx()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `game.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1471861471861472 - nodes in this community are weakly interconnected._
 - **Why does `splash()` connect `game.js` to `online.js`?**
-  _High betweenness centrality (0.006) - this node is a cross-community bridge._
+  _High betweenness centrality (0.005) - this node is a cross-community bridge._
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Should `fighters.js` be split into smaller, more focused modules?**

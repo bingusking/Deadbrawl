@@ -412,11 +412,143 @@ def build_saloon():
         S.cyl(0x3a3036, bx, by, bz + 0.97, bz + 1.05, 0.58, seg=12, j=0)
     S.export('arena_saloon.glb')
 
+# ------------------------------------------------------------------ THE COLOSSEUM
+def build_colosseum():
+    """Curved two-arcade amphitheatre around a sand floor, low enough that the game's sunset sky shows above it."""
+    random.seed(31); S = Scene()
+    STONE, STONE_D, STONE_L = 0x8e6a5e, 0x6a4e48, 0xa8826e
+    SHADOW, RED, GOLD = 0x24121c, 0x861a22, 0xb08430
+    # sand floor: concentric rings, a little darker toward the walls
+    S.box(0x6e4e3e, -37, 37, -16, 34, -0.4, -0.02, j=0)
+    for k, (r, c) in enumerate([(30, 0x765442), (22, 0x7e5a46), (15, 0x86604a), (9.6, 0x8c644c)]):
+        S.cyl(c, 0, 1, -0.02 + k * 0.004, -0.018 + k * 0.004, r, seg=72, j=0)
+    S.cyl(0x5a3828, 0, 1, -0.002, 0.0, 7.25, seg=72, j=0)
+    S.cyl(0x8c644c, 0, 1, 0.0, 0.002, 6.95, seg=72, j=0)
+    for a8 in range(8):
+        ang = a8 * math.pi / 4
+        S.obox(0x5a3828, math.cos(ang) * 8.4, 1 + math.sin(ang) * 8.4, 0.001, 1.3, 0.16, 0.004, rot=(0, 0, ang), j=0)
+    A, B, CY = 40.0, 20.0, 7.0
+    NA = 30
+    def bays(off):
+        out = []
+        for i in range(NA):
+            t = math.pi * (i + 0.5) / NA
+            x, y = (A + off) * math.cos(t), CY + (B + off) * math.sin(t)
+            tx, ty = -(A + off) * math.sin(t), (B + off) * math.cos(t)     # tangent
+            L = math.hypot(tx, ty); rot = math.atan2(ty, tx) + math.pi
+            dt = math.pi / NA / 2   # real width of this bay along the ellipse, plus overlap so no sky shows through the joints
+            w = math.hypot((A + off) * (math.cos(t + dt) - math.cos(t - dt)), (B + off) * (math.sin(t + dt) - math.sin(t - dt))) + 0.25
+            nx, ny = -ty / L, tx / L                                         # normal pointing into the arena
+            if nx * (0 - x) + ny * (0 - y) < 0: nx, ny = -nx, -ny
+            out.append((i, x, y, rot, w, nx, ny, t))
+        return out
+    def P(x, y, nx, ny, d):   # point pushed d toward the arena
+        return x + nx * d, y + ny * d
+    def arcade(off, z0, z1, lower):
+        h = z1 - z0
+        for (i, x, y, rot, w, nx, ny, t) in bays(off):
+            if abs(x) < 4.6 and y > CY + B - 2 and lower:
+                continue                                                      # leave room for the gate
+            S.obox(STONE_D, x, y, (z0 + z1) / 2, w, 0.8, h, rot=(0, 0, rot))   # wall slab
+            ow = w * 0.62; ar = ow / 2; zs = z1 - 0.8 - ar                    # opening width / arch spring height
+            cx, cy = P(x, y, nx, ny, 0.42)
+            S.obox(SHADOW, cx, cy, (z0 + 0.45 + zs) / 2, ow, 0.04, zs - z0 - 0.45, rot=(0, 0, rot), j=0.04)
+            for k in range(6):                                                # stepped semicircle = arched top
+                a = math.pi / 2 * (k + 0.5) / 6
+                S.obox(SHADOW, cx, cy, zs + ar * math.sin(a) - ar / 12 + ar / 12, ow * math.cos(a), 0.04, ar / 6 + 0.02, rot=(0, 0, rot), j=0.04)
+            if lower and i % 5 == 2:                                          # torch-lit doorway
+                gx, gy_ = P(x, y, nx, ny, 0.3)
+                S.obox(0x9a4a1e, gx, gy_, z0 + 0.95, ow * 0.5, 0.03, 1.0, rot=(0, 0, rot), kind='GLOW', j=0.05)
+                S.obox(0xc8702a, gx, gy_, z0 + 0.75, ow * 0.22, 0.04, 0.5, rot=(0, 0, rot), kind='GLOW', j=0.05)
+            vx, vy = P(x, y, nx, ny, 0.46)
+            for v in range(9):                                                # light stone ring around the arch
+                a0 = math.pi * (v + 0.5) / 9
+                ox = math.cos(a0) * (ar + 0.14)
+                S.obox(STONE_L, vx + math.cos(rot) * ox, vy + math.sin(rot) * ox, zs + math.sin(a0) * (ar + 0.14), ar * 0.36, 0.08, 0.26, rot=(0, -(a0 - math.pi / 2), rot), j=0.03)
+            for side in (-1, 1):                                              # half-columns between bays
+                ox = side * w / 2
+                S.obox(STONE, vx + math.cos(rot) * ox, vy + math.sin(rot) * ox, (z0 + z1) / 2 - 0.2, 0.42, 0.12, h - 0.6, rot=(0, 0, rot), j=0.02)
+            S.obox(STONE_L, vx, vy, z1 - 0.3, w + 0.02, 0.16, 0.36, rot=(0, 0, rot), j=0.02)   # cornice
+            S.obox(STONE, vx, vy, z0 + 0.22, w + 0.02, 0.12, 0.44, rot=(0, 0, rot), j=0.02)    # base band
+            if not lower and i % 3 == 1:                                      # banners on the upper arcade
+                bx, by = P(x, y, nx, ny, 0.5)
+                ox = w / 2
+                S.obox(RED, bx + math.cos(rot) * ox, by + math.sin(rot) * ox, z0 + 2.0, 0.55, 0.04, 2.8, rot=(0, 0, rot), j=0.03)
+                S.obox(GOLD, bx + math.cos(rot) * ox, by + math.sin(rot) * ox, z0 + 0.65, 0.55, 0.05, 0.1, rot=(0, 0, rot), j=0)
+    # podium wall (with a painted band), two arcades, attic with crowd and masts
+    for (i, x, y, rot, w, nx, ny, t) in bays(0.0):
+        if abs(x) < 4.6 and y > CY + B - 2:
+            continue
+        S.obox(STONE_D, x, y, 1.1, w, 1.0, 2.2, rot=(0, 0, rot))
+        bx, by = P(x, y, nx, ny, 0.52)
+        S.obox(RED, bx, by, 1.75, w + 0.02, 0.04, 0.42, rot=(0, 0, rot), j=0.02)
+        S.obox(GOLD, bx, by, 1.5, w + 0.02, 0.05, 0.06, rot=(0, 0, rot), j=0)
+        S.obox(STONE_L, bx, by, 2.15, w + 0.02, 0.2, 0.14, rot=(0, 0, rot), j=0)
+    arcade(0.6, 2.2, 6.6, True)
+    arcade(1.2, 6.6, 10.4, False)
+    for (i, x, y, rot, w, nx, ny, t) in bays(1.8):
+        S.obox(STONE_D, x, y, 11.1, w, 0.9, 1.4, rot=(0, 0, rot))
+        wx, wy = P(x, y, nx, ny, 0.47)
+        S.obox(SHADOW, wx, wy, 11.1, w * 0.28, 0.04, 0.6, rot=(0, 0, rot), j=0)
+        if i % 2 == 0:
+            S.obox(0x4a3026, x, y, 13.3, 0.18, 0.18, 3.0, rot=(0, 0, rot))
+            mx, my = P(x, y, nx, ny, 3.2)
+            S.rod(0x9a2a22, (x, y, 14.6), (mx, my, 13.6), 0.04, seg=4)
+        for c in range(3):
+            if random.random() < 0.75:
+                ox = (c - 1) * w * 0.3; cx, cy = x + math.cos(rot) * ox, y + math.sin(rot) * ox
+                cx, cy = P(cx, cy, nx, ny, 0.25)
+                S.obox(random.choice([0x3a2228, 0x4a2a26, 0x5a2222, 0x2e2838, 0x5a3a2a]), cx, cy, 12.2, 0.36, 0.36, 0.75, rot=(0, 0, rot), j=0.1)
+                S.obox(0x6a4232, cx, cy, 12.72, 0.25, 0.25, 0.28, rot=(0, 0, rot), j=0.1)
+    # grand gate at the back centre with a portcullis, flanked by statues on plinths
+    gy = CY + B + 0.2
+    S.box(STONE_L, -4.6, 4.6, gy - 1.0, gy + 0.8, 0, 10.4)
+    S.box(SHADOW, -2.4, 2.4, gy - 1.06, gy - 1.0, 0, 5.4, j=0)
+    for k in range(6):
+        a = math.pi / 2 * (k + 0.5) / 6
+        S.box(SHADOW, -2.4 * math.cos(a), 2.4 * math.cos(a), gy - 1.06, gy - 1.0, 5.4 + 2.4 * math.sin(a) - 0.2, 5.4 + 2.4 * math.sin(a) + 0.2, j=0)
+    for v in range(11):
+        a0 = math.pi * (v + 0.5) / 11
+        S.obox(STONE, math.cos(a0) * 2.7, gy - 1.12, 5.4 + math.sin(a0) * 2.7, 0.75, 0.14, 0.42, rot=(0, -(a0 - math.pi / 2), 0))
+    for k in range(8):
+        S.box(0x1e1216, -2.2 + k * 0.6, -2.08 + k * 0.6, gy - 1.12, gy - 1.08, 0, 6.6, j=0)
+    for k in range(5):
+        S.box(0x1e1216, -2.4, 2.4, gy - 1.14, gy - 1.1, 0.5 + k * 1.15, 0.62 + k * 1.15, j=0)
+    S.box(RED, -1.4, 1.4, gy - 1.08, gy - 1.04, 8.6, 10.0, j=0)
+    S.box(GOLD, -0.8, 0.8, gy - 1.12, gy - 1.08, 9.0, 9.6, j=0)
+    for sx in (-1, 1):
+        bx, by = sx * 6.6, gy - 2.0
+        S.box(STONE_D, bx - 1.1, bx + 1.1, by - 1.0, by + 1.0, 0, 2.6)
+        S.box(STONE_L, bx - 1.25, bx + 1.25, by - 1.15, by + 1.15, 2.6, 2.9, j=0)
+        S.cyl(STONE_L, bx, by, 2.9, 4.5, 0.48, 0.4, seg=10)              # robed statue with a spear
+        S.cyl(STONE_L, bx, by, 4.5, 5.7, 0.42, 0.3, seg=10)
+        S.cyl(STONE_L, bx, by, 5.7, 6.3, 0.25, 0.21, seg=10)
+        S.rod(STONE_L, (bx + sx * 0.3, by, 5.5), (bx + sx * 0.7, by, 7.2), 0.09, seg=6)
+        S.rod(0x6a5e56, (bx + sx * 0.7, by, 3.0), (bx + sx * 0.7, by, 8.4), 0.05, seg=6)
+        S.cyl(0x6a5e56, bx + sx * 0.7, by, 8.4, 8.9, 0.12, 0.0, seg=6)
+    # braziers either side of the fight, and a pair further back
+    for (bx, by, sc) in [(-12.5, 3.5, 1.0), (12.5, 3.5, 1.0), (-21, 11, 0.85), (21, 11, 0.85)]:
+        S.cyl(STONE_D, bx, by, 0, 0.5 * sc, 0.9 * sc, seg=12)
+        S.cyl(STONE, bx, by, 0.5 * sc, 2.4 * sc, 0.35 * sc, 0.28 * sc, seg=12)
+        S.cyl(0x4a3020, bx, by, 2.4 * sc, 3.0 * sc, 0.45 * sc, 0.85 * sc, seg=14)
+        S.cyl(GOLD, bx, by, 2.95 * sc, 3.05 * sc, 0.88 * sc, seg=14, j=0)
+        S.cyl(0xff7a2a, bx, by, 3.0 * sc, 4.6 * sc, 0.7 * sc, 0.05, seg=8, kind='GLOW', j=0)
+        S.cyl(0xffc04a, bx + 0.1, by, 3.0 * sc, 4.0 * sc, 0.42 * sc, 0.03, seg=8, kind='GLOW', j=0)
+        S.cyl(0x40200a, bx, by, 0.0, 5.5 * sc, 2.4 * sc, 0.5 * sc, seg=16, kind='BEAM', j=0)
+    for (rx, ry) in [(-17, 9.5), (16.5, 9.0)]:                            # weapon racks by the wall
+        S.box(0x4a3020, rx - 1.2, rx + 1.2, ry - 0.15, ry + 0.15, 1.6, 1.75)
+        for k in range(4):
+            S.rod(0x6a5e56, (rx - 0.9 + k * 0.6, ry, 0), (rx - 0.9 + k * 0.6 + 0.2, ry, 2.6), 0.05, seg=5)
+    for (sx_, sy_) in [(-9, 8.5), (10.5, 10), (-26, 4)]:                  # dropped shields
+        S.cyl(0x6a2a22, sx_, sy_, 0, 0.12, 0.6, seg=14)
+        S.cyl(GOLD, sx_, sy_, 0.12, 0.16, 0.18, seg=10, j=0)
+    S.export('arena_colosseum.glb')
+
 if __name__ == '__main__':
     if sys.argv[1:2] == ['pack']:
         import glob
         for g in sorted(glob.glob(os.path.join(OUT, 'arena_*.glb'))): pack(g)
         sys.exit()
-    which = sys.argv[1:] or ['ring', 'alley', 'saloon']
+    which = sys.argv[1:] or ['colosseum', 'ring', 'alley', 'saloon']
     for w in which:
-        {'ring': build_ring, 'alley': build_alley, 'saloon': build_saloon}[w]()
+        {'colosseum': build_colosseum, 'ring': build_ring, 'alley': build_alley, 'saloon': build_saloon}[w]()
