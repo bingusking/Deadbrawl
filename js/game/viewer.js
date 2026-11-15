@@ -23,10 +23,18 @@ function viewerTick(){
 /* ---------- characters page (HTML profile; the 3D viewer scene is no longer shown) ---------- */
 // play style, summary and stat bars (1-5) per fighter
 const CVMETA={
-  vish:{splash:'assets/splash_vish.webp',bg:'assets/bg_vish.webp',feet:[0,0.81],ax:0,rim:'#ff8a3a',tag:'ALL-ROUNDER · ZONER',bio:'Keeps you at range with knives and a shotgun, then dashes through to start a combo. Strong at every distance.',st:{POWER:3,SPEED:4,RANGE:5,DIFFICULTY:2}},
-  rift:{splash:'assets/splash_rift.webp',bg:'assets/bg_rift.webp',feet:[0.06,0.96],ax:0.5,rim:'#ff3cc8',tag:'MIX-UPS · GRAPPLER',bio:'Teleports behind you and grabs straight through your guard. Hard to read and deadly up close, but every blink leaves an opening.',st:{POWER:4,SPEED:3,RANGE:3,DIFFICULTY:4}},
-  jacob:{splash:'assets/splash_jacob.webp',bg:'assets/bg_jacob.webp',feet:[0.07,0.83],ax:0.6,rim:'#ffb050',tag:'POWERHOUSE · HOOK',bio:'Drags you in with the grapple hook and flattens you with slams. Slow on foot, huge damage once he connects.',st:{POWER:5,SPEED:2,RANGE:3,DIFFICULTY:3}},
+  vish:{splash:'assets/splash_vish.webp',bg:'assets/bg_vish.webp',feet:[0,0.81],ax:0,rim:'#ff8a3a',tag:'ALL-ROUNDER · ZONER',col:'#c8322e',rival:'RIFT',lore:'A drifter who settles other people\'s debts with a sawn-off and a deck of knives. Rift sold out his last crew; Vish is the only one who walked away from it.',bio:'Keeps you at range with knives and a shotgun, then dashes through to start a combo. Strong at every distance.',st:{POWER:3,SPEED:4,RANGE:5,DIFFICULTY:2}},
+  rift:{splash:'assets/splash_rift.webp',bg:'assets/bg_rift.webp',feet:[0.06,0.96],ax:0.5,rim:'#ff3cc8',tag:'MIX-UPS · GRAPPLER',col:'#8a3cff',rival:'VISH',lore:'A fixer who stepped through one door too many and came back able to step through all of them. He swears the job with Vish\'s crew was never personal.',bio:'Teleports behind you and grabs straight through your guard. Hard to read and deadly up close, but every blink leaves an opening.',st:{POWER:4,SPEED:3,RANGE:3,DIFFICULTY:4}},
+  jacob:{splash:'assets/splash_jacob.webp',bg:'assets/bg_jacob.webp',feet:[0.07,0.83],ax:0.6,rim:'#ffb050',tag:'POWERHOUSE · HOOK',col:'#3a5a9a',rival:'TO BE ADDED',lore:'Lore to be added.',bio:'Drags you in with the grapple hook and flattens you with slams. Slow on foot, huge damage once he connects.',st:{POWER:5,SPEED:2,RANGE:3,DIFFICULTY:3}},
+  plat:{bg:'assets/arena_bg.webp',rim:'#fff0d0',col:'#d8c8b0',tag:'ZONER · TRANSFORM',rival:'TO BE ADDED',lore:'Lore to be added.',bio:'Controls space with her slug and cuffs, then turns into the wolf for ten seconds of speed, bites and a finisher that throws you into the next arena.',st:{POWER:4,SPEED:4,RANGE:4,DIFFICULTY:4}},
 };
+// short looping previews for each signature move: [animation, frame] pairs
+const CVPREV={
+  vish:{1:[['knife',1],['knife',2],['knife',3],['knife',4],['knife',5]],2:[['dash',0],['dash',1],['dash',2],['dash',3],['dash',4],['dash',5]],3:[['dash',5],['dash',5],['shotgun',2],['dash',5]],4:[['kick',1],['kick',2],['kick',3],['kick',4]]},
+  rift:{1:[['rift_slash',0],['rift_slash',1],['rift_slash',2],['rift_slash',3],['rift_slash',4]],2:[['rift_bout',0],['rift_bout',1],['rift_bout',2],['rift_bin',0],['rift_bin',1]],3:[['rift_grab',0],['rift_grab',0],['rift_throwf',0],['rift_throwf',0]],4:[['rift_lunge',0],['rift_lunge',1],['rift_lunge',1]]},
+  jacob:{1:[['jacob_heavy',1],['jacob_heavy',2],['jacob_heavy',2]],2:[['jacob_jump',2],['jacob_jump',3],['jacob_heavy',4]],3:[['jacob_heavy',1],['jacob_heavy',3],['jacob_heavy',4]],4:[['jacob_run',0],['jacob_run',2],['jacob_jab',1],['jacob_jab',1]]},
+  plat:{1:[['plat_idle',0]],2:[['plat_idle',0]],3:[['plat_idle',0]],4:[['plat_idle',0]]}};
+const DIFFWORD=['','BEGINNER','EASY','MEDIUM','HARD','EXPERT'];
 const CVDATA={};
 function cvInit(){if(cvInit.done)return;cvInit.done=1; // runs on first open (the fighter list is defined in menus.js, which loads after this file)
   CIDS.forEach(c=>{CVDATA[c]=[...document.querySelectorAll('#abl-'+c+' tr:not(.hd)')].map(r=>[...r.cells].map(td=>td.textContent.trim()));});
@@ -47,14 +55,19 @@ function cvName(cx){const n=$('#cvname'),vw=innerWidth/100,vh=innerHeight/100;
 addEventListener('resize',()=>{if(G.mode==='viewer')cvPlace();});
 function cvShow(c){cvInit();vChar=c;const M=CVMETA[c],rows=CVDATA[c];
   $('#cvnm').textContent=CHARS[c].name;$('#cvname').textContent=CHARS[c].name;$('#cvtag').textContent=M.tag;$('#cvbio').textContent=M.bio;
-  $('#cvstats').innerHTML=Object.entries(M.st).map(([k,n])=>'<div>'+k+'<i>'+[1,2,3,4,5].map(x=>'<u'+(x<=n?' class="on"':'')+'></u>').join('')+'</i></div>').join('');
-  $('#cvabl').innerHTML=rows.filter(r=>/^[1-4]$/.test(r[0])).map(r=>'<div class="cvcard"><div class="ky">'+r[0]+'</div><span class="dm">'+(r[2]==='—'?'':r[2])+'</span><div class="an">'+r[1].toUpperCase()+'</div><div class="ds">'+r[3]+'</div></div>').join('');
+  $('#cvlore').textContent=M.lore||'';
+  $('#cvdiff').innerHTML='DIFFICULTY<i>'+'★'.repeat(M.st.DIFFICULTY)+'☆'.repeat(5-M.st.DIFFICULTY)+'</i><b>'+DIFFWORD[M.st.DIFFICULTY]+'</b>';
+  $('#cvrival').innerHTML='RIVAL<b>'+(M.rival||'—')+'</b>';
+  $('#cvcol').innerHTML='COLOUR <u class="on" title="Default" style="background:'+M.col+'"></u>'+['#3a6ad8','#3aa86a','#d8a02a','#e8e8ee'].map(c=>'<u class="lk" title="Locked" style="background:'+c+'"></u>').join('');
+  $('#cvstats').innerHTML=Object.entries(M.st).filter(([k])=>k!=='DIFFICULTY').map(([k,n])=>'<div>'+k+'<i>'+[1,2,3,4,5].map(x=>'<u'+(x<=n?' class="on"':'')+'></u>').join('')+'</i></div>').join('');
+  $('#cvabl').innerHTML=rows.filter(r=>/^[1-4]$/.test(r[0])).map(r=>'<div class="cvcard"><img class="pv" data-k="'+r[0]+'" alt=""><div class="ky">'+r[0]+'</div><span class="dm">'+(r[2]==='—'?'':r[2])+'</span><div class="an">'+r[1].toUpperCase()+'</div><div class="ds">'+r[3]+'</div></div>').join('');
   const kit=rows.filter(r=>!/^[1-4]$/.test(r[0]));kit.splice(kit.findIndex(r=>r[0]==='SHIFT')+1,0,['HOLD BACK','Block','—','Block on the ground. Grabs go through it.']);
   $('#cvkit').innerHTML=kit.map(r=>'<div title="'+r[3].replace(/"/g,'&quot;')+'"><b>'+r[0]+'</b>'+r[1]+'</div>').join('');
   $$('#cvroster .rp').forEach(e=>e.classList.toggle('on',e.dataset.c===c));
   const v=$('#viewer');v.classList.toggle('hasSplash',!!M.splash);if(M.splash){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';cvName(23*innerWidth/100);}
   v.style.setProperty('--cvbg',M.bg?'url('+M.bg+')':'url(assets/arena_bg.webp)');v.classList.remove('swap');void v.offsetWidth;v.classList.add('swap');cvT=0;cvStep(true);}
 function cvStep(force){if(G.mode!=='viewer'&&!force)return;cvT++;
+  $$('#cvabl .pv').forEach(im=>{const L=(CVPREV[vChar]||{})[im.dataset.k];if(!L)return;const[a,i]=L[Math.floor(cvT/2)%L.length],fr=SPR[a]&&SPR[a][i];if(fr&&im.dataset.s!==a+i){im.dataset.s=a+i;im.src=fr.src;im.style.transform=fr.flip?'scaleX(-1)':'';}});
   const fr=SPR[vChar==='vish'?'vish_menu':vChar+'_idle'],f=fr[cvT%fr.length],k=f.k||SPRK,hv=68*(f.h*k/1.92),wv=hv*f.w/f.h,im=$('#cvimg');
   im.src=f.src;im.style.height=hv+'vh';im.style.left=`calc(23vw - ${(f.ax/f.w)*wv}vh)`;im.style.transformOrigin=(f.ax/f.w*100)+'% 100%';im.style.transform=f.flip?'scaleX(-1)':'';}
 setInterval(()=>cvStep(),110);

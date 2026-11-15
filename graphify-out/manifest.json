@@ -1,8 +1,8 @@
 {
   "js/game/ai.js": {
-    "mtime": 1794666754.2396054,
-    "seen": 1794666878.170727,
-    "ast_hash": "d3ff04b9416f1b66b85e75be5cd3d846",
+    "mtime": 1794669475.4300914,
+    "seen": 1794704894.69721,
+    "ast_hash": "fe151d48a4ad01645c7d4274af35c475",
     "semantic_hash": ""
   },
   "js/game/animation.js": {
@@ -24,9 +24,9 @@
     "semantic_hash": ""
   },
   "js/game/fighters.js": {
-    "mtime": 1794666297.5757616,
-    "seen": 1794666878.1707418,
-    "ast_hash": "00d4fc2747d93e14dfb8172b6fe1928c",
+    "mtime": 1794669475.4289136,
+    "seen": 1794704894.6972258,
+    "ast_hash": "12ef62feb52eda6fcec748db8c462152",
     "semantic_hash": ""
   },
   "js/game/fx.js": {
@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794666354.5349896,
-    "seen": 1794666878.1707435,
-    "ast_hash": "c6b4650238b094084041af8d2c0fa5c3",
+    "mtime": 1794704569.0441146,
+    "seen": 1794704894.6972284,
+    "ast_hash": "3e42c4c84c6849e7bb3c18d9d7a8b047",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "js/game/menus.js": {
-    "mtime": 1794666354.5356572,
-    "seen": 1794666878.170746,
-    "ast_hash": "95a71527d8a2cde1c64441ab9c4bb8a3",
+    "mtime": 1794704488.2530541,
+    "seen": 1794704894.6972308,
+    "ast_hash": "a984cc5f3fe570a780b23b3e706d4522",
     "semantic_hash": ""
   },
   "js/game/moves.js": {
@@ -66,21 +66,21 @@
     "semantic_hash": ""
   },
   "js/game/sprites.js": {
-    "mtime": 1794666297.5747476,
-    "seen": 1794666878.1707487,
-    "ast_hash": "ac3763fc4bb4fd86fb9f0c0672f04308",
+    "mtime": 1794669475.429309,
+    "seen": 1794704894.6972368,
+    "ast_hash": "39b37cffba7553a8d6f9ff6469130ee1",
     "semantic_hash": ""
   },
   "js/game/stage.js": {
-    "mtime": 1794666354.534722,
-    "seen": 1794666878.1707494,
-    "ast_hash": "b791692eb649d7416ca339711fca009f",
+    "mtime": 1794666895.624066,
+    "seen": 1794704894.6972377,
+    "ast_hash": "4a446d922f709191f3efa2e7bf9dc102",
     "semantic_hash": ""
   },
   "js/game/viewer.js": {
-    "mtime": 1794479531.1961582,
-    "seen": 1794479605.5522225,
-    "ast_hash": "3cffea9d8d76a5e588b2101ba7b67e2b",
+    "mtime": 1794669540.1740408,
+    "seen": 1794704894.69724,
+    "ast_hash": "1a2032bece109a18d488f2ec775983f1",
     "semantic_hash": ""
   },
   "package.json": {
@@ -96,21 +96,21 @@
     "semantic_hash": ""
   },
   "server.js": {
-    "mtime": 1794653128.6626785,
-    "seen": 1794654005.7182236,
-    "ast_hash": "0364a9cf2ecc0dac2e3eeaa8205792af",
+    "mtime": 1794669475.4306588,
+    "seen": 1794704894.6972437,
+    "ast_hash": "148544f642727165205ca6ed5b2d8cf3",
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1794654004.117672,
-    "seen": 1794654005.7182345,
-    "ast_hash": "aad70cb758c9507afc5a52140c58f01b",
+    "mtime": 1794704890.2576478,
+    "seen": 1794704894.697251,
+    "ast_hash": "dd7844b271ba954a2e0c663c74814b04",
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794663068.0058339,
-    "seen": 1794663506.2025192,
-    "ast_hash": "a4b070b7bc8d91e6022e025e168a98ad",
+    "mtime": 1794704569.0434575,
+    "seen": 1794704894.697252,
+    "ast_hash": "550fd0ad0cc07813e9ea7271856e0092",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
@@ -132,9 +132,9 @@
     "semantic_hash": ""
   },
   "CLAUDE.md": {
-    "mtime": 1794485449.141483,
-    "seen": 1794485529.7303686,
-    "ast_hash": "dcef5e757b1ab8eac72b5a5945acdb75",
+    "mtime": 1794704890.2595685,
+    "seen": 1794704894.6972501,
+    "ast_hash": "e6ae1771881f289e42a8301569d63862",
     "semantic_hash": ""
   },
   "tools/sprites/README.md": {
@@ -144,21 +144,27 @@
     "semantic_hash": ""
   },
   "js/game/ult.js": {
-    "mtime": 1794666297.575307,
-    "seen": 1794666878.1707501,
-    "ast_hash": "a84a843bf514ec768fe6fb9ea20005db",
+    "mtime": 1794669475.4291081,
+    "seen": 1794704894.697239,
+    "ast_hash": "047b93bc2bc40cc5f0d4abebfddbfdbe",
     "semantic_hash": ""
   },
   "js/game/binds.js": {
-    "mtime": 1794662735.465055,
-    "seen": 1794663506.2024975,
-    "ast_hash": "cd55ac4c6b37c23ae080087e2bcd7e88",
+    "mtime": 1794669475.430416,
+    "seen": 1794704894.6972227,
+    "ast_hash": "e86238aa32fd033a20fe15bf151169c3",
     "semantic_hash": ""
   },
   "tools/arenas/build_arenas.py": {
     "mtime": 1794666400.080199,
     "seen": 1794666878.170755,
     "ast_hash": "670d5564736813e864ba87df0fb22b57",
+    "semantic_hash": ""
+  },
+  "js/game/plat.js": {
+    "mtime": 1794704569.0438173,
+    "seen": 1794704894.6972358,
+    "ast_hash": "ab0b96b372848975786abcd781910542",
     "semantic_hash": ""
   },
   "package-lock.json": {

@@ -6,7 +6,7 @@ const path = require('path');
 const { WebSocketServer } = require('ws');
 
 const PORT = process.env.PORT || 3000;
-const CHARS = ['vish', 'rift', 'jacob'];
+const CHARS = ['vish', 'rift', 'jacob', 'plat'];
 const zlib = require('zlib');
 
 // static files: index.html, js/ and assets/ are loaded into memory (gzipped) at startup

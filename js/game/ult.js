@@ -15,7 +15,7 @@ MOVES.rult={base:'stance',aim:1,startup:10,active:14,recovery:24,vx:0.34,dmg:1,r
 function tryUlt(f){
   if(!(f.buf.ult>0))return false;f.buf.ult=0;
   if(!ULTS[f.char]||f.tension<ULT_COST)return false;
-  f.tension=0;if(f.char==='rift')startMove(f,'rult');else if(f.char==='vish')startMove(f,'vult');else lashFire(f,f===p1?p2:p1);
+  f.tension=0;if(f.char==='rift')startMove(f,'rult');else if(f.char==='vish')startMove(f,'vult');else if(f.char==='plat'){f.wolf=PL.WOLF;f.cd.dodge=0;platShift(f,1);}else lashFire(f,f===p1?p2:p1);
   cutin(f);G.freeze=40;sfx.super();return true;}
 
 function riftUltStart(a,d){

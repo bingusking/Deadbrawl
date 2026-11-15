@@ -1,18 +1,18 @@
 'use strict';
 /* =============== SCREENS / MENUS =============== */
 p1=new Fighter(PAL1,0);p2=new Fighter(PAL2,1);
-$('#ccard0').style.backgroundImage='url('+HUDIMG.face_vish+')';$$('.cib .art').forEach(e=>e.style.backgroundImage='url('+HUDIMG.intro+')');let cPick=null,cCur=0,cT=0;const CIDS=['vish','rift','jacob'];$('#ccard2').style.backgroundImage='url('+HUDIMG.face_jacob+')';$('#ccard1').style.backgroundImage='url('+HUDIMG.face_rift+')';$('#ccard1').textContent='';$('#ccard2').addEventListener('click',()=>cChoose(2));$('#ccard3').addEventListener('click',()=>cChoose(3));
+$('#ccard0').style.backgroundImage='url('+HUDIMG.face_vish+')';$$('.cib .art').forEach(e=>e.style.backgroundImage='url('+HUDIMG.intro+')');let cPick=null,cCur=0,cT=0;const CIDS=['vish','rift','jacob','plat'],RAND=CIDS.length;$('#ccard2').style.backgroundImage='url('+HUDIMG.face_jacob+')';$('#ccard1').style.backgroundImage='url('+HUDIMG.face_rift+')';$('#ccard1').textContent='';$('#ccard3').style.backgroundImage='url('+HUDIMG.face_plat+')';$('#ccard2').addEventListener('click',()=>cChoose(2));$('#ccard3').addEventListener('click',()=>cChoose(3));$('#ccard4').addEventListener('click',()=>cChoose(4));
 function cReset(keep){if(!keep){G.selStage=0;$('#ctitle').textContent='CHOOSE YOUR FIGHTER';}cPick=null;cCur=-1;$('#cidle').style.display='none';$('#cname2').innerHTML='&nbsp;';$('#cdesc').textContent='';$('#cgo').style.visibility='hidden';
   // vs CPU: the opponent can't be the fighter you picked
   $$('#csel .ccard').forEach((c,k)=>{c.classList.remove('sel');c.classList.toggle('taken',G.selStage===1&&!G.training&&CIDS[k]===G.p1char);});
   $('#chint').textContent='PICK A CHARACTER (A / D) · ESC TO GO BACK';}
-const cTaken=i=>i<3&&G.selStage===1&&!G.training&&CIDS[i]===G.p1char;
-function cNav(d){let i=cCur;for(let n=0;n<4;n++){i=(i+d+4)%4;if(!cTaken(i))return cChoose(i);}}
+const cTaken=i=>i<RAND&&G.selStage===1&&!G.training&&CIDS[i]===G.p1char;
+function cNav(d){let i=cCur;const N=RAND+1;for(let n=0;n<N;n++){i=(i+d+N)%N;if(!cTaken(i))return cChoose(i);}}
 function cChoose(i){if(i===undefined){if(cCur<0)return cNav(1);i=cCur;}if(cTaken(i)){sfx.block();return;}
-  const rand=i===3,id=rand?'random':CIDS[i];
+  const rand=i===RAND,id=rand?'random':CIDS[i];
   if(cPick===id){ // second press confirms; RANDOM rolls from whoever is allowed
     const pool=CIDS.filter((c,k)=>!cTaken(k)),real=rand?pool[rnd()*pool.length|0]:id;
-    if(G.selStage===1){G.p2char=real;act('fight');return;}G.p1char=real;if(G.training){act('fight');return;}sfx.ok();G.selStage=1;cReset(true);$('#ctitle').textContent='CHOOSE YOUR OPPONENT';return;}
+    if(G.selStage===1){G.p2char=real;act('fight');return;}G.p1char=real;if(G.training){act('fight');return;}if(G.arcade){arcadeStart();return;}sfx.ok();G.selStage=1;cReset(true);$('#ctitle').textContent='CHOOSE YOUR OPPONENT';return;}
   sfx.ok();cPick=id;cCur=i;
   const im=$('#cidle');im.style.display='block';im.style.filter=rand?'brightness(0) drop-shadow(0 0 .4vw #d8232f)':'';im.removeAttribute('src');
   $('#cname2').textContent=rand?'RANDOM':CHARS[id].name;$('#cdesc').textContent=rand?(G.selStage===1?'A surprise opponent':'A surprise fighter'):CHARS[id].desc;$('#cgo').style.visibility='visible';
@@ -63,27 +63,40 @@ function show(id,anim){
   if(!anim||!cur||!nxt)return;
   const [o,i]=SLIDES[anim];cur.classList.add('leaving',o);nxt.classList.add(i);
   clearTimeout(show.t);show.t=setTimeout(()=>{cur.classList.remove('leaving',o);nxt.classList.remove(i);},650);}
-function toSelect(){cReset();G.mode='select';closeOvl();show('csel','down');$('#hud').classList.remove('on');canvas.style.visibility='hidden';$('#cmode').textContent=G.training?'TRAINING':'VS CPU';$('#cdiffrow').style.display=G.training?'none':'';$('#dlabel').textContent=G.diff;}
-function toMenu(){const pm=G.mode;if(CIDS.includes(G.p1char)&&MF.front!==G.p1char){MF.front=G.p1char;mfBuild();}netClose();$('[data-a=rematch]').style.display='';$('#rnext').style.display='none';$('#cintro').classList.remove('on');G.mode='menu';G.paused=false;closeOvl();show('menu',pm==='viewer'?'right':(pm==='select'||pm==='onl')?'up':null);$('#hud').classList.remove('on');canvas.style.visibility='hidden';}
-function toFight(){G.mode='fight';G.paused=false;closeOvl();show('');$('#hud').classList.add('on');canvas.style.visibility='visible';if(G.training)G.p2char='vish';charIntro();startMatch();updCam(true);}
+function toSelect(){cReset();G.mode='select';closeOvl();show('csel','down');$('#hud').classList.remove('on');canvas.style.visibility='hidden';$('#cmode').textContent=G.training?'TRAINING':G.arcade?'ARCADE':'VS CPU';$('#cdiffrow').style.display=G.training||G.arcade?'none':'';stageLabel();$('#dlabel').textContent=G.diff;}
+function toMenu(){const pm=G.mode;if(G.arcade){G.diff=G.arcade.diff0;G.arcade=null;}$('#rarc').style.display='none';$('[data-a=rematch]').textContent='REMATCH';if(CIDS.includes(G.p1char)&&MF.front!==G.p1char){MF.front=G.p1char;mfBuild();}netClose();$('[data-a=rematch]').style.display='';$('#rnext').style.display='none';$('#cintro').classList.remove('on');G.mode='menu';G.paused=false;closeOvl();show('menu',pm==='viewer'?'right':(pm==='select'||pm==='onl')?'up':null);$('#hud').classList.remove('on');canvas.style.visibility='hidden';}
+// arcade ladder: every other fighter in a random order, getting harder, with an IMPOSSIBLE boss at the end
+function arcadeSet(){const A=G.arcade,n=A.list.length;G.p2char=A.list[A.i];G.diff=A.i===n-1?'IMPOSSIBLE':A.i===0?'NORMAL':'HARD';}
+function arcadeStart(){const A=G.arcade;A.list=CIDS.filter(c=>c!==G.p1char).sort(()=>rnd()-0.5);A.i=0;arcadeSet();act('fight');}
+// stage select: RANDOM or a specific arena (Q / E on the select screen)
+const STAGES=()=>['RANDOM',...ARENAS.map(a=>a.name)];
+function stageLabel(){$('#slabel').textContent=STAGES()[(G.stage??-1)+1];}
+function stageNav(d){const n=ARENAS.length+1;G.stage=((G.stage??-1)+1+d+n)%n-1;stageLabel();sfx.sel();}
+function toFight(){G.mode='fight';$('#inlog').classList.toggle('on',!!(G.training&&G.inlog));G.paused=false;closeOvl();show('');$('#hud').classList.add('on');canvas.style.visibility='visible';if(G.training)G.p2char='vish';charIntro();startMatch();updCam(true);}
 function charIntro(){const c=$('#cintro'),A=c.querySelector('.a'),B=c.querySelector('.b');c.classList.add('on');
-  [[A,G.p1char,G.online?(G.online.role==='host'?'YOU':'P1'):'P1'],[B,G.p2char,G.online?(G.online.role==='guest'?'YOU':'P2'):'CPU']].forEach(([e,id,lab])=>{e.querySelector('.art').style.backgroundImage='url('+HUDIMG[id==='vish'?'intro':'intro_'+id]+')';e.querySelector('.nm').innerHTML='<small>'+lab+'</small>'+CHARS[id].name;});
+  [[A,G.p1char,G.online?(G.online.role==='host'?'YOU':'P1'):'P1'],[B,G.p2char,G.online?(G.online.role==='guest'?'YOU':'P2'):G.arcade&&G.arcade.i===G.arcade.list.length-1?'FINAL BOSS':'CPU']].forEach(([e,id,lab])=>{e.querySelector('.art').style.backgroundImage='url('+HUDIMG[id==='vish'?'intro':'intro_'+id]+')';e.querySelector('.nm').innerHTML='<small>'+lab+'</small>'+CHARS[id].name;});
   for(const e of[A,B]){e.classList.remove('go');e.style.animationDelay='';}void c.offsetWidth;
   A.classList.add('go');G.introHold=88;
   if(!G.training){B.style.animationDelay='1.4s';B.classList.add('go');G.introHold=172;}}
 function toViewer(){G.mode='viewer';show('viewer','left');$('#hud').classList.remove('on');canvas.style.visibility='hidden';cvShow(CIDS.includes(G.p1char)?G.p1char:'vish');}
 let ovl=null;
-function openOvl(id){ovl=id;$$('.ovl').forEach(o=>o.classList.toggle('on',o.id===id));setSel($$('#'+id+' .mbtn'),0);}
-function closeOvl(){ovl=null;$$('.ovl').forEach(o=>o.classList.remove('on'));}
+function openOvl(id){if(id==='pause'){$$('#pause .tr').forEach(b=>b.style.display=G.training?'':'none');$('#tDum').textContent=G.dummy||'STAND';$('#tInp').textContent=G.inlog?'ON':'OFF';}
+  ovl=id;$$('.ovl').forEach(o=>o.classList.toggle('on',o.id===id));setSel($$('#'+id+' .mbtn'),0);}
+function closeOvl(){$('#movePanel').classList.remove('on');$('#pause').classList.remove('side');ovl=null;$$('.ovl').forEach(o=>o.classList.remove('on'));}
 function setSel(list,i){const was=list.findIndex(b=>b.classList.contains('sel'));list.forEach((b,k)=>b.classList.toggle('sel',k===i));
   if(G.mode==='menu'&&!ovl&&was!==i&&list[i]&&list[i].dataset.a==='char'&&!$('#menu').classList.contains('art'))mfCycle();} // landing on Characters swaps who stands in front
-function curList(){if(ovl)return $$('#'+ovl+' .mbtn');if(G.mode==='menu')return $$('#menu .mbtn');return [];}
+function curList(){if(ovl)return $$('#'+ovl+' .mbtn').filter(b=>b.style.display!=='none');if(G.mode==='menu')return $$('#menu .mbtn');return [];}
 function act(a){
   sfx.ok();
   switch(a){
-    case 'play':G.training=false;toSelect();break;
+    case 'play':G.training=false;G.arcade=null;toSelect();break;
+    case 'arcade':G.training=false;G.arcade={i:0,list:[],diff0:G.diff};toSelect();break;
+    case 'anext':G.arcade.i++;arcadeSet();closeOvl();toFight();break;
+    case 'moves':{const P=$('#movePanel'),on=!P.classList.contains('on');if(on){const c=(G.me||p1).char;$('#moveBody').innerHTML='<h3>'+CHARS[c].name+'</h3>'+$('#abl-'+c).outerHTML.replace(/ id="[^"]*"/,'').replace(' style="display:none"','');}P.classList.toggle('on',on);$('#pause').classList.toggle('side',on);break;}
+    case 'tdummy':{const L=['STAND','BLOCK','JUMP','PARRY'];G.dummy=L[(L.indexOf(G.dummy||'STAND')+1)%L.length];$('#tDum').textContent=G.dummy;break;}
+    case 'tinput':G.inlog=!G.inlog;$('#tInp').textContent=G.inlog?'ON':'OFF';$('#inlog').classList.toggle('on',!!G.inlog);$('#inlog').innerHTML='';break;
     case 'online':goOnline();break;
-    case 'train':G.training=true;toSelect();break;
+    case 'train':G.training=true;G.arcade=null;toSelect();break;
     case 'fight':toFight();break;
     case 'diff':{const i=(DIFFS.indexOf(G.diff)+1)%DIFFS.length;G.diff=DIFFS[i];$('#dlabel').textContent=G.diff;break;}
     case 'char':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));toViewer();break;
@@ -92,7 +105,7 @@ function act(a){
     case 'vol':SET.vol=[1,0.75,0.5,0.25][([1,0.75,0.5,0.25].indexOf(SET.vol)+1)%4];applySet();saveSet();break;
     case 'fs':toggleFullscreen();break;
     case 'shk':SET.shake=SET.shake?0:1;applySet();saveSet();break;
-    case 'sback':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));closeOvl();setSel($$('#menu .mbtn'),4);break;
+    case 'sback':($('#ctrlPanel').classList.remove('on'),$('#settings').classList.remove('side'));closeOvl();setSel($$('#menu .mbtn'),$$('#menu .mbtn').findIndex(b=>b.dataset.a==='set'));break;
     case 'ctrl':$('#ctrlPanel').classList.toggle('on');$('#settings').classList.toggle('side',$('#ctrlPanel').classList.contains('on'));break;
     case 'resume':G.paused=false;closeOvl();break;
     case 'restart':if(G.online){closeOvl();break;}G.paused=false;closeOvl();startMatch();break;
@@ -118,6 +131,7 @@ addEventListener('keydown',e=>{
   }
   if(G.mode==='onl'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();toMenu();}return;}
   if(G.mode==='select'&&!G.training&&['KeyW','ArrowUp','KeyS','ArrowDown'].includes(e.code)){const d=e.code==='KeyW'||e.code==='ArrowUp'?-1:1;G.diff=DIFFS[(DIFFS.indexOf(G.diff)+d+DIFFS.length)%DIFFS.length];$('#dlabel').textContent=G.diff;sfx.sel();return;}
+  if(G.mode==='select'&&(e.code==='KeyQ'||e.code==='KeyE')){stageNav(e.code==='KeyQ'?-1:1);return;}
   if(G.mode==='select'){if(e.code==='Escape'||e.code==='Backspace'){sfx.sel();if(G.selStage===1)cReset();else toMenu();}else if(['Enter','Space','KeyJ'].includes(e.code)&&!e.repeat)cChoose();else if(['KeyA','ArrowLeft'].includes(e.code))cNav(-1);else if(['KeyD','ArrowRight'].includes(e.code))cNav(1);return;}
   if(G.mode==='viewer'){if(e.code==='Escape'||e.code==='Backspace')toMenu();else if(e.code==='KeyA'||e.code==='ArrowLeft')cvNav(-1);else if(e.code==='KeyD'||e.code==='ArrowRight')cvNav(1);return;}
   if(G.mode==='fight'){
@@ -130,6 +144,7 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>{keys[e.code]=false;});
 addEventListener('blur',()=>{for(const k in keys)keys[k]=false;});
 function toggleMute(){SET.sound=SET.sound?0:1;applySet();saveSet();}
+$('#slabel').addEventListener('click',()=>stageNav(1));G.stage=-1;
 $('#dlabel').addEventListener('click',()=>{G.diff=DIFFS[(DIFFS.indexOf(G.diff)+1)%DIFFS.length];$('#dlabel').textContent=G.diff;sfx.sel();});
 applySet();mfBuild();
 $('#mute').addEventListener('click',toggleMute);

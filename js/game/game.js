@@ -14,12 +14,12 @@ function showCombo(a,n,dmg){if(n===undefined)n=a.combo;if(n<2)return;const el=$(
   el.classList.toggle('hot',n>=5);el.classList.toggle('fire',n>=9);el.classList.add('on');el.classList.remove('pop');void el.offsetWidth;el.classList.add('pop');
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1400);}
 function KO(a,d){if(G.training){d.hp=1;return;}if(G.phase!=='fight')return;G.phase='ko';G.pt=0;G.koBy=a;G.wins[a.idx]++;d.state='airhit';sfx.ko();flash(0.6);splash('K.O.<span class="u"></span>',2.2);G.hitstop=20;}
-function hudSetup(){const me=G.me||p1;hudKeys();$('#ab-m').style.display=me.char==='vish'?'':'none';CHARS[me.char].ab.forEach((n,i)=>$('#ab-'+(i+1)+' .n').textContent=n);$('#ab-1 .pips').style.display=me.char==='rift'?'none':'';$('#ab-2').classList.remove('charging');}
-function startMatch(){setArena(0);p1.char=G.p1char;p2.char=G.p2char;hudSetup();G.wins=[0,0];G.round=1;p1.tension=p2.tension=0;startRound();}
+function hudSetup(){const me=G.me||p1;hudKeys();$('#ab-m').style.display=me.char==='vish'?'':'none';CHARS[me.char].ab.forEach((n,i)=>$('#ab-'+(i+1)+' .n').textContent=n);$('#ab-1 .pips').style.display=['rift','plat'].includes(me.char)?'none':'';$('#ab-2').classList.remove('charging');}
+function startMatch(){setArena(G.online||G.stage<0?Math.floor(rnd()*ARENAS.length):G.stage);p1.char=G.p1char;p2.char=G.p2char;hudSetup();G.wins=[0,0];G.round=1;p1.tension=p2.tension=0;startRound();}
 function startRound(){
   $('#cutin').classList.remove('on');
   for(const p of projectiles)scene.remove(p.mesh);projectiles.length=0;clearFx();
-  for(const f of[p1,p2])Object.assign(f,{um:'',ut:0,u2:0,ucOn:0,hide:0,uRope:0,uSl:0,uSh:0,uPose:'',uFollow:0,udT:0,uLong:0});if(arenaNext>=0)setArena(arenaIdx);
+  for(const f of[p1,p2])Object.assign(f,{wolf:0,cuffT:0,biteT:0,um:'',ut:0,u2:0,ucOn:0,hide:0,uRope:0,uSl:0,uSh:0,uPose:'',uFollow:0,udT:0,uLong:0});if(arenaNext>=0)setArena(arenaIdx);
   p1.reset(-2.2);p2.reset(2.2);G.timer=99*60;G.phase='intro';G.pt=0;G.hitstop=0;G.freeze=0;
   p2.ai={think:30,plan:0,dir:0};
   const final=G.wins[0]===1&&G.wins[1]===1;
@@ -45,7 +45,11 @@ function phaseLogic(){
     }
   }
 }
-function endMatch(){G.phase='done';const mi=G.me?G.me.idx:0,win=G.wins[mi]>G.wins[1-mi];const t=$('#rtitle');t.textContent=win?'YOU WIN':'YOU LOSE';t.className=win?'win':'lose';$('#rsub').textContent=G.online?`${G.wins[mi]} – ${G.wins[1-mi]}  ·  ONLINE`:`${G.wins[0]} – ${G.wins[1]}  ·  ${G.diff}`;openOvl('result');if(G.online)setSel($$('#result .mbtn'),1);}
+function endMatch(){G.phase='done';const mi=G.me?G.me.idx:0,win=G.wins[mi]>G.wins[1-mi];const t=$('#rtitle');t.textContent=win?'YOU WIN':'YOU LOSE';t.className=win?'win':'lose';$('#rsub').textContent=G.online?`${G.wins[mi]} – ${G.wins[1-mi]}  ·  ONLINE`:`${G.wins[0]} – ${G.wins[1]}  ·  ${G.diff}`;
+  {const A=!G.online&&G.arcade,more=A&&win&&A.i<A.list.length-1; // arcade ladder: next fight, or the ladder is cleared
+   $('#rarc').style.display=more?'':'none';$('[data-a=rematch]').style.display=more||(A&&win)?'none':'';$('[data-a=rematch]').textContent=A?'RETRY':'REMATCH';
+   if(A){$('#rsub').textContent=`ARCADE · FIGHT ${A.i+1} OF ${A.list.length} · ${G.diff}`;if(win&&!more){t.textContent='ARCADE CLEARED';$('#rsub').textContent='YOU BEAT THE IMPOSSIBLE BOSS';}}}
+  openOvl('result');if(G.online)setSel($$('#result .mbtn'),1);}
 let lastHud={};
 function updHud(force){
   for(const f of[p1,p2]){const i=f.idx+1;
@@ -71,7 +75,11 @@ function updHud(force){
   else $('#ab-1').classList.remove('charging');
   if(f.char==='rift'){set('1',f.cd.r1,150);set('2',f.tpWin>0?0:f.cd.r2,300);set('3',f.cd.r3,240);set('4',f.cd.r4,240);$('#ab-2').classList.toggle('charging',f.tpWin>0);}
   {const r=$('#ab-r'),has=!!ULTS[f.char];r.classList.toggle('lock',!has);r.querySelector('.soon').style.display=has?'none':'';
-   r.querySelector('i').style.height=has?(100-Math.min(100,f.tension/ULT_COST*100))+'%':'0%';r.classList.toggle('ultready',has&&f.tension>=ULT_COST);}
+   r.querySelector('i').style.height=has?(100-Math.min(100,f.tension/ULT_COST*100))+'%':'0%';r.classList.toggle('ultready',has&&f.tension>=ULT_COST);
+   if(f.char==='plat'&&f.wolf>0){r.querySelector('i').style.height=(100-f.wolf/PL.WOLF*100)+'%';r.classList.add('ultready');}}
+  if(f.char==='plat'){const W=f.wolf>0,nm=W?['LEAP','BITE','SLAM','—']:CHARS.plat.ab;nm.forEach((n,i)=>{const e=$('#ab-'+(i+1)+' .n');if(e.textContent!==n)e.textContent=n;});
+    if(W){set('1',f.cd.w1||0,90);set('2',f.cd.w2||0,150);set('3',f.cd.w3||0,150);set('4',0,1);$('#ab-4').classList.remove('ready');}
+    else{set('1',f.cd.p1||0,150);set('2',f.cd.p2||0,300);set('3',f.cd.p3||0,210);set('4',f.cd.p4||0,240);}}
   const q=$('#ab-q');q.classList.toggle('charging',f.state==='charge'&&f.charge>=TAP);q.classList.add('ready');
   q.querySelector('i').style.height=f.state==='charge'?(100-Math.min(1,f.charge/CHARGE)*100)+'%':'0%';
 }
@@ -88,7 +96,7 @@ function updCam(snap){
   const lo=Math.min(p1.y,p2.y)*0.5;
   const want=new THREE.Vector3(tx,ty+lo,tz),look=new THREE.Vector3(tx,1.15+hy*0.3+lo,0);
   for(const f of[p1,p2])if(f.uFollow&&!f.air()&&!(f===p1?p2:p1).air())f.uFollow=0;
-  {const U=[p1,p2].find(f=>f.state==='rult'||f.state==='jult'||f.state==='vult'||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
+  {const U=[p1,p2].find(f=>ULT_ATK.includes(f.state)||(f.uFollow&&(f.air()||(f===p1?p2:p1).air()))),V=U&&(U===p1?p2:p1); // ultimate: frame both fighters as the combo climbs
    if(U&&U.ucOn){const L=G.me||p1;want.set(L.x,Math.max(1.9,L.y*0.6+1.9),10.2);look.set(L.x,L.y*0.55+1.2,0);G.ultCam=30;G.camFollow=1;} // knocked into the next arena: ride along with your fighter
    else if(U){const top=Math.max(U.y,V.y)+2.3,bot=Math.min(U.y,V.y),cy=(top+bot)/2;want.set(clamp((U.x+V.x)/2,BL+3.2,BR-3.2),cy+0.2,6.6+(top-bot)*1.15);look.set(want.x,cy,0);G.ultCam=30;}else if(G.ultCam>0)G.ultCam--;}
   if(G.phase==='intro'&&G.pt<70){const k=1-G.pt/70;want.z-=k*2.2;want.y-=k*0.6;} // intro: start close, pull back, centred between both fighters

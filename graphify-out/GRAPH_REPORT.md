@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-15)
 
 ## Corpus Check
-- 26 files · ~17,514 words
+- 27 files · ~18,734 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 381 nodes · 595 edges · 20 communities (19 shown, 1 thin omitted)
-- Extraction: 94% EXTRACTED · 6% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.86)
+- 405 nodes · 631 edges · 21 communities (20 shown, 1 thin omitted)
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `ebb4ef3c`
+- Built from commit: `41273909`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -33,33 +33,34 @@
 - binds.js
 - viewer.js
 - loop.js
+- plat.js
 - build_arenas.py
 - Deadbrawl: notes for Claude
 
 ## God Nodes (most connected - your core abstractions)
-1. `Scene` - 13 edges
-2. `runMove()` - 11 edges
-3. `act()` - 11 edges
+1. `act()` - 13 edges
+2. `Scene` - 13 edges
+3. `runMove()` - 11 edges
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
 6. `ultHit()` - 8 edges
 7. `vishUltTick()` - 8 edges
 8. `build_colosseum()` - 8 edges
 9. `services` - 8 edges
-10. `goOnline()` - 7 edges
+10. `bindRender()` - 7 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
-- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/sprites.js
+- `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/moves.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (20 total, 1 thin omitted)
+## Communities (21 total, 1 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -75,15 +76,15 @@ Nodes (28): addFx(), dust(), dustGeo, fx, muzzleFlash(), spark(), sparkGeo, trai
 
 ### Community 3 - "fighters.js"
 Cohesion: 0.11
-Nodes (26): afterimage(), AIM_MOVES, aimDir(), applyHit(), burstKnife(), canBlock(), Fighter, overlap() (+18 more)
+Nodes (27): afterimage(), AIM_MOVES, aimDir(), applyHit(), burstKnife(), canBlock(), Fighter, overlap() (+19 more)
 
 ### Community 4 - "server.js"
 Cohesion: 0.07
 Nodes (25): dependencies, ws@^8.18.0, description, engines, node, main, name, scripts (+17 more)
 
 ### Community 5 - "menus.js"
-Cohesion: 0.13
-Nodes (28): act(), applySet(), cChoose(), charIntro(), CIDS, closeOvl(), cNav(), cReset() (+20 more)
+Cohesion: 0.12
+Nodes (33): act(), applySet(), arcadeSet(), arcadeStart(), cChoose(), charIntro(), CIDS, closeOvl() (+25 more)
 
 ### Community 6 - "moves.js"
 Cohesion: 0.08
@@ -114,20 +115,24 @@ Cohesion: 0.60
 Nodes (4): ac(), noise(), sfx, tone()
 
 ### Community 14 - "ai.js"
-Cohesion: 0.60
-Nodes (4): aiCore(), aiThink(), DIFF, GOD()
+Cohesion: 0.53
+Nodes (5): aiCore(), aiThink(), DIFF, GOD(), trainDummy()
 
 ### Community 15 - "binds.js"
-Cohesion: 0.16
-Nodes (21): actionsFor(), AIMED, BIND_ALT, BIND_DEF, BIND_LBL, BIND_TABS, bindOf(), bindRender() (+13 more)
+Cohesion: 0.14
+Nodes (23): actionsFor(), AIMED, BIND_ALT, BIND_DEF, BIND_LBL, BIND_TABS, bindOf(), bindRender() (+15 more)
 
 ### Community 16 - "viewer.js"
-Cohesion: 0.26
-Nodes (9): CVDATA, cvInit(), CVMETA, cvName(), cvNav(), cvPlace(), cvShow(), cvStep() (+1 more)
+Cohesion: 0.21
+Nodes (11): CVDATA, cvInit(), CVMETA, cvName(), cvNav(), cvPlace(), CVPREV, cvShow() (+3 more)
 
 ### Community 17 - "loop.js"
 Cohesion: 0.67
 Nodes (3): last, loop(), reportErr()
+
+### Community 18 - "plat.js"
+Cohesion: 0.21
+Nodes (8): CUFF_BLOCK, PL, platFinEnd(), platFinTick(), platMove(), platShift(), platTick(), spawnCuff()
 
 ### Community 19 - "build_arenas.py"
 Cohesion: 0.10
@@ -144,7 +149,7 @@ Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `impactFrame()` connect `ult.js` to `online.js`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+  _High betweenness centrality (0.046) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
@@ -152,8 +157,8 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Why does `splash()` connect `game.js` to `online.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `fighters.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.11174242424242424 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.10695187165775401 - nodes in this community are weakly interconnected._
 - **Should `server.js` be split into smaller, more focused modules?**
   _Cohesion score 0.06881720430107527 - nodes in this community are weakly interconnected._

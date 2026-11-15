@@ -3,8 +3,25 @@
 const DIFF={EASY:{think:28,react:16,block:0.15,parry:0.08,dodge:0.1,combo:0.2,aggr:0.6,juggle:0.2},NORMAL:{think:15,react:8,block:0.35,parry:0.25,dodge:0.2,combo:0.6,aggr:1,juggle:0.55},HARD:{think:7,react:3,block:0.5,parry:0.45,dodge:0.25,combo:0.9,aggr:1.3,juggle:0.85},
   IMPOSSIBLE:{think:2,react:0,block:0.26,parry:0.7,dodge:0.04,combo:1,aggr:1.7,juggle:1,god:1}};
 const GOD=()=>!!DIFF[G.diff].god;
+// training dummy: STAND / BLOCK / JUMP / PARRY (set from the pause menu)
+function trainDummy(b,p){const dist=Math.abs(p.x-b.x),tw=Math.sign(p.x-b.x)||1,M=G.dummy||'STAND';b.cd.parry=Math.min(b.cd.parry,30);
+  const atk=(p.state==='attack'&&p.move)||p.state==='charge'||p.shotT>8||projectiles.some(q=>q.owner===p&&Math.abs(q.x-b.x)<4);
+  if(M==='BLOCK'&&atk&&dist<5&&!b.air()){if(tw>0)b.inp.l=1;else b.inp.r=1;}
+  if(M==='JUMP'&&b.state==='idle'&&G.time%70===0)press(b,'jump');
+  if(M==='PARRY'&&p.state==='attack'&&p.move&&p.move.melee&&dist<2.6&&p.mt>=p.move.startup-2&&p.mt<=p.move.startup&&b.cd.parry<=0&&['idle','walkf','walkb','guard'].includes(b.state))press(b,'parry');}
 function aiThink(b,p){
   aiCore(b,p);
+  if(G.training&&G.phase==='fight'){trainDummy(b,p);return;}
+  if(b.char==='plat'&&G.phase==='fight'){const A=b.ai,dist=Math.abs(p.x-b.x),D=DIFF[G.diff],go=k=>!(b.cd[k]>0),ok=['idle','walkf','walkb','guard','jump'].includes(b.state);
+    if(b.wolf>0){ // wolf: chase, bite, slam, and spend the last seconds on the finisher
+      if(ok&&dist<1.5&&go('w2')&&rnd()<0.08*D.aggr)press(b,'a2');
+      else if(ok&&dist<1.7&&go('w3')&&rnd()<0.06*D.aggr)press(b,'a3');
+      if(ok&&go('w1')&&dist<4.5&&(b.wolf<200||p.state==='stun'||p.hp<200)&&rnd()<0.12)press(b,'a1');
+      if(ok&&dist>2.5&&b.cd.dodge<=0&&rnd()<0.04){b.inp[p.x>b.x?'r':'l']=1;press(b,'dodge');}
+    }else{
+      if(b.tension>=ULT_COST&&!b.air()&&dist<6&&rnd()<(GOD()?0.5:0.04))press(b,'ult');
+      if(ok&&rnd()<0.03*D.aggr){if(dist>3.5)press(b,go('p1')?'a1':'a2');else if(dist>1.8)press(b,go('p3')?'a3':'a1');else press(b,go('p4')&&rnd()<0.4?'a4':'a1');}}
+  }
   if(b.char==='jacob'&&G.phase==='fight'&&!G.training){const dist=Math.abs(p.x-b.x);
     if(b.buf.a2>0&&dist>1.6){b.buf.a2=0;b.buf.a1=8;}
     if(b.buf.a4>0&&dist>1.5){b.buf.a4=0;b.buf.a1=8;}

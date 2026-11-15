@@ -72,6 +72,7 @@ function drawSprite(f){
   const rift=f.char==='rift'&&!dummy;let own=false;
   if(rift){[anim,idx,mode]=riftFrame(f);own=true;}
   if(f.char==='jacob'&&!dummy)[anim,idx,mode]=jacobFrame(f);
+  if(f.char==='plat'&&!dummy)[anim,idx,mode]=platFrame(f);
   const fr=SPR[anim][idx],tex=TEX[dummy||rift?0:f.idx][anim][idx],m=f.spr;
   m.material.color.setHex(rift&&!own?0xc09cff:0xffffff);
   if(!tex.image){m.visible=false;return;}
@@ -83,6 +84,7 @@ function drawSprite(f){
   if(mode==='down'){rot=fc*Math.PI/2*0.96;px=f.x-fc*h*0.15;py=f.y+w*0.5-0.08;}
   else if(mode==='tumble'){rot=fc*clamp(0.5-f.vy*4,-0.2,1.3);py=f.y+h*0.5;}
   else if(mode==='aim')rot=fc*f.shotA*0.75; // tilt the gun toward where the shot went
+  else if(typeof mode==='number')rot=-fc*mode; // lean (Platinum's single-frame poses)
   else if(mode==='flip'){rot=-fc*Math.PI*2*(1-f.flip/24);py=f.y+h*0.5;px=f.x;}
   else if(f.state==='stun'&&!(G.time-(f.heldT||-9)<=1))rot=Math.sin(G.time*0.15)*0.06;
   m.rotation.z=rot;m.position.set(px,py,0.05+f.idx*0.01);

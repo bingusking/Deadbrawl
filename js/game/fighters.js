@@ -23,7 +23,7 @@ function aimDir(f,o,oy=1.2){const aimed=f.uAimT!==undefined&&G.time-f.uAimT<40&&
 const AIM_MOVES=new Set(['knife','burst','rult']);
 function take(f,b){if(f.buf[b]>0){f.buf[b]=0;return true;}return false;}
 const projectiles=[];
-const ULT_STATES=['rult','jult','vult','ultd'];
+const ULT_ATK=['rult','jult','vult','pult'],ULT_STATES=[...ULT_ATK,'ultd'];
 let p1,p2;
 function startMove(f,name){
   const m=MOVES[name];f.state='attack';f.move=m;f.mname=name;f.mt=0;f.hasHit=false;f.lastRes='';f.atkId++;f.airMove=f.air();
@@ -45,6 +45,8 @@ function startDodge(f){
 function tryAbility(f){
   if(tryUlt(f))return true;
   const V=f.char==='vish';if(f.char==='rift'&&tryRift(f))return true;if(f.char==='jacob'&&tryJacob(f))return true;
+  if(f.cuffT>0){f.buf.dodge=0;for(const k of CUFF_BLOCK[f.char]||[])f.buf[k]=0;} // cuffed: no dodge or movement abilities
+  if(f.char==='plat'&&tryPlat(f))return true;
   if(V&&f.buf.a1>0&&f.knives>0){f.buf.a1=0;const o=f===p1?p2:p1,d=(o.x-f.x)*f.facing;
     if(Math.abs(d)<1.7&&Math.abs(o.y-f.y)<1.4&&o.state!=='ko')return startMove(f,'burst'); // point-blank: throw every stored knife
     return startMove(f,'knife');}
@@ -135,6 +137,7 @@ function stepFighter(f,o){
   for(const k in f.cd)if(f.cd[k]>0)f.cd[k]--;
   if(f.tpWin>0&&--f.tpWin===0)f.cd.r2=300;
   if(f.char==='jacob')jacobTick(f,o);else if(f.rope)f.rope.visible=false;
+  platTick(f,o);
   if(f.knives<3){if(++f.knifeT>=CD.knifeRegen){f.knives++;f.knifeT=0;}}else f.knifeT=0;
   if(f.shotCd>0)f.shotCd--;if(f.shotT>0)f.shotT--;
   if(f.ammo<3){if(++f.ammoT>=SHOT.RELOAD_DELAY+SHOT.RELOAD){f.ammo++;f.ammoT=SHOT.RELOAD_DELAY;}}else f.ammoT=0; // first shell after ~1.8s, then one every ~1.2s
@@ -142,6 +145,7 @@ function stepFighter(f,o){
   if(f.state==='rult'){riftUltTick(f,o);return;} // the ultimates drive both fighters' positions
   if(f.state==='jult'){lashUltTick(f,o);return;}
   if(f.state==='vult'){vishUltTick(f,o);return;}
+  if(f.state==='pult'){platFinTick(f,o);return;}
   if(f.state==='jfire'){lashFireTick(f,o);return;}
   if(f.state==='ultd'){f.vx=f.vy=0;return;}
   const wasAir=f.air();
@@ -155,8 +159,9 @@ function stepFighter(f,o){
       if(tryAbility(f)||tryMelee(f))break;
       if(f.char==='vish'&&f.inp.s&&Math.abs(f.vx)>SLIDE.MIN){f.state='slide';f.mt=0;f.facing=Math.sign(f.vx);dust(f.x,4);break;}
       if(take(f,'jump')){f.state='jump';f.vy=JUMPV;f.vx=(fwd()?1:back()?-0.85:0)*f.facing*0.085;f.jumps=1;f.flip=0;sfx.jump();dust(f.x,4);break;}
-      if(fwd()){f.state='walkf';f.vx=f.facing*RUNF;}
-      else if(back()){f.state='walkb';f.vx=-f.facing*RUNB;}
+      const sp=f.wolf>0?1.55:1; // wolf form runs faster
+      if(fwd()){f.state='walkf';f.vx=f.facing*RUNF*sp;}
+      else if(back()){f.state='walkb';f.vx=-f.facing*RUNB*sp;}
       else{f.state='idle';f.vx*=0.5;}
       if(f.state==='walkb'&&threatOf(f,o)){f.state='guard';f.vx=0;} // hold back near an attack = stand and block
       if((f.state==='walkf'||f.state==='walkb')&&G.time%12===0)dust(f.x-f.vx*4,1);
@@ -200,7 +205,7 @@ function stepFighter(f,o){
     case 'parry':f.mt++;f.vx*=0.5;if(f.mt>=PARRY_WIN+10){if(!f.parried)f.cd.parry=CD.parry;f.state='idle';}break;
     case 'dodge':
       f.mt++;f.vx=f.mt<=18?f.dodgeDir*0.13:f.vx*0.6;if(wasAir&&f.mt<=14)f.vy=Math.max(0,f.vy*0.5);
-      if(f.mt>=24){f.state=f.air()?'jump':'idle';f.pass=false;f.cd.dodge=CD.dodge;f.flip=0;}
+      if(f.mt>=24){f.state=f.air()?'jump':'idle';f.pass=false;f.cd.dodge=f.wolf>0?0:CD.dodge;f.flip=0;}
       break;
     case 'hitstun':f.stun--;f.vx*=0.9;if(f.stun<=0)f.state='idle';break;
     case 'block':f.stun--;f.vx*=0.85;if(f.stun<=0)f.state='idle';break;
@@ -277,6 +282,7 @@ function runMove(f,o){
       if(h)callout(f,n+'× KNIVES','#ffcc33');}
     if(f.mt===m.startup+2){f.move=null;f.state='jump';f.vx=-f.adx*0.2;f.vy=f.air()?-f.ady*0.24:Math.max(0.07,-f.ady*0.24);/* pushed away from where you aimed */f.jumps=1;f.airUsed=false;f.flip=0;dust(f.x,6);sfx.jump();return;}
   }
+  if(f.char==='plat')platMove(f,o,m);
   if(f.mname==='shotgun'&&f.mt===m.startup)shotgunFx(f);
   if(f.mname==='dash'&&f.mt>m.startup&&f.mt%2===0)afterimage(f);
   if(m.dmg&&!f.hasHit&&f.mt>m.startup&&f.mt<=m.startup+m.active){const h=overlap(f,o,m);if(h){f.hasHit=true;applyHit(f,o,m,h.x,h.y);}}
@@ -352,7 +358,8 @@ function updProj(){
     const o=p.owner===p1?p2:p1;let dead=p.life<=0||p.x<BL-3||p.x>BR+3||p.y<0.05||p.y>16;if(p.y<0.05)dust(p.x,3);
     for(const q of projectiles)if(q!==p&&q.owner!==p.owner&&Math.abs(q.x-p.x)<0.4){dead=true;q.life=0;spark(p.x,p.y,0xffffff,14,0.12);sfx.block();}
     if(!dead&&Math.abs(p.x-o.x)<0.42&&p.y>o.y&&p.y<o.y+1.8&&o.invuln<=0&&o.state!=='ko'&&!ULT_STATES.includes(o.state)){
-      if(p.hook){p.owner.hookOn=60;o.hp=Math.max(1,o.hp-15);o.lastHitT=G.time;spark(p.x,p.y,0xffffff,8,0.1);sfx.block();}
+      if(p.cuff)cuffHit(p.owner,o,p);
+      else if(p.hook){p.owner.hookOn=60;o.hp=Math.max(1,o.hp-15);o.lastHitT=G.time;spark(p.x,p.y,0xffffff,8,0.1);sfx.block();}
       else applyHit({x:p.x-p.vx*3,facing:Math.sign(p.vx),idx:p.owner.idx,tension:0,combo:0,lastRes:''},o,KNIFE_HIT,p.x,p.y);
       p.owner.tension=Math.min(100,p.owner.tension+5);dead=true;}
     if(dead){scene.remove(p.mesh);projectiles.splice(i,1);}
@@ -361,11 +368,11 @@ function updProj(){
 // safety net: nobody can stay locked in an ultimate that isn't actually running
 function ultWatchdog(){
   for(const f of[p1,p2]){const o=f===p1?p2:p1;
-    if(f.state==='ultd'&&!['rult','jult','vult'].includes(o.state)){if(++f.udT>20){f.state='airhit';f.uPose='';f.vy=-0.2;f.pass=false;f.udT=0;}}else f.udT=0;
-    if(['rult','jult','vult'].includes(f.state)){if(++f.uLong>1500){f.uLong=0;f.state=f.y>0?'jump':'idle';f.um='';}}else f.uLong=0;
-    if(!['rult','jult','vult'].includes(f.state)&&(f.hide||f.ucOn||f.uRope||f.uSl)){f.hide=0;f.ucOn=0;f.uRope=0;f.uSl=0;} // leftovers if an ult was cut short
+    if(f.state==='ultd'&&!ULT_ATK.includes(o.state)){if(++f.udT>20){f.state='airhit';f.uPose='';f.vy=-0.2;f.pass=false;f.udT=0;}}else f.udT=0;
+    if(ULT_ATK.includes(f.state)){if(++f.uLong>1500){f.uLong=0;f.state=f.y>0?'jump':'idle';f.um='';}}else f.uLong=0;
+    if(!ULT_ATK.includes(f.state)&&(f.hide||f.ucOn||f.uRope||f.uSl)){f.hide=0;f.ucOn=0;f.uRope=0;f.uSl=0;} // leftovers if an ult was cut short
   }
-  if(arenaNext>=0&&![p1,p2].some(f=>['rult','jult','vult'].includes(f.state))){const X=ARENAS[arenaNext].px||0;if(Math.abs((p1.x+p2.x)/2-X)<Math.abs((p1.x+p2.x)/2)){worldShift(-X);arenaRecenter(X);}else setArena(arenaIdx);} // arena change left half done
+  if(arenaNext>=0&&![p1,p2].some(f=>ULT_ATK.includes(f.state))){const X=ARENAS[arenaNext].px||0;if(Math.abs((p1.x+p2.x)/2-X)<Math.abs((p1.x+p2.x)/2)){worldShift(-X);arenaRecenter(X);}else setArena(arenaIdx);} // arena change left half done
 }
 function pushbox(){
   const a=p1,b=p2,dx=b.x-a.x;
@@ -374,6 +381,6 @@ function pushbox(){
     if(a.x<BL||a.x>BR){a.x=clamp(a.x,BL,BR);b.x=a.x+s*0.64;}
     if(b.x<BL||b.x>BR){b.x=clamp(b.x,BL,BR);a.x=b.x-s*0.64;}
   }
-  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult'||f.state==='rult'||f.state==='vult'||f.ucOn);if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
-  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult'&&f.state!=='rult'&&f.state!=='vult')f.x=clamp(f.x,BL,BR); // ultimates can carry fighters off screen
+  const MAXSEP=11,inUlt=[a,b].some(f=>f.state==='ultd'||f.state==='jult'||f.state==='rult'||f.state==='vult'||f.state==='pult'||f.ucOn);if(!inUlt&&Math.abs(b.x-a.x)>MAXSEP){const mid=(a.x+b.x)/2,s=Math.sign(b.x-a.x);a.x=mid-s*MAXSEP/2;b.x=mid+s*MAXSEP/2;}
+  for(const f of[a,b])if(f.state!=='ultd'&&f.state!=='jult'&&f.state!=='rult'&&f.state!=='vult'&&f.state!=='pult')f.x=clamp(f.x,BL,BR); // ultimates can carry fighters off screen
 }

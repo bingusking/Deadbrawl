@@ -7,7 +7,8 @@ const BIND_DEF={
   general:{left:'KeyA',right:'KeyD',jump:'KeyW',down:'KeyS',melee:'KeyQ',parry:'KeyF',dodge:'ShiftLeft',ult:'KeyR',taunt:'KeyT'},
   vish:{a1:'Digit1',a2:'Digit2',a3:'Digit3',a4:'Digit4',shot:'Mouse0'},
   rift:{a1:'Digit1',a2:'Digit2',a3:'Digit3',a4:'Digit4'},
-  jacob:{a1:'Digit1',a2:'Digit2',a3:'Digit3',a4:'Digit4'}};
+  jacob:{a1:'Digit1',a2:'Digit2',a3:'Digit3',a4:'Digit4'},
+  plat:{a1:'Digit1',a2:'Digit2',a3:'Digit3',a4:'Digit4'}};
 const BIND_ALT={left:['ArrowLeft'],right:['ArrowRight'],jump:['ArrowUp','Space'],down:['ArrowDown'],dodge:['ShiftRight']};
 // labels shown in the controls panel
 const BIND_LBL={
@@ -15,8 +16,9 @@ const BIND_LBL={
     ['melee','Melee · hold to charge · air: launcher'],['parry','Parry'],['dodge','Dodge roll'],['ult','Ultimate'],['taunt','Taunt']],
   vish:[['a1','Throwing Knife (aims at mouse)'],['a2','Dash'],['a3','Slide (hold)'],['a4','Spike Kick'],['shot','Shotgun (aims at mouse)']],
   rift:[['a1','Big Slash'],['a2','Blink'],['a3','Grab'],['a4','Lunge']],
-  jacob:[['a1','Grapple Hook'],['a2','Slam'],['a3','Uppercut'],['a4','Kick Off']]};
-const BIND_TABS=[['general','GENERAL'],['vish','VISH'],['rift','RIFT'],['jacob','THE LASH']];
+  jacob:[['a1','Grapple Hook'],['a2','Slam'],['a3','Uppercut'],['a4','Kick Off']],
+  plat:[['a1','Slug (aims at mouse) · wolf: Pounce'],['a2','Cuffs (aims at mouse) · wolf: Bite'],['a3','Pounce (aims at mouse) · wolf: Slam'],['a4','Stock Swing']]};
+const BIND_TABS=[['general','GENERAL'],['vish','VISH'],['rift','RIFT'],['jacob','THE LASH'],['plat','PLATINUM']];
 const BINDS=JSON.parse(JSON.stringify(BIND_DEF));
 try{const s=JSON.parse(localStorage.getItem('deadbrawl.binds')||'{}');for(const g in BINDS)Object.assign(BINDS[g],s[g]||{});}catch(e){}
 function saveBinds(){try{localStorage.setItem('deadbrawl.binds',JSON.stringify(BINDS));}catch(e){}}
@@ -34,13 +36,17 @@ function actionsFor(code,ch=myChar()){const out=[];
 const AIMED=new Set(['a1','a2','a3','a4','ult','shot']);
 // a key or mouse button went down during a fight
 function fightPress(code){
-  for(const a of actionsFor(code)){
+  for(const a of actionsFor(code)){inLog(a);
     if(a==='left')pressMe('kL');else if(a==='right')pressMe('kR');else if(a==='down')pressMe('kD');
     else if(a==='jump'){pressMe('kU');pressMe('jump');}
     else if(a==='melee'){if(held('down'))pressMe('slam');else pressMe('melee');}
     else if(AIMED.has(a))pressMe(a,mouseWorld());
     else pressMe(a);}
 }
+// training input display: the last few things you pressed
+const INSYM={left:'←',right:'→',jump:'↑',down:'↓',melee:'MELEE',parry:'PARRY',dodge:'DODGE',ult:'ULT',taunt:'TAUNT',a1:'1',a2:'2',a3:'3',a4:'4',shot:'GUN'};
+function inLog(a){const el=document.getElementById('inlog');if(!el||!G.training||!G.inlog)return;const s=document.createElement('span');s.textContent=INSYM[a]||a;
+  if(['left','right','jump','down'].includes(a))s.className='dir';el.prepend(s);while(el.children.length>12)el.lastChild.remove();setTimeout(()=>s.remove(),3200);}
 function keyName(c){if(!c)return '—';
   const M={Mouse0:'M1',Mouse1:'M3',Mouse2:'M2',Space:'SPACE',ShiftLeft:'SHIFT',ShiftRight:'R-SHIFT',ControlLeft:'CTRL',ControlRight:'R-CTRL',AltLeft:'ALT',AltRight:'R-ALT',
     ArrowLeft:'←',ArrowRight:'→',ArrowUp:'↑',ArrowDown:'↓',Tab:'TAB',CapsLock:'CAPS',Backquote:'`',Minus:'-',Equal:'=',BracketLeft:'[',BracketRight:']',Semicolon:';',Quote:"'",Comma:',',Period:'.',Slash:'/',Backslash:'\\'};
