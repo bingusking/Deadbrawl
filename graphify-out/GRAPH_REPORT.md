@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-15)
 
 ## Corpus Check
-- 27 files · ~18,734 words
+- 27 files · ~18,860 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 405 nodes · 631 edges · 21 communities (20 shown, 1 thin omitted)
-- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 34 edges (avg confidence: 0.86)
+- 410 nodes · 639 edges · 20 communities
+- Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 35 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `41273909`
+- Built from commit: `50231907`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -38,14 +38,14 @@
 - Deadbrawl: notes for Claude
 
 ## God Nodes (most connected - your core abstractions)
-1. `act()` - 13 edges
+1. `act()` - 14 edges
 2. `Scene` - 13 edges
 3. `runMove()` - 11 edges
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
-6. `ultHit()` - 8 edges
-7. `vishUltTick()` - 8 edges
-8. `build_colosseum()` - 8 edges
+6. `build_colosseum()` - 8 edges
+7. `ultHit()` - 8 edges
+8. `vishUltTick()` - 8 edges
 9. `services` - 8 edges
 10. `bindRender()` - 7 edges
 
@@ -60,7 +60,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (21 total, 1 thin omitted)
+## Communities (20 total, 0 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -83,8 +83,8 @@ Cohesion: 0.07
 Nodes (25): dependencies, ws@^8.18.0, description, engines, node, main, name, scripts (+17 more)
 
 ### Community 5 - "menus.js"
-Cohesion: 0.12
-Nodes (33): act(), applySet(), arcadeSet(), arcadeStart(), cChoose(), charIntro(), CIDS, closeOvl() (+25 more)
+Cohesion: 0.10
+Nodes (38): act(), applySet(), arcadeSet(), arcadeStart(), cChoose(), charIntro(), CIDS, closeOvl() (+30 more)
 
 ### Community 6 - "moves.js"
 Cohesion: 0.08
@@ -135,25 +135,22 @@ Cohesion: 0.21
 Nodes (8): CUFF_BLOCK, PL, platFinEnd(), platFinTick(), platMove(), platShift(), platTick(), spawnCuff()
 
 ### Community 19 - "build_arenas.py"
-Cohesion: 0.10
+Cohesion: 0.08
 Nodes (10): build_alley(), build_colosseum(), arcade(), bays(), P(), build_ring(), build_saloon(), hexc() (+2 more)
 
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
-## Knowledge Gaps
-- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
-
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `impactFrame()` connect `ult.js` to `online.js`?**
-  _High betweenness centrality (0.046) - this node is a cross-community bridge._
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
-  _High betweenness centrality (0.009) - this node is a cross-community bridge._
+  _High betweenness centrality (0.008) - this node is a cross-community bridge._
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Why does `splash()` connect `game.js` to `online.js`?**

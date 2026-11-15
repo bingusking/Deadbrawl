@@ -130,6 +130,13 @@ canvas{cursor:crosshair}
 #settings.side>*{translate:-28vw 0}#pause.side>*{translate:-25vw 0} /* heading and list move over together when Controls opens */
 #pause .mbtn{min-width:13em;text-align:left;padding-left:.6em}#pause .mbtn small{float:right}#pause .mbtn.sel::before{display:block}
 #movePanel{width:min(48vw,820px);max-height:86vh;overflow:auto;padding:18px 24px}
+.mvwrap{display:flex;gap:18px;margin-top:10px}.mvlist{display:flex;flex-direction:column;gap:4px;min-width:230px}
+.mvb{font:inherit;font-size:19px;letter-spacing:1px;text-align:left;background:#1c1418;color:#c9bfc3;border:0;border-left:4px solid #3a2a30;padding:3px 10px;cursor:pointer;white-space:nowrap}
+.mvb b{display:inline-block;min-width:92px;color:#ffcc33;font-weight:600}.mvb:hover{color:#fff}.mvb.on{background:#2a1a20;border-left-color:#d8232f;color:#fff}
+.mvdet{flex:1;min-height:300px}.mvhint{color:#8a7f85;letter-spacing:2px;margin-top:40px;text-align:center}
+.mvstage{height:170px;background:linear-gradient(#1a1016,#2a1a20);border-bottom:3px solid #d8232f;display:flex;align-items:flex-end;justify-content:center;overflow:hidden}.mvstage img{image-rendering:pixelated;margin-bottom:6px}
+.mvn{font-size:30px;font-weight:600;letter-spacing:2px;color:#fff;margin-top:8px}.mvs{display:flex;gap:26px;font-size:15px;letter-spacing:2px;color:#8a7f85;margin:2px 0 6px}.mvs b{color:#ff5a4a;margin-left:8px;font-size:20px}.mvs span:first-child b{color:#ffcc33}
+.mvdet p{color:#d5cbd0;font-size:19px;line-height:1.25;margin:0}
 #movePanel table{font-size:17px;margin-top:6px}#movePanel td{padding:3px 12px 3px 0;vertical-align:top;line-height:1.15}#movePanel td.an{color:#fff;white-space:nowrap}#movePanel td.dm{color:#ff5a4a}#movePanel td.ds{color:#bdb2b7;font-size:15px}#movePanel tr.hd td{color:#8a7f85;font-size:14px;letter-spacing:2px}
 #inlog{position:fixed;left:1.2vw;top:30vh;z-index:5;display:none;flex-direction:column;gap:3px;pointer-events:none}#inlog.on{display:flex}
 #inlog span{background:rgba(12,8,12,.85);border-left:3px solid #ffcc33;color:#fff;font-size:17px;letter-spacing:1px;padding:1px 9px;min-width:54px;animation:inl 3.2s forwards}#inlog span.dir{border-left-color:#7ec8ff;font-size:20px}

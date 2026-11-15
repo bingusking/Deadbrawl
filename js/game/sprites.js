@@ -68,7 +68,7 @@ function drawSprite(f){
   let [anim,idx,mode]=spriteFrame(f);
   const dummy=G.training&&f.idx===1;
   if(dummy){anim='dummy';const hit=['hitstun','stun','airhit','ultd'].includes(f.state);
-    idx=hit?(Math.floor(f.st/3)%8):0;mode=['kd','ko'].includes(f.state)?'down':f.state==='airhit'?'tumble':undefined;}
+    idx=hit?(Math.floor(f.st/3)%8):0;mode=['kd','ko'].includes(f.state)||(f.state==='ultd'&&f.uPose==='down')?'down':f.state==='airhit'||(f.state==='ultd'&&f.uPose==='fly')?'tumble':undefined;}
   const rift=f.char==='rift'&&!dummy;let own=false;
   if(rift){[anim,idx,mode]=riftFrame(f);own=true;}
   if(f.char==='jacob'&&!dummy)[anim,idx,mode]=jacobFrame(f);

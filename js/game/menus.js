@@ -17,7 +17,7 @@ function cChoose(i){if(i===undefined){if(cCur<0)return cNav(1);i=cCur;}if(cTaken
   const im=$('#cidle');im.style.display='block';im.style.filter=rand?'brightness(0) drop-shadow(0 0 .4vw #d8232f)':'';im.removeAttribute('src');
   $('#cname2').textContent=rand?'RANDOM':CHARS[id].name;$('#cdesc').textContent=rand?(G.selStage===1?'A surprise opponent':'A surprise fighter'):CHARS[id].desc;$('#cgo').style.visibility='visible';
   $$('#csel .ccard').forEach((c,k)=>c.classList.toggle('sel',k===i));$('#chint').textContent='SELECT AGAIN OR ENTER TO CONFIRM · ESC TO GO BACK';}
-setInterval(()=>{if(G.mode==='select'&&cPick){cT++;const pk=cPick==='random'?CIDS.filter((c,k)=>!cTaken(k))[Math.floor(cT/4)%CIDS.filter((c,k)=>!cTaken(k)).length]:cPick;const fr=SPR[pk==='vish'?'vish_menu':pk+'_idle'];$('#cidle').src=fr[(fr.length>10?cT*2:cT)%fr.length].src;}},150);
+setInterval(()=>{if(G.mode==='select'&&cPick){cT++;const pk=cPick==='random'?CIDS.filter((c,k)=>!cTaken(k))[Math.floor(cT/4)%CIDS.filter((c,k)=>!cTaken(k)).length]:cPick;const src=SPR[pk==='vish'?'idle':pk+'_idle'][0].src,im=$('#cidle');if(im.dataset.pk!==pk){im.dataset.pk=pk;im.src=src;}}},150); // one steady frame per fighter (cycling frames made the picture jump)
 $('#ccard0').addEventListener('click',()=>cChoose(0));$('#ccard1').addEventListener('click',()=>cChoose(1));$('#cgo').addEventListener('click',()=>cChoose());
 $$('.ink').forEach((el,n)=>{let r=n*7+3;const R=()=>{r=(r*9301+49297)%233280;return r/233280;};const pts=[],N=26;
   const slant=el.classList.contains('plate')?6:el.classList.contains('splash')?14:4;
@@ -65,6 +65,27 @@ function show(id,anim){
   clearTimeout(show.t);show.t=setTimeout(()=>{cur.classList.remove('leaving',o);nxt.classList.remove(i);},650);}
 function toSelect(){cReset();G.mode='select';closeOvl();show('csel','down');$('#hud').classList.remove('on');canvas.style.visibility='hidden';$('#cmode').textContent=G.training?'TRAINING':G.arcade?'ARCADE':'VS CPU';$('#cdiffrow').style.display=G.training||G.arcade?'none':'';stageLabel();$('#dlabel').textContent=G.diff;}
 function toMenu(){const pm=G.mode;if(G.arcade){G.diff=G.arcade.diff0;G.arcade=null;}$('#rarc').style.display='none';$('[data-a=rematch]').textContent='REMATCH';if(CIDS.includes(G.p1char)&&MF.front!==G.p1char){MF.front=G.p1char;mfBuild();}netClose();$('[data-a=rematch]').style.display='';$('#rnext').style.display='none';$('#cintro').classList.remove('on');G.mode='menu';G.paused=false;closeOvl();show('menu',pm==='viewer'?'right':(pm==='select'||pm==='onl')?'up':null);$('#hud').classList.remove('on');canvas.style.visibility='hidden';}
+/* pause move list: pick a move on the left to see its key, damage, what it does and a looping preview of it */
+const MVPREV={
+  vish:{'Q':[['light',0],['light',1],['light',2],['light',3]],'HOLD Q':[['vish_heavy2',0],['vish_heavy2',0],['vish_heavy2',1],['vish_heavy2',2]],'AIR Q':[['vish_jump2',2],['vish_airup',0],['vish_airup',0]],'AIR S + Q':[['vish_airup',0],['kick',3],['vish_jump2',4]],
+    'F':[['parry',0],['parry',1],['parry',2],['parry',3],['parry',4],['parry',5]],'SHIFT':[['roll',0],['roll',1],['roll',2],['roll',3],['roll',4],['roll',5]],'CLICK':[['shotgun',0],['shotgun',1],['shotgun',2],['shotgun',3]],'R':[['knife',3],['shotgun',2],['dash',3],['dash',4],['shotgun',2],['shotgun',3]]},
+  rift:{'Q':[['rift_heavy',0],['rift_jab',0],['rift_jab',0]],'HOLD Q':[['rift_heavy',0],['rift_heavy',0],['rift_heavy',1],['rift_heavy',2]],'AIR Q':[['rift_air',0],['rift_air',1],['rift_air',2],['rift_air',3]],'AIR S + Q':[['rift_slam',0],['rift_slam',1],['rift_slam',2]],
+    'F':[['rift_block',0],['rift_block',1]],'SHIFT':[['rift_roll',0],['rift_roll',1],['rift_roll',2],['rift_roll',3],['rift_roll',4]],'R':[['rift_lunge',0],['rift_lunge',1],['rift_bout',1],['rift_bin',1],['rift_slam',1],['rift_slam',2],['rift_throwf',0]]},
+  jacob:{'Q':[['jacob_jab',0],['jacob_jab',1]],'HOLD Q':[['jacob_heavy',0],['jacob_heavy',1],['jacob_heavy',2],['jacob_heavy',3],['jacob_heavy',4]],'AIR Q':[['jacob_jump',2],['jacob_heavy',3]],'AIR S + Q':[['jacob_jump',3],['jacob_heavy',4]],
+    'F':[['jacob_idle',0]],'SHIFT':[['jacob_run',0],['jacob_run',1],['jacob_run',2],['jacob_run',3],['jacob_run',4],['jacob_run',5]],'R':[['jacob_heavy',1],['jacob_heavy',3],['jacob_jump',2],['jacob_win',2],['jacob_heavy',3]]},
+  plat:{}};
+const MV={frames:null,t:0};
+function movePrev(c,key){const L=(MVPREV[c]||{})[key]||(CVPREV[c]||{})[key];if(L)return L;return [[c==='plat'?(key.startsWith('WOLF')?'plat_wolf':'plat_idle'):c==='vish'?'idle':c+'_idle',0]];}
+function moveList(){const c=(G.me||p1).char,rows=[...document.querySelectorAll('#abl-'+c+' tr:not(.hd)')].map(r=>[...r.cells].map(td=>td.textContent.trim()));
+  $('#moveBody').innerHTML='<h3>'+CHARS[c].name+' · MOVE LIST</h3><div class="mvwrap"><div class="mvlist">'+rows.map((r,i)=>'<button class="mvb" data-i="'+i+'"><b>'+r[0]+'</b>'+r[1]+'</button>').join('')+'</div><div class="mvdet" id="mvdet"><p class="mvhint">CLICK A MOVE TO SEE WHAT IT DOES</p></div></div>';
+  MV.frames=null;
+  $$('#moveBody .mvb').forEach(b=>b.onclick=e=>{e.stopPropagation();sfx.sel();const r=rows[+b.dataset.i];$$('#moveBody .mvb').forEach(x=>x.classList.toggle('on',x===b));
+    $('#mvdet').innerHTML='<div class="mvstage"><img id="mvprev" alt=""></div><div class="mvn">'+r[1].toUpperCase()+'</div><div class="mvs"><span>KEY<b>'+r[0]+'</b></span><span>DAMAGE<b>'+r[2]+'</b></span></div><p>'+r[3]+'</p>';
+    MV.frames=movePrev(c,r[0]);MV.t=0;moveStep();});}
+function moveStep(){const im=document.getElementById('mvprev');if(!im||!MV.frames||!$('#movePanel').classList.contains('on'))return;
+  const[a,i]=MV.frames[MV.t++%MV.frames.length],fr=SPR[a]&&SPR[a][Math.min(i,SPR[a].length-1)];if(!fr)return;
+  const k=fr.k||SPRK,H=150*(fr.h*k/1.92);im.src=fr.src;im.style.height=H+'px';im.style.transform=fr.flip?'scaleX(-1)':'';}
+setInterval(moveStep,140);
 // arcade ladder: every other fighter in a random order, getting harder, with an IMPOSSIBLE boss at the end
 function arcadeSet(){const A=G.arcade,n=A.list.length;G.p2char=A.list[A.i];G.diff=A.i===n-1?'IMPOSSIBLE':A.i===0?'NORMAL':'HARD';}
 function arcadeStart(){const A=G.arcade;A.list=CIDS.filter(c=>c!==G.p1char).sort(()=>rnd()-0.5);A.i=0;arcadeSet();act('fight');}
@@ -92,7 +113,7 @@ function act(a){
     case 'play':G.training=false;G.arcade=null;toSelect();break;
     case 'arcade':G.training=false;G.arcade={i:0,list:[],diff0:G.diff};toSelect();break;
     case 'anext':G.arcade.i++;arcadeSet();closeOvl();toFight();break;
-    case 'moves':{const P=$('#movePanel'),on=!P.classList.contains('on');if(on){const c=(G.me||p1).char;$('#moveBody').innerHTML='<h3>'+CHARS[c].name+'</h3>'+$('#abl-'+c).outerHTML.replace(/ id="[^"]*"/,'').replace(' style="display:none"','');}P.classList.toggle('on',on);$('#pause').classList.toggle('side',on);break;}
+    case 'moves':{const P=$('#movePanel'),on=!P.classList.contains('on');if(on)moveList();P.classList.toggle('on',on);$('#pause').classList.toggle('side',on);break;}
     case 'tdummy':{const L=['STAND','BLOCK','JUMP','PARRY'];G.dummy=L[(L.indexOf(G.dummy||'STAND')+1)%L.length];$('#tDum').textContent=G.dummy;break;}
     case 'tinput':G.inlog=!G.inlog;$('#tInp').textContent=G.inlog?'ON':'OFF';$('#inlog').classList.toggle('on',!!G.inlog);$('#inlog').innerHTML='';break;
     case 'online':goOnline();break;
