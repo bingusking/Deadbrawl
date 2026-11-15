@@ -145,7 +145,7 @@ canvas{cursor:crosshair}
 .cvmeta{display:flex;gap:26px;margin-bottom:1.2vh;font-size:15px;letter-spacing:2px;color:#8a7f85}.cvmeta b{color:#fff;margin-left:6px}.cvmeta i{font-style:normal;color:#ffcc33;letter-spacing:3px;margin-left:6px}
 .cvcol{display:flex;gap:8px;align-items:center;margin-bottom:1.6vh;font-size:14px;letter-spacing:2px;color:#8a7f85}
 .cvcol u{width:26px;height:26px;display:block;transform:skewX(-12deg);border:2px solid #2a2028;position:relative;text-decoration:none}.cvcol u.on{border-color:#fff}
-.cvcol u.lk{opacity:.45}.cvcol u.lk::after{content:'🔒';position:absolute;inset:0;font-size:12px;display:flex;align-items:center;justify-content:center;transform:skewX(12deg)}
+#viewer .cvcol{pointer-events:auto}.cvcol u{cursor:pointer}.cvcol em{font-style:normal;color:#ffcc33;margin-left:10px;font-size:13px}.cvcol u.lk{opacity:.45}.cvcol u.lk::after{content:'🔒';position:absolute;inset:0;font-size:12px;display:flex;align-items:center;justify-content:center;transform:skewX(12deg)}
 .cvcard .pv{position:absolute;right:8px;bottom:6px;height:58px;max-width:80px;object-fit:contain;opacity:.95;pointer-events:none}.cvcard .ds{padding-right:74px}
 .btabs{display:flex;gap:4px;margin-top:12px}
 .btab{font:inherit;font-size:19px;letter-spacing:2px;background:#1c1418;color:#aaa;border:0;border-bottom:3px solid #3a2a30;padding:5px 12px;cursor:pointer}
@@ -433,6 +433,7 @@ canvas{cursor:crosshair}
 <div class="ovl" id="result">
   <h2 id="rtitle">YOU WIN</h2>
   <div class="sub" id="rsub">2 – 0</div>
+  <div class="sub" id="runl" style="display:none;color:#ffcc33;letter-spacing:3px"></div>
   <button class="mbtn" data-a="anext" id="rarc" style="display:none">NEXT FIGHT</button>
   <button class="mbtn sel" data-a="rematch">REMATCH</button>
   <button class="mbtn" data-a="online" id="rnext" style="display:none">FIND NEW MATCH</button>
@@ -455,6 +456,7 @@ canvas{cursor:crosshair}
 <script src="js/game/stage.js"></script>
 <script src="js/game/fx.js"></script>
 <script src="js/game/sprites.js"></script>
+<script src="js/game/skins.js"></script>
 <script src="js/game/fighters.js"></script>
 <script src="js/game/ult.js"></script>
 <script src="js/game/animation.js"></script>

@@ -73,7 +73,7 @@ function drawSprite(f){
   if(rift){[anim,idx,mode]=riftFrame(f);own=true;}
   if(f.char==='jacob'&&!dummy)[anim,idx,mode]=jacobFrame(f);
   if(f.char==='plat'&&!dummy)[anim,idx,mode]=platFrame(f);
-  const fr=SPR[anim][idx],tex=TEX[dummy||rift?0:f.idx][anim][idx],m=f.spr;
+  const fr=SPR[anim][idx],tex=!dummy&&f.skin?skinTex(f.char,f.skin,anim,idx):TEX[dummy||rift?0:f.idx][anim][idx],m=f.spr;
   m.material.color.setHex(rift&&!own?0xc09cff:0xffffff);
   if(!tex.image){m.visible=false;return;}
   m.visible=!f.hide&&!(f.invuln>0&&f.state==='wakeup'&&G.time%4<2);

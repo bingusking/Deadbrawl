@@ -58,18 +58,22 @@ function cvShow(c){cvInit();vChar=c;const M=CVMETA[c],rows=CVDATA[c];
   $('#cvlore').textContent=M.lore||'';
   $('#cvdiff').innerHTML='DIFFICULTY<i>'+'★'.repeat(M.st.DIFFICULTY)+'☆'.repeat(5-M.st.DIFFICULTY)+'</i><b>'+DIFFWORD[M.st.DIFFICULTY]+'</b>';
   $('#cvrival').innerHTML='RIVAL<b>'+(M.rival||'—')+'</b>';
-  $('#cvcol').innerHTML='COLOUR <u class="on" title="Default" style="background:'+M.col+'"></u>'+['#3a6ad8','#3aa86a','#d8a02a','#e8e8ee'].map(c=>'<u class="lk" title="Locked" style="background:'+c+'"></u>').join('');
+  {const cur=skinOf(c),sw=(id,col,lk,tip)=>'<u data-s="'+id+'" class="'+(cur===id?'on ':'')+(lk?'lk':'')+'" title="'+tip+'" style="background:'+col+'"></u>';
+   $('#cvcol').innerHTML='COLOUR '+sw('',M.col,0,'Default')+Object.entries(SKINS).map(([id,S])=>sw(id,S.sw,!skinHas(c,id),S.name+(skinHas(c,id)?'':' (locked): '+S.how(c)))).join('')+sw('x','#3a6ad8',1,'Coming soon')+sw('x','#8a3cff',1,'Coming soon')+'<em id="cvcolh"></em>';
+   $$('#cvcol u').forEach(e=>e.onclick=()=>{const id=e.dataset.s;if(id==='x'){$('#cvcolh').textContent='COMING SOON';sfx.block();return;}
+     if(id&&!skinHas(c,id)){$('#cvcolh').textContent='LOCKED · '+SKINS[id].how(c).toUpperCase();sfx.block();return;}
+     if(id)SKINSEL[c]=id;else delete SKINSEL[c];skinSave();sfx.ok();cvShow(c);});}
   $('#cvstats').innerHTML=Object.entries(M.st).filter(([k])=>k!=='DIFFICULTY').map(([k,n])=>'<div>'+k+'<i>'+[1,2,3,4,5].map(x=>'<u'+(x<=n?' class="on"':'')+'></u>').join('')+'</i></div>').join('');
   $('#cvabl').innerHTML=rows.filter(r=>/^[1-4]$/.test(r[0])).map(r=>'<div class="cvcard"><img class="pv" data-k="'+r[0]+'" alt=""><div class="ky">'+r[0]+'</div><span class="dm">'+(r[2]==='—'?'':r[2])+'</span><div class="an">'+r[1].toUpperCase()+'</div><div class="ds">'+r[3]+'</div></div>').join('');
   const kit=rows.filter(r=>!/^[1-4]$/.test(r[0]));kit.splice(kit.findIndex(r=>r[0]==='SHIFT')+1,0,['HOLD BACK','Block','—','Block on the ground. Grabs go through it.']);
   $('#cvkit').innerHTML=kit.map(r=>'<div title="'+r[3].replace(/"/g,'&quot;')+'"><b>'+r[0]+'</b>'+r[1]+'</div>').join('');
   $$('#cvroster .rp').forEach(e=>e.classList.toggle('on',e.dataset.c===c));
-  const v=$('#viewer');v.classList.toggle('hasSplash',!!M.splash);if(M.splash){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';cvName(23*innerWidth/100);}
+  const v=$('#viewer'),hasS=!!M.splash&&!skinOf(c);v.classList.toggle('hasSplash',hasS);if(hasS){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';cvName(23*innerWidth/100);}
   v.style.setProperty('--cvbg',M.bg?'url('+M.bg+')':'url(assets/arena_bg.webp)');v.classList.remove('swap');void v.offsetWidth;v.classList.add('swap');cvT=0;cvStep(true);}
 function cvStep(force){if(G.mode!=='viewer'&&!force)return;cvT++;
   $$('#cvabl .pv').forEach(im=>{const L=(CVPREV[vChar]||{})[im.dataset.k];if(!L)return;const[a,i]=L[Math.floor(cvT/2)%L.length],fr=SPR[a]&&SPR[a][i];if(fr&&im.dataset.s!==a+i){im.dataset.s=a+i;im.src=fr.src;im.style.transform=fr.flip?'scaleX(-1)':'';}});
   const fr=SPR[vChar==='vish'?'vish_menu':vChar+'_idle'],f=fr[cvT%fr.length],k=f.k||SPRK,hv=68*(f.h*k/1.92),wv=hv*f.w/f.h,im=$('#cvimg');
-  im.src=f.src;im.style.height=hv+'vh';im.style.left=`calc(23vw - ${(f.ax/f.w)*wv}vh)`;im.style.transformOrigin=(f.ax/f.w*100)+'% 100%';im.style.transform=f.flip?'scaleX(-1)':'';}
+  {const an=vChar==='vish'?'vish_menu':vChar+'_idle',sk=skinOf(vChar);im.src=sk?skinSrc(vChar,sk,an,cvT%fr.length):f.src;}im.style.height=hv+'vh';im.style.left=`calc(23vw - ${(f.ax/f.w)*wv}vh)`;im.style.transformOrigin=(f.ax/f.w*100)+'% 100%';im.style.transform=f.flip?'scaleX(-1)':'';}
 setInterval(()=>cvStep(),110);
 function cvNav(d){sfx.sel();cvShow(CIDS[(CIDS.indexOf(vChar)+d+CIDS.length)%CIDS.length]);}
 $('#vback').addEventListener('click',()=>{sfx.sel();toMenu();});

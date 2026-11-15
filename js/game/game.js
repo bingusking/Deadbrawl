@@ -15,7 +15,8 @@ function showCombo(a,n,dmg){if(n===undefined)n=a.combo;if(n<2)return;const el=$(
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),1400);}
 function KO(a,d){if(G.training){d.hp=1;return;}if(G.phase!=='fight')return;G.phase='ko';G.pt=0;G.koBy=a;G.wins[a.idx]++;d.state='airhit';sfx.ko();flash(0.6);splash('K.O.<span class="u"></span>',2.2);G.hitstop=20;}
 function hudSetup(){const me=G.me||p1;hudKeys();$('#ab-m').style.display=me.char==='vish'?'':'none';CHARS[me.char].ab.forEach((n,i)=>$('#ab-'+(i+1)+' .n').textContent=n);$('#ab-1 .pips').style.display=['rift','plat'].includes(me.char)?'none':'';$('#ab-2').classList.remove('charging');}
-function startMatch(){setArena(G.online||G.stage<0?Math.floor(rnd()*ARENAS.length):G.stage);p1.char=G.p1char;p2.char=G.p2char;hudSetup();G.wins=[0,0];G.round=1;p1.tension=p2.tension=0;startRound();}
+function startMatch(){p1.skin=skinOf(G.p1char);p2.skin=''; // your chosen colour (the opponent keeps the default)
+  setArena(G.online||G.stage<0?Math.floor(rnd()*ARENAS.length):G.stage);p1.char=G.p1char;p2.char=G.p2char;hudSetup();G.wins=[0,0];G.round=1;p1.tension=p2.tension=0;startRound();}
 function startRound(){
   $('#cutin').classList.remove('on');
   for(const p of projectiles)scene.remove(p.mesh);projectiles.length=0;clearFx();
@@ -49,6 +50,10 @@ function endMatch(){G.phase='done';const mi=G.me?G.me.idx:0,win=G.wins[mi]>G.win
   {const A=!G.online&&G.arcade,more=A&&win&&A.i<A.list.length-1; // arcade ladder: next fight, or the ladder is cleared
    $('#rarc').style.display=more?'':'none';$('[data-a=rematch]').style.display=more||(A&&win)?'none':'';$('[data-a=rematch]').textContent=A?'RETRY':'REMATCH';
    if(A){$('#rsub').textContent=`ARCADE · FIGHT ${A.i+1} OF ${A.list.length} · ${G.diff}`;if(win&&!more){t.textContent='ARCADE CLEARED';$('#rsub').textContent='YOU BEAT THE IMPOSSIBLE BOSS';}}}
+  {let u='';if(!G.online&&!G.training&&win){ // unlocks
+     if(!G.arcade&&G.diff==='IMPOSSIBLE'&&skinUnlock(G.p2char,'black'))u='UNLOCKED: BLACK '+CHARS[G.p2char].name;
+     if(G.arcade&&G.arcade.i>=G.arcade.list.length-1&&skinUnlock(G.p1char,'gold'))u='UNLOCKED: GOLD '+CHARS[G.p1char].name;}
+   $('#runl').textContent=u;$('#runl').style.display=u?'':'none';}
   openOvl('result');if(G.online)setSel($$('#result .mbtn'),1);}
 let lastHud={};
 function updHud(force){

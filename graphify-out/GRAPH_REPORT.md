@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-15)
 
 ## Corpus Check
-- 27 files · ~18,860 words
+- 28 files · ~19,161 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 410 nodes · 639 edges · 20 communities
+- 425 nodes · 661 edges · 22 communities (21 shown, 1 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 35 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `50231907`
+- Built from commit: `1c174b7d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -26,6 +26,7 @@
 - stage.js
 - ult.js
 - services
+- skins.js
 - Deadbrawl
 - animation.js
 - audio.js
@@ -43,11 +44,11 @@
 3. `runMove()` - 11 edges
 4. `stepFighter()` - 10 edges
 5. `buildRig()` - 9 edges
-6. `build_colosseum()` - 8 edges
-7. `ultHit()` - 8 edges
-8. `vishUltTick()` - 8 edges
-9. `services` - 8 edges
-10. `bindRender()` - 7 edges
+6. `cvShow()` - 8 edges
+7. `build_colosseum()` - 8 edges
+8. `ultHit()` - 8 edges
+9. `vishUltTick()` - 8 edges
+10. `services` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
@@ -60,7 +61,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (20 total, 0 thin omitted)
+## Communities (22 total, 1 thin omitted)
 
 ### Community 0 - "core.js"
 Cohesion: 0.09
@@ -102,6 +103,10 @@ Nodes (30): arenaKnock(), blinkTo(), impactFrame(), KN, lashFinisher(), lashFire
 Cohesion: 0.22
 Nodes (8): services, buildCommand, healthCheckPath, name, plan, runtime, startCommand, type
 
+### Community 10 - "skins.js"
+Cohesion: 0.20
+Nodes (14): SKC, skinCanvas(), skinHas(), skinMask(), skinOf(), skinPix(), SKINS, skinSave() (+6 more)
+
 ### Community 11 - "Deadbrawl"
 Cohesion: 0.33
 Nodes (5): Code layout, Deadbrawl, Deploy, Online play, Run locally
@@ -135,18 +140,21 @@ Cohesion: 0.21
 Nodes (8): CUFF_BLOCK, PL, platFinEnd(), platFinTick(), platMove(), platShift(), platTick(), spawnCuff()
 
 ### Community 19 - "build_arenas.py"
-Cohesion: 0.08
+Cohesion: 0.10
 Nodes (10): build_alley(), build_colosseum(), arcade(), bays(), P(), build_ring(), build_saloon(), hexc() (+2 more)
 
 ### Community 20 - "Deadbrawl: notes for Claude"
 Cohesion: 0.50
 Nodes (3): After changing code, Deadbrawl: notes for Claude, Finding code
 
+## Knowledge Gaps
+- **1 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `impactFrame()` connect `ult.js` to `online.js`?**
-  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+  _High betweenness centrality (0.042) - this node is a cross-community bridge._
 - **Should `core.js` be split into smaller, more focused modules?**
   _Cohesion score 0.0896551724137931 - nodes in this community are weakly interconnected._
 - **Why does `stars()` connect `fighters.js` to `online.js`?**
@@ -154,7 +162,7 @@ _Questions this graph is uniquely positioned to answer:_
 - **Should `online.js` be split into smaller, more focused modules?**
   _Cohesion score 0.11693548387096774 - nodes in this community are weakly interconnected._
 - **Why does `splash()` connect `game.js` to `online.js`?**
-  _High betweenness centrality (0.008) - this node is a cross-community bridge._
+  _High betweenness centrality (0.007) - this node is a cross-community bridge._
 - **Should `fighters.js` be split into smaller, more focused modules?**
   _Cohesion score 0.10695187165775401 - nodes in this community are weakly interconnected._
 - **Should `server.js` be split into smaller, more focused modules?**

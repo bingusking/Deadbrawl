@@ -28,6 +28,7 @@ Then open http://localhost:3000. Open it in two tabs and pick **Online** in both
 | `js/game/menus.js` | Menus, character select, input handling |
 | `js/game/binds.js` | Rebindable keys (General + per-fighter tabs), mouse buttons, HUD key labels |
 | `js/game/plat.js` | Platinum: human kit, wolf form (Full Moon), finisher, single-frame pose tilts |
+| `js/game/skins.js` | Black / Gold recolours (per-fighter colour masks), unlock rules and saved selection |
 | `tools/arenas/build_arenas.py` | Builds the Ring / Back Alley / Saloon arenas in Blender (`pip install bpy`) and exports `assets/arena_*.glb` |
 | `js/game/audio.js`, `stage.js`, `fx.js`, `viewer.js`, `loop.js` | Sound, arena, effects, character viewer, frame loop |
 | `js/data/` | Sprite frames and HUD portraits (generated, large) |
