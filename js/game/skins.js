@@ -17,9 +17,9 @@ function skinMask(c,skin,h,s,v,u,w,anim){
   if(c==='vish')return (h>=330||h<=8)&&((s>=0.84&&v>0.28)||(s>=0.74&&v>0.42))?1:0; // the red trousers and trim; not the wooden arm, shirt, body or skin
   if(c==='rift')return near(355,20)&&s>0.5&&(skin!=='gold'||v>0.42)?1:0;                                   // gold leaves the dark blood alone
   if(c==='jacob')return (near(215,32)&&s>0.35)||(near(357,14)&&s>0.6&&v>0.25)?1:0;                          // shirt, plus the gauntlet arm and scarf
-  if(c==='plat'){if(s>=0.75&&v>0.3&&(h<=18||h>=345))return 1;                                               // jacket / wolf mane
+  if(c==='plat'){if(s>=0.62&&v>0.25&&(h<=20||h>=345))return 1;                                               // jacket / wolf mane
     // black: all of her hair goes black (hair shares its colours with her skin highlights, so it is picked out by where it sits in the frame)
-    const hair=h>=9&&h<=32&&s>0.25&&s<0.66&&v>0.7,zone=w<0.085||(w<0.2&&!(u>0.43&&u<0.545&&w<0.175)&&!(u>0.3&&u<0.57&&w>=0.175))||(u<0.22&&w<0.75)||(u<0.3&&w>0.45&&w<0.73)||(u>0.57&&w>0.1&&w<0.22)||(u>0.39&&u<0.5&&w>0.56&&w<0.68);
+    const hair=h>=9&&h<=34&&s>0.15&&s<0.66&&v>0.6,zone=w<0.085||(w<0.2&&!(u>0.5&&u<0.68))||(u<0.34&&w<0.36)||(u<0.22&&w<0.47)||(u<0.3&&w>0.5&&w<0.78)||(u>0.68&&w<0.2);
     return skin==='black'&&anim==='plat_idle'&&hair&&zone?2:0;}
   return 0;}
 function skinPix(skin,h,s,v){ // -> [h,s,v]
@@ -49,7 +49,7 @@ function skinCanvas(c,skin,img,anim){
   for(let i=0;i<p.length;i+=4){if(p[i+3]<8)continue;const r=p[i]/255,g=p[i+1]/255,b=p[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),dl=mx-mn;if(mx<0.12)continue;
     let h=0;if(dl>1e-5){h=mx===r?((g-b)/dl)%6:mx===g?(b-r)/dl+2:(r-g)/dl+4;h*=60;if(h<0)h+=360;}
     const s=mx?dl/mx:0,k=i/4,m=skinMask(c,skin,h,s,mx,(k%W)/W,Math.floor(k/W)/H,anim);if(!m)continue;
-    let [nh,ns,nv]=skinPix(skin,h,s,mx);if(m===2){ns=0.12;nv=Math.max(0.05,0.08+(mx-0.8)*0.75);} // black hair, keeping a little of its shine
+    let [nh,ns,nv]=skinPix(skin,h,s,mx);if(m===2){ns=0.12;nv=Math.max(0.05,0.06+(mx-0.6)*0.42);} // black hair, keeping a little of its shine
     const hh=((nh%360)+360)%360/60,ii=Math.floor(hh),f=hh-ii,P=nv*(1-ns),Q=nv*(1-f*ns),T=nv*(1-(1-f)*ns);
     const o=[[nv,T,P],[Q,nv,P],[P,nv,T],[P,Q,nv],[T,P,nv],[nv,P,Q]][ii%6];p[i]=o[0]*255;p[i+1]=o[1]*255;p[i+2]=o[2]*255;}
   x.putImageData(d,0,0);return cv;}

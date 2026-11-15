@@ -77,7 +77,7 @@ function platFinTick(f,o){
 // which frame + tilt she shows (a number in the third slot = lean forward by that many radians)
 function platFrame(f){const A=f.wolf>0?'plat_wolf':'plat_idle',t=G.time,st=f.st||0;let m=0;
   switch(f.state){
-    case 'idle':case 'intro':m=Math.sin(t*0.07+f.idx)*0.012;break;
+    case 'idle':case 'intro':if(f.wolf>0){m=Math.sin(t*0.07+f.idx)*0.012;break;}return [A,Math.floor(t/5+f.idx*3)%SPR.plat_idle.length]; // her idle animation (human form)
     case 'walkf':m=(f.wolf>0?0.2:0.1)+Math.sin(t*0.45)*0.04;break;
     case 'walkb':m=-0.07+Math.sin(t*0.3)*0.02;break;
     case 'jump':if(f.flip>0)return [A,0,'flip'];m=clamp(0.1-f.vy*0.8,-0.15,0.35);break;
