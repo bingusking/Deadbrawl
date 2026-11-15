@@ -16,9 +16,9 @@ Object.assign(MOVES,{
   pshot:{base:'stance',startup:9,active:2,recovery:18},
   pcuff:{base:'stance',startup:8,active:1,recovery:16},
   ppounce:{base:'stance',aim:1,impact:1,startup:5,active:13,recovery:14,vx:0.3,dmg:PL.POUNCE,reach:[0,1.3],y:[-0.3,2.0],shake:0.12,
-    react:(a,d)=>{const ax=a.adx||a.facing,ay=a.ady||0; // they fly where you aimed, you spring back off them
-      d.state='airhit';d.vx=ax*0.3;d.vy=Math.max(0.1,ay*0.3+0.1);d.y=Math.max(d.y,0.02);
-      a.move=null;a.state='jump';a.vx=-ax*0.2;a.vy=0.17;a.jumps=Math.max(a.jumps,1);a.flip=0;}},
+    react:(a,d)=>{const kx=a.pkx??-a.facing,ky=a.pky??0.3; // you kick off them toward your mouse; they are sent the other way
+      d.state='airhit';d.vx=-kx*0.3;d.vy=Math.max(0.1,-ky*0.25+0.1);d.y=Math.max(d.y,0.02);
+      a.move=null;a.state='jump';a.vx=kx*0.24;a.vy=Math.max(0.1,ky*0.24+0.08);a.jumps=Math.max(a.jumps,1);a.flip=0;}},
   pswing:{base:'stance',melee:1,impact:1,trail:1,startup:24,active:5,recovery:22,dmg:PL.SWING,reach:[0,2.0],y:[0,2.1],kd:1,launch:0.14,kb:0.3,stop:12,shake:0.25},
   wpounce:{base:'stance',aim:1,grab:1,startup:4,active:16,recovery:14,vx:0.36,dmg:1,reach:[0,1.4],y:[-0.3,2.0],shake:0.15,react:(a,d)=>platFinStart(a,d)},
   wbite:{base:'stance',grab:1,startup:5,active:8,recovery:10,vx:0.2,dmg:PL.BITE,reach:[0,1.2],y:[0,2.0],shake:0.1,
@@ -31,6 +31,11 @@ function tryPlat(f){const c=f.cd,go=(b,cd,n,mv)=>{if(f.buf[b]>0&&!(c[cd]>0)){f.b
   return go('a1','p1',150,'pshot')||go('a2','p2',300,'pcuff')||go('a3','p3',210,'ppounce')||go('a4','p4',240,'pswing');}
 // things that happen on a particular frame of her moves (called from runMove)
 function platMove(f,o,m){
+  if(f.mname==='ppounce'&&f.pId!==f.atkId){f.pId=f.atkId; // the leap homes on the enemy; remember where the mouse was for the kick-off
+    const aimed=f.uAimT!==undefined&&G.time-f.uAimT<40&&isFinite(f.uAX)&&isFinite(f.uAY);
+    const dx=o.x-f.x,dy=o.y+0.9-(f.y+1.0),L=Math.hypot(dx,dy)||1;
+    if(aimed){const mx=f.uAX-o.x,my=f.uAY-(o.y+1),M=Math.hypot(mx,my)||1;f.pkx=mx/M;f.pky=my/M;}else{f.pkx=-Math.sign(dx)||-f.facing;f.pky=0.3;}
+    f.adx=dx/L;f.ady=dy/L;if(Math.abs(dx)>0.05)f.facing=Math.sign(dx);}
   if(f.mname==='pshot'&&f.mt===m.startup){ // the slug: a thin, long shot along the aim
     const dx=f.adx??f.facing,dy=f.ady??0,ox=f.x+dx*0.5,oy=f.y+1.2;shotFx(ox+dx*0.6,oy+dy*0.6,dx,dy);if(!f.air())f.vx-=dx*0.05;
     for(let i=1;i<PL.RANGE;i++)spark(ox+dx*i,oy+dy*i,0xfff0b0,1,0.02,0.03);

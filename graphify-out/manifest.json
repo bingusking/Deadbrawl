@@ -36,9 +36,9 @@
     "semantic_hash": ""
   },
   "js/game/game.js": {
-    "mtime": 1794707463.1424916,
-    "seen": 1794708007.4525034,
-    "ast_hash": "3cb1e0dc7d102044f63b3b7da0d7d34b",
+    "mtime": 1794725937.8265412,
+    "seen": 1794726106.090317,
+    "ast_hash": "1323666f5a0e6d617571b0c31d131feb",
     "semantic_hash": ""
   },
   "js/game/loop.js": {
@@ -48,9 +48,9 @@
     "semantic_hash": ""
   },
   "js/game/menus.js": {
-    "mtime": 1794707463.1434731,
-    "seen": 1794708007.4525065,
-    "ast_hash": "22e3cd8c2f96842aca297c296e65493d",
+    "mtime": 1794725937.8258471,
+    "seen": 1794726106.0903196,
+    "ast_hash": "585a5d02e3c57d02f525e6b5d9e4757e",
     "semantic_hash": ""
   },
   "js/game/moves.js": {
@@ -78,9 +78,9 @@
     "semantic_hash": ""
   },
   "js/game/viewer.js": {
-    "mtime": 1794707463.1436598,
-    "seen": 1794708007.452517,
-    "ast_hash": "12d0001a9d9f0f7e5d8dcb8c60cfdef6",
+    "mtime": 1794725937.8262424,
+    "seen": 1794726106.0903277,
+    "ast_hash": "835b89ac5f8f4db0ca94dfbb23050967",
     "semantic_hash": ""
   },
   "package.json": {
@@ -108,9 +108,9 @@
     "semantic_hash": ""
   },
   "index.html": {
-    "mtime": 1794707811.5936694,
-    "seen": 1794708007.4525294,
-    "ast_hash": "1ac68a6b0b9a75328920db56a549af12",
+    "mtime": 1794725937.8274503,
+    "seen": 1794726106.0903375,
+    "ast_hash": "fceee4a61e79a562b284f2b4227d2cee",
     "semantic_hash": ""
   },
   "tools/sprites/add_anim.py": {
@@ -150,9 +150,9 @@
     "semantic_hash": ""
   },
   "js/game/binds.js": {
-    "mtime": 1794669475.430416,
-    "seen": 1794704894.6972227,
-    "ast_hash": "e86238aa32fd033a20fe15bf151169c3",
+    "mtime": 1794725937.8277786,
+    "seen": 1794726106.090312,
+    "ast_hash": "c909f2095826a2a21d9aefd5db601194",
     "semantic_hash": ""
   },
   "tools/arenas/build_arenas.py": {
@@ -162,9 +162,9 @@
     "semantic_hash": ""
   },
   "js/game/plat.js": {
-    "mtime": 1794724251.1440165,
-    "seen": 1794724547.0424726,
-    "ast_hash": "45a3fd92d7588a43845984e1fca08ab8",
+    "mtime": 1794725937.826873,
+    "seen": 1794726106.0903227,
+    "ast_hash": "c519c932d5cbdbc6c9e968264bf3f5ba",
     "semantic_hash": ""
   },
   "js/game/skins.js": {

@@ -7,7 +7,7 @@ function readPlayer(){p1.inp=readHeld();if(G.phase!=='fight'){p1.inp={l:0,r:0,u:
 function callout(f,txt,col){const el=$('#call'+(f.idx+1));el.innerHTML='<b style="color:'+col+'">'+txt+'</b>';el.classList.remove('on');void el.offsetWidth;el.classList.add('on');clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('on'),900);}
 function splash(html,dur=1.2){const s=$('#splash');s.innerHTML=html;s.classList.remove('show');void s.offsetWidth;s.style.setProperty('--d',dur+'s');s.classList.add('show');}
 function flash(a){const f=$('#flash');f.style.transition='none';f.style.opacity=a;void f.offsetWidth;f.style.transition='opacity .35s';f.style.opacity=0;}
-function cutin(f){const c=$('#cutin');if(f&&f.char){c.querySelector('.cface').style.backgroundImage='url('+(HUDIMG['face_'+f.char]||'assets/face.webp')+')';c.querySelector('.cname').innerHTML='<small>ULTIMATE</small>'+((ULTS[f.char]||{}).name||'SUPER');}c.classList.remove('on');void c.offsetWidth;c.classList.add('on');const bar=c.querySelector('.cbar');bar.style.animation='none';void bar.offsetWidth;bar.style.animation='';flash(0.35);}
+function cutin(f){const c=$('#cutin');if(f&&f.char){c.querySelector('.cface').style.backgroundImage='url('+(HUDIMG['cut_'+f.char]||HUDIMG['face_'+f.char]||'assets/face.webp')+')';c.querySelector('.cname').innerHTML='<small>ULTIMATE</small>'+((ULTS[f.char]||{}).name||'SUPER');}c.classList.remove('on');void c.offsetWidth;c.classList.add('on');const bar=c.querySelector('.cbar');bar.style.animation='none';void bar.offsetWidth;bar.style.animation='';flash(0.35);}
 // combo counter: grows, shakes and heats up with each hit, shows the running damage total
 function showCombo(a,n,dmg){if(n===undefined)n=a.combo;if(n<2)return;const el=$('#combo'+(a.idx+1));
   el.innerHTML='<b>'+n+'</b>HITS'+(dmg?'<em>'+dmg+' DMG</em>':'');el.style.setProperty('--s',Math.min(1.6,1+(n-2)*0.07));
@@ -66,7 +66,7 @@ function updHud(force){
     $$('#rw'+i+' .rd').forEach((d,k)=>d.classList.toggle('w',G.wins[f.idx]>k));
   }
   $('#timer').textContent=G.training?'∞':Math.ceil(G.timer/60);
-  for(const g of[p1,p2]){const want=G.training&&g.idx===1?'pf_dummy':'pf_'+g.char+'_'+(g.state==='victory'?'won':g.hp<MAXHP*0.3?'low':'default');if(g._face!==want){g._face=want;$('#pt'+(g.idx+1)).style.backgroundImage='url('+HUDIMG[want]+')';}}
+  for(const g of[p1,p2]){const want=G.training&&g.idx===1?'pf_dummy':(g.char==='plat'&&g.wolf>0)?'pf_plat_wolf':'pf_'+g.char+'_'+(g.state==='victory'?'won':g.hp<MAXHP*0.3?'low':'default');if(g._face!==want){g._face=want;$('#pt'+(g.idx+1)).style.backgroundImage='url('+HUDIMG[want]+')';}}
   vultPromptUpd();
   const f=G.me||p1,set=(id,cd,max)=>{const el=$('#ab-'+id);el.querySelector('i').style.height=(cd>0?cd/max*100:0)+'%';el.querySelector('b').textContent=cd>0?Math.ceil(cd/60):'';el.classList.toggle('ready',cd<=0);};
   set('f',f.cd.parry,CD.parry);set('2',f.cd.dash,CD.dash);set('3',0,1);$('#ab-3').classList.toggle('charging',f.char==='vish'&&f.state==='slide');set('4',f.cd.kick,CD.kick);set('s',f.cd.dodge,CD.dodge);

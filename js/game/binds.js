@@ -17,7 +17,7 @@ const BIND_LBL={
   vish:[['a1','Throwing Knife (aims at mouse)'],['a2','Dash'],['a3','Slide (hold)'],['a4','Spike Kick'],['shot','Shotgun (aims at mouse)']],
   rift:[['a1','Big Slash'],['a2','Blink'],['a3','Grab'],['a4','Lunge']],
   jacob:[['a1','Grapple Hook'],['a2','Slam'],['a3','Uppercut'],['a4','Kick Off']],
-  plat:[['a1','Slug (aims at mouse) · wolf: Pounce'],['a2','Cuffs (aims at mouse) · wolf: Bite'],['a3','Pounce (aims at mouse) · wolf: Slam'],['a4','Stock Swing']]};
+  plat:[['a1','Slug (aims at mouse) · wolf: Pounce'],['a2','Cuffs (aims at mouse) · wolf: Bite'],['a3','Pounce (kick off toward mouse) · wolf: Slam'],['a4','Stock Swing']]};
 const BIND_TABS=[['general','GENERAL'],['vish','VISH'],['rift','RIFT'],['jacob','THE LASH'],['plat','PLATINUM']];
 const BINDS=JSON.parse(JSON.stringify(BIND_DEF));
 try{const s=JSON.parse(localStorage.getItem('deadbrawl.binds')||'{}');for(const g in BINDS)Object.assign(BINDS[g],s[g]||{});}catch(e){}

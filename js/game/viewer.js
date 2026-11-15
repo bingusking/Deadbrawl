@@ -12,7 +12,7 @@ function buildViewer(){
 buildViewer();
 function viewerTick(){
   G.time++;vT++;
-  const anim=vChar==='vish'?'vish_menu':vChar+'_idle',n=SPR[anim].length,spd=n>10?5:9,i=Math.floor(vT/spd)%n;
+  const anim=vChar==='vish'?'idle':vChar+'_idle',n=SPR[anim].length,spd=n>10?5:9,i=Math.floor(vT/spd)%n;
   const idx=Math.min(n-1,i),fr=SPR[anim][idx],tex=TEX[vAlt][anim][idx];
   if(tex.image){if(vSpr.material.map!==tex){vSpr.material.map=tex;vSpr.material.needsUpdate=true;}}
   const k=(fr.k||SPRK)*1.25,fl=fr.flip?-1:1;vSpr.scale.set(fr.w*k*fl,fr.h*k,1);
@@ -68,12 +68,12 @@ function cvShow(c){cvInit();vChar=c;const M=CVMETA[c],rows=CVDATA[c];
   const kit=rows.filter(r=>!/^[1-4]$/.test(r[0]));kit.splice(kit.findIndex(r=>r[0]==='SHIFT')+1,0,['HOLD BACK','Block','—','Block on the ground. Grabs go through it.']);
   $('#cvkit').innerHTML=kit.map(r=>'<div title="'+r[3].replace(/"/g,'&quot;')+'"><b>'+r[0]+'</b>'+r[1]+'</div>').join('');
   $$('#cvroster .rp').forEach(e=>e.classList.toggle('on',e.dataset.c===c));
-  const v=$('#viewer'),hasS=!!M.splash&&!skinOf(c);v.classList.toggle('hasSplash',hasS);if(hasS){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';cvName(23*innerWidth/100);}
+  const v=$('#viewer'),hasS=false; /* always the in-game idle (the splash art loaded badly) */v.classList.toggle('hasSplash',hasS);if(hasS){const im=$('#cvsplash');im.onload=cvPlace;im.src=M.splash;im.style.setProperty('--rim',M.rim);if(im.complete)cvPlace();}else{const fl=$('.cvfloor');fl.style.left=fl.style.width=fl.style.bottom='';cvName(23*innerWidth/100);}
   v.style.setProperty('--cvbg',M.bg?'url('+M.bg+')':'url(assets/arena_bg.webp)');v.classList.remove('swap');void v.offsetWidth;v.classList.add('swap');cvT=0;cvStep(true);}
 function cvStep(force){if(G.mode!=='viewer'&&!force)return;cvT++;
   $$('#cvabl .pv').forEach(im=>{const L=(CVPREV[vChar]||{})[im.dataset.k];if(!L)return;const[a,i]=L[Math.floor(cvT/2)%L.length],fr=SPR[a]&&SPR[a][i];if(fr&&im.dataset.s!==a+i){im.dataset.s=a+i;im.src=fr.src;im.style.transform=fr.flip?'scaleX(-1)':'';}});
-  const fr=SPR[vChar==='vish'?'vish_menu':vChar+'_idle'],f=fr[cvT%fr.length],k=f.k||SPRK,hv=68*(f.h*k/1.92),wv=hv*f.w/f.h,im=$('#cvimg');
-  {const an=vChar==='vish'?'vish_menu':vChar+'_idle',sk=skinOf(vChar);im.src=sk?skinSrc(vChar,sk,an,cvT%fr.length):f.src;}im.style.height=hv+'vh';im.style.left=`calc(23vw - ${(f.ax/f.w)*wv}vh)`;im.style.transformOrigin=(f.ax/f.w*100)+'% 100%';im.style.transform=f.flip?'scaleX(-1)':'';}
+  const fr=SPR[vChar==='vish'?'idle':vChar+'_idle'],f=fr[cvT%fr.length],k=f.k||SPRK,hv=68*(f.h*k/1.92),wv=hv*f.w/f.h,im=$('#cvimg');
+  {const an=vChar==='vish'?'idle':vChar+'_idle',sk=skinOf(vChar);im.src=sk?skinSrc(vChar,sk,an,cvT%fr.length):f.src;}im.style.height=hv+'vh';im.style.left=`calc(23vw - ${(f.ax/f.w)*wv}vh)`;im.style.transformOrigin=(f.ax/f.w*100)+'% 100%';im.style.transform=f.flip?'scaleX(-1)':'';}
 setInterval(()=>cvStep(),110);
 function cvNav(d){sfx.sel();cvShow(CIDS[(CIDS.indexOf(vChar)+d+CIDS.length)%CIDS.length]);}
 $('#vback').addEventListener('click',()=>{sfx.sel();toMenu();});
