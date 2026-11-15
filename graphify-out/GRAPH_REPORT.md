@@ -1,17 +1,17 @@
 # Graph Report - deadbrawl  (2026-11-15)
 
 ## Corpus Check
-- 28 files · ~19,161 words
+- 28 files · ~19,307 words
 - Verdict: corpus is large enough that graph structure adds value.
 - Unclassified: 2 file(s) not represented in the graph (top: (none) 2)
 
 ## Summary
-- 425 nodes · 661 edges · 22 communities (21 shown, 1 thin omitted)
+- 427 nodes · 663 edges · 22 communities (21 shown, 1 thin omitted)
 - Extraction: 95% EXTRACTED · 5% INFERRED · 0% AMBIGUOUS · INFERRED: 35 edges (avg confidence: 0.86)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1c174b7d`
+- Built from commit: `70bba584`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -51,12 +51,12 @@
 10. `services` - 8 edges
 
 ## Surprising Connections (you probably didn't know these)
-- `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
-  tools/sprites/README.md → js/game/sprites.js
 - `3. Use it in code` --references--> `jacobFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
 - `3. Use it in code` --references--> `riftFrame()`  [INFERRED]
   tools/sprites/README.md → js/game/moves.js
+- `3. Use it in code` --references--> `spriteFrame()`  [INFERRED]
+  tools/sprites/README.md → js/game/sprites.js
 
 ## Import Cycles
 - None detected.
@@ -104,8 +104,8 @@ Cohesion: 0.22
 Nodes (8): services, buildCommand, healthCheckPath, name, plan, runtime, startCommand, type
 
 ### Community 10 - "skins.js"
-Cohesion: 0.20
-Nodes (14): SKC, skinCanvas(), skinHas(), skinMask(), skinOf(), skinPix(), SKINS, skinSave() (+6 more)
+Cohesion: 0.17
+Nodes (16): GOLD_GAIN, GOLD_RAMP, SKC, skinCanvas(), skinHas(), skinMask(), skinOf(), skinPix() (+8 more)
 
 ### Community 11 - "Deadbrawl"
 Cohesion: 0.33
